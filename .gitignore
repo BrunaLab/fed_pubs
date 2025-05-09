@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+.quarto
+apikeys.R
+fed_productivity_summary.log
