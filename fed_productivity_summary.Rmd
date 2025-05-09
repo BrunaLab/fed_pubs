@@ -1,0 +1,573 @@
+---
+title: "Scientific Articles Published by US Federal Agency Scientists"
+subtitle: "2019-2025 (Jany-May)"
+author: "Emilio M. Bruna"
+date: "2025-04-25"
+# output: html_document
+output: pdf_document
+
+# https://pubs.usgs.gov/search?q=&startYear=2019&__ncforminfo=Rf6y9tBB_4xn4sDOJ7tdSPmxI5Eu33dcCKy8YpAAAQRE-JJvXyAJAosPJMziEEMnxQE_iCi7dgGWVwrbQe9Gpb9a-7115VxO
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE)
+library(tidyverse)
+library(janitor)
+library(gghighlight)
+library(kableExtra)
+
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+```
+
+
+
+
+
+```{r data, echo = FALSE, warning=FALSE,message = FALSE}
+
+# Read data
+#  fed affils -------------------------------------------------------------
+# 
+fed_authors  <- readRDS("./data_clean/analysis_fed_pubs.rds") 
+
+agency_authors<-read_rds("./data_clean/agency_authors.rds") 
+agency_authors<-agency_authors %>%   ungroup()
+```
+
+```{r totals, echo = FALSE, warning=FALSE,message = FALSE}
+
+total_pubs<-agency_authors %>% 
+  summarize(n=n_distinct(refID))
+
+# Total_authors (fed+non)
+total_authors<-fed_authors %>% 
+  select(authorID) %>% 
+  distinct() %>% 
+  tally()
+
+
+total_fed_authors<-fed_authors %>% 
+  filter(fed_author==TRUE) %>% 
+  select(authorID) %>% 
+  distinct() %>% 
+  tally()
+
+total_NOTfed_authors<-fed_authors %>% 
+  filter(fed_author==FALSE) %>% 
+  select(authorID) %>% 
+  distinct() %>% 
+  tally() 
+  
+
+first_authors <- fed_authors %>%
+  filter(fed_author == TRUE) %>%
+  filter(author_order == 1) %>%
+  drop_na(agency)
+
+prop_papers_fed_1st<-nrow(first_authors)/ total_pubs*100
+
+last_authors <- fed_authors %>%
+  group_by(refID) %>%
+  slice_tail() %>%
+  filter(author_order != 1) %>%
+  filter(fed_author == TRUE) %>%
+  drop_na(agency)
+
+prop_papers_fed_last<-nrow(last_authors)/ total_pubs*100
+
+
+all_author_positions <- fed_authors %>%
+  filter(fed_author == TRUE) %>%
+  drop_na(agency) %>% 
+  select(refID,PY,PM,agency) %>% 
+  distinct() %>% 
+  arrange(refID)
+
+```
+
+
+
+## Summary: All Agencies
+
+### Total papers (2019-2025 to date)
+
+- Total N = `r comma(total_pubs$n)`
+
+### Total authors (2019-2025 to date)
+
+- Total N = `r comma(total_authors$n)`
+
+- Federal Agency Authors: N = `r comma(total_fed_authors$n)`
+
+- Non-Federal Agency Authors: N = `r comma(total_NOTfed_authors$n)`
+
+### Author Position (2019-2025)
+
+Articles with Federal Scientist in 1st Author Position:  `r comma(prop_papers_fed_1st)`%
+
+Articles with Federal Scientist in Last Author position:  `r comma(prop_papers_fed_last)`%
+
+
+### Total papers by year (2019-2025 to date)
+```{r pubs_year, echo = FALSE, warning=FALSE,message = FALSE}
+
+# papers by yr
+pubs_yr <- agency_authors %>%
+  group_by(PY) %>%
+  tally() %>%
+  arrange(PY)
+
+# pubs_yr_tbl<-
+# pubs_yr %>% 
+# kable(digits = 2,
+#   format = "latex",
+#   align = "ll",
+#   escape = FALSE,
+#   row.names = FALSE,
+#   booktabs = T,
+#   linesep = ""
+# ) %>% 
+#   kable_styling(
+#     bootstrap_options = c("hover"),
+#     # full_width = F,
+#     latex_options = c("scale_down"),
+#     # latex_options = c("hold_position"),
+#     font_size = 12,
+#     position = "center"
+#   )
+
+pubs_yr %>% 
+  ggplot(aes(x=PY, y=n)) +
+  geom_bar(stat="identity")+
+  expand_limits(y = 0)+
+  theme_classic()+
+  gghighlight(PY == 2025)
+```
+
+
+
+  
+<!-- summary<- -->
+<!-- fed_papers %>%  -->
+<!--   group_by(PY,PM) %>%  -->
+<!--   tally()  -->
+
+
+
+
+<!-- unique(as.factor(all_trim$agency)) -->
+
+
+### Articles Published Monthly (January-December 2019-2024)
+
+
+```{r pubs_monthly, echo = FALSE, warning=FALSE,message = FALSE}
+### Papers per month per year 2019-2024
+pubs_mo_yr <-
+  fed_authors %>%
+  group_by(PM, PY) %>%
+  tally() %>%
+  mutate(PM=as.numeric(PM),
+         PY=as.numeric(PY)) %>% 
+  arrange(PY, PM) %>% 
+  ungroup() %>% 
+  mutate(month=row_number())
+
+pubs_per_quarter<-pubs_mo_yr %>% 
+  mutate(PM=as.numeric(PM)) %>% 
+  mutate(Q=cut(PM, breaks = c(0, 3, 6, 9,12), 
+               labels = c("Q1", "Q2", "Q3", "Q4"))) %>% 
+  group_by(PY,Q) %>% 
+  summarize(n=sum(n))
+
+pubs_mo_yr %>% 
+  filter(PY<2025) %>% 
+  ggplot(aes(x=PM, y=n,group=PY,color=PY)) +
+  geom_line() + 
+  geom_point()+
+  expand_limits(y = 0)+
+  theme_classic()+
+  scale_x_continuous(n.breaks = 13, limits = c(1, 12))+
+  scale_y_continuous(n.breaks = 20, limits = c(0, max(pubs_mo_yr %>% select(n))+500))+
+  # gghighlight(min(n) < 50)
+  gghighlight(PY == 2024)
+
+
+
+pubs_per_quarter %>% 
+  filter(PY<2025) %>% 
+  ggplot(aes(x=Q, y=n,group=PY,color=PY)) +
+  geom_line() + 
+  geom_point()+
+  expand_limits(y = 0)+
+  theme_classic()+
+  # scale_x_continuous(n.breaks = 4, limits = c(1, ))+
+  scale_y_continuous(n.breaks = 20, limits = c(0, max(pubs_per_quarter %>% select(n))+500))+
+  # gghighlight(min(n) < 50)
+  gghighlight(PY == 2024)
+
+```
+
+
+### Articles published Monthly (January-May 2019-2025)
+
+```{r fig_monthly_compare, echo = FALSE, warning=FALSE,message = FALSE}
+pubs_mo_yr %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>% ######## THIS IS KEY
+  filter(PM<6) %>% 
+  ggplot(aes(x=PM, y=n,group=PY,color=PY)) +
+  geom_line() + 
+  geom_point()+
+  expand_limits(y = 0)+
+  theme_classic()+
+  scale_x_continuous(n.breaks = 5, limits = c(1, 5))+
+  scale_y_continuous(n.breaks = 15, limits = c(0, max(pubs_mo_yr %>% select(n))+500))+
+  # gghighlight(min(n) < 50)
+  gghighlight(PY == 2025)
+
+```
+
+### Total Publications January-May (2019-2025)
+
+```{r fig_total_to_date, echo = FALSE, warning=FALSE,message = FALSE}
+
+total_jan_may<-pubs_mo_yr %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>% ######## THIS IS KEY
+  filter(PM<6) %>% 
+  group_by(PY) %>% 
+  summarize(n=sum(n))
+
+
+n_2024<-total_jan_may %>% filter(PY==2024) %>% select(n)
+n_2025<-total_jan_may %>% filter(PY==2025) %>% select(n)
+perc_2425<-as.numeric((n_2025-n_2024)/n_2024*100)
+
+total_jan_may %>% 
+  ggplot(aes(x=PY, y=n)) +
+  geom_bar(stat="identity")+
+  expand_limits(y = 0)+
+  theme_classic()+
+  annotate(geom="text", x=2024, y=(max(total_jan_may$n)-.01*max(total_jan_may$n)), label=n_2024,
+                 color="navyblue")+
+  annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.01*max(total_jan_may$n)), label=n_2025,
+           color="navyblue")+
+  annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.1*max(total_jan_may$n)), label=paste("(",round(perc_2425,2),"%)",sep=""),
+           color="red")+
+  scale_y_continuous(n.breaks = 20, limits = c(0, max(total_jan_may %>% select(n))+500))+
+  scale_x_continuous(breaks=seq(2019,2025,by=1))+
+  gghighlight(PY == 2025)
+
+
+pubs_mo_yr %>%
+  filter(month<78) %>% 
+  ggplot(aes(x = month, y = n)) +
+  geom_line() +
+  geom_point() +
+  theme_classic() +
+  scale_x_continuous(n.breaks = 77, limits = c(1, 77)) +
+  scale_y_continuous(n.breaks = 20, limits = c(0, max(pubs_mo_yr %>% select(n)) + 500))+
+  # gghighlight(min(n) < 50)
+  gghighlight(PY == 2025)
+
+
+```
+
+
+## Agency-Specific Productivity
+
+
+```{r agency_n, echo = FALSE,warning=FALSE,message = FALSE}
+# 
+# total_pubs_per_agency <- agency_authors %>%
+#   select(-n_agencies, -refID) %>%
+#   filter(PY<2025) %>% 
+#   group_by(PY) %>%
+#   summarise(across(where(is.numeric), sum)) %>%
+#   pivot_longer(!PY, names_to = "agency", values_to = "count") %>%
+#   ungroup() %>% 
+#   group_by(agency) %>%
+#   summarize(n = sum(count)) %>%
+#   arrange(n)
+# pubs_per_agency
+
+total_pubs_per_agency <- fed_authors %>% 
+  filter(fed_author==TRUE) %>% 
+  group_by(refID,agency,PY) %>% 
+  tally() %>% 
+  ungroup() %>% 
+  group_by(agency) %>% 
+  tally() %>% 
+  arrange(n)
+
+
+
+total_pubs_per_agency %>%
+kable(digits = 2,
+  format = "latex",
+  align = "ll",
+  escape = FALSE,
+  row.names = FALSE,
+  booktabs = T,
+  linesep = ""
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = c("scale_down"),
+    # latex_options = c("hold_position"),
+    font_size = 12,
+    position = "center"
+  )
+
+
+agency_subset_over5K <- total_pubs_per_agency %>%
+  filter(n > 5000) %>%
+  select(agency,n) %>% 
+  arrange(desc(n))
+
+agency_subset_less5K <- total_pubs_per_agency %>%
+  filter(n < 5000) %>%
+  select(agency,n) %>% 
+  arrange(desc(n))
+
+```
+
+### Publications per Agency (2019-2024)
+
+pubs_per_agency_tbl
+
+### Agencies with > 5,000 Publications (2019-2024)
+
+#### Productivity January-May Relative to Previous Year January-May (2024-2025)
+
+```{r}
+
+
+agency_subset<-agency_subset_over5K$agency
+
+
+agency_n_decline_first <-
+  first_authors %>%
+  filter(agency %in% agency_subset) %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>%
+  filter(PM<6) %>%
+  group_by(agency, PY) %>%
+  tally() %>%
+  group_by(agency) %>%
+  mutate(decline_n = (n - lag(n))) %>%
+  mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>% 
+  mutate(author_position="first")
+
+agency_n_decline_last <-
+  last_authors %>%
+  filter(agency %in% agency_subset) %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>%
+  filter(PM<6) %>%
+  group_by(agency, PY) %>%
+  tally() %>%
+  group_by(agency) %>%
+  mutate(decline_n = (n - lag(n))) %>%
+  mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>% 
+  mutate(author_position="last")
+
+
+agency_n_decline_any <-
+  all_author_positions %>%
+  filter(agency %in% agency_subset) %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>%
+  filter(PM<6) %>%
+  group_by(agency, PY) %>%
+  tally() %>%
+  group_by(agency) %>%
+  mutate(decline_n = (n - lag(n))) %>%
+  mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>% 
+  mutate(author_position="any")
+
+agency_n_decline<-bind_rows(agency_n_decline_first,agency_n_decline_last,agency_n_decline_any) %>% mutate(PY=as.numeric(PY))
+
+compare_agency_2425 <-
+  agency_n_decline %>%
+  drop_na() %>%
+  filter(PY > 2023)
+
+agency_n_decline %>%
+  drop_na() %>%
+  filter(PY > 2023) %>%
+  ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) +
+  # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
+  geom_point() +
+  geom_line() +
+  theme_classic() +
+  facet_wrap(vars(author_position))+
+  scale_x_continuous(breaks = c(2019, 2025)) 
+# +
+  # scale_y_continuous(limits = c(0, 2000))+
+  # gghighlight((perc_previous < -.5))
+
+agency_n_decline %>%
+  drop_na() %>%
+  filter(author_position=="any") %>% 
+  filter(PY > 2023) %>%
+  ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_x_continuous(breaks = c(2024, 2025))+
+  theme_classic() +
+  facet_wrap(vars(agency))+
+  gghighlight(PY==2025)
+
+
+
+agency_n_decline %>%
+  drop_na() %>%
+  filter(author_position=="any") %>% 
+  filter(PY > 2023) %>%
+  ggplot(aes(x = agency, y = perc_previous, fill = PY, group=agency)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  # scale_x_continuous(breaks = c(2024, 2025))+
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(vars(PY))
+
+# scale_y_continuous(limits = c(0, 2000))+
+```
+
+
+
+
+
+### Agencies with < 5,000 Publications (2019-2024)
+
+#### Productivity January-May Relative to Previous Year January-May (2024-2025)
+
+
+
+```{r}
+
+agency_subset<-agency_subset_less5K$agency
+
+
+agency_n_decline_first <-
+  first_authors %>%
+  filter(agency %in% agency_subset) %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>%
+  filter(PM<6) %>%
+  group_by(agency, PY) %>%
+  tally() %>%
+  group_by(agency) %>%
+  mutate(decline_n = (n - lag(n))) %>%
+  mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>% 
+  mutate(author_position="first")
+
+agency_n_decline_last <-
+  last_authors %>%
+  filter(agency %in% agency_subset) %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>%
+  filter(PM<6) %>%
+  group_by(agency, PY) %>%
+  tally() %>%
+  group_by(agency) %>%
+  mutate(decline_n = (n - lag(n))) %>%
+  mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>% 
+  mutate(author_position="last")
+
+
+agency_n_decline_any <-
+  all_author_positions %>%
+  filter(agency %in% agency_subset) %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>%
+  filter(PM<6) %>%
+  group_by(agency, PY) %>%
+  tally() %>%
+  group_by(agency) %>%
+  mutate(decline_n = (n - lag(n))) %>%
+  mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>% 
+  mutate(author_position="any")
+
+agency_n_decline<-bind_rows(agency_n_decline_first,agency_n_decline_last,agency_n_decline_any) %>% mutate(PY=as.numeric(PY))
+
+compare_agency_2425 <-
+  agency_n_decline %>%
+  drop_na() %>%
+  filter(PY > 2023)
+
+agency_n_decline %>%
+  drop_na() %>%
+  filter(PY > 2023) %>%
+  ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) +
+  # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
+  geom_point() +
+  geom_line() +
+  theme_classic() +
+  facet_wrap(vars(author_position))+
+  scale_x_continuous(breaks = c(2019, 2025)) 
+# +
+  # scale_y_continuous(limits = c(0, 2000))+
+  # gghighlight((perc_previous < -.5))
+
+agency_n_decline %>%
+  drop_na() %>%
+  filter(author_position=="any") %>% 
+  filter(PY > 2023) %>%
+  ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_x_continuous(breaks = c(2024, 2025))+
+  theme_classic() +
+  facet_wrap(vars(agency))+
+  gghighlight(PY==2025)
+
+
+
+agency_n_decline %>%
+  drop_na() %>%
+  filter(author_position=="any") %>% 
+  filter(PY > 2023) %>%
+  ggplot(aes(x = agency, y = perc_previous, fill = PY, group=agency)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  # scale_x_continuous(breaks = c(2024, 2025))+
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(vars(PY))
+
+# scale_y_continuous(limits = c(0, 2000))+
+```
+
+
+
+<!-- AF-ID(60011347) USGS in Scopus -->
+<!-- 2019-2025  -->
+<!-- Article, Review, Editorial, Letter, Data Paper, Book Chapter -->
+<!-- N=12788 -->
+
+<!-- OG=(https://ror.org/035a68863) USGS in WOS -->
+<!-- N=13866 -->
+<!-- 2019-2025  -->
+<!-- Article, Review, Editorial, Letter, Data Paper, Book Chapter -->
+<!-- N=13886 -->
+
+
+<!-- National Park Service in SCOPUS -->
+<!-- AF-ID(60016933) -->
+<!-- N=1772 -->
+
+<!-- National Park Service in WOS -->
+<!-- https://ror.org/044zqqy65 -->
+<!-- N=1223 -->
+
+
+<!-- INTERIOR In WOS -->
+<!-- OG=(https://ror.org/03v0pmy70) -->
+<!-- 24488 -->
+
+
+<!-- https://ror.org/035a68863 -->
+<!-- USGS https://ror.org/035a68863 -->
+<!-- Interior: https://ror.org/03v0pmy70 -->
+
+
+<!-- Interior WOS ROR ID Search -->
+<!-- https://www.webofscience.com/wos/woscc/summary/29ab9bde-f922-4502-a9ef-71f0c7a4dd7a-0160dcc2fa/date-descending/1 -->
+<!-- 2019-2025 -->
+<!-- Article, Review Article, Editorial Material, Letter, Data Paper, Book Chapters -->
+<!-- N=14022 -->
