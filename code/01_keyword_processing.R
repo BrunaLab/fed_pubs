@@ -13,7 +13,9 @@ library(janitor)
 
 
 # 
-# all_scopus_api<-readRDS("./data_clean/all_scopus_api.rds")
+fed_pubs<-readRDS("./data_clean/analysis_fed_pubs.rds")
+source("./code/keyword_splitter.R")
+keywords_all <- keyword_splitter(fed_pubs)
 # pubs<-all_scopus_api[[1]]
 # authors<-all_scopus_api[[2]]
 
@@ -21,6 +23,7 @@ library(janitor)
 # Load reference records, clean keywords and text of DE and titles -----------------
 
 # complete_data <- read_csv("./data/data_clean/complete_data_clean.csv") %>%
+# fed_pubs<-readRDS("./data_clean/analysis_fed_pubs.rds")
 #   mutate(TI = gsub(" - ", "-", TI)) %>%
 #   mutate(refID = paste(refID, PY, sep = "-")) %>%
 #   relocate(refID, .before = 1)

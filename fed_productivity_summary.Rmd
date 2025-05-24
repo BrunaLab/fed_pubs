@@ -1,88 +1,144 @@
 ---
-title: "Scientific Articles Published by US Federal Agency Scientists"
-subtitle: "2019-2025 (Jany-May)"
+title: "Articles Published by US Federal Personnel"
+subtitle: "January 2019 - May 2025)"
 author: "Emilio M. Bruna"
-date: "2025-04-25"
+date: "`r format(Sys.time(), '%d %B %Y')`"
 # output: html_document
 output: pdf_document
+geometry: margin=1in
+fontsize: 11pt
+linkcolor: darkmidnightblue
+urlcolor: darkmidnightblue
+header-includes:
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \usepackage[default]{sourcesanspro}
+  - \usepackage{parskip}
+  - \usepackage{geometry}
+  - \usepackage{caption}
+  - \usepackage{xcolor}
+  - \definecolor{darkmidnightblue}{rgb}{0.0, 0.2, 0.4}
+  - \AtBeginDocument{\let\maketitle\relax}
+  - \usepackage[none]{hyphenat}
+  - \usepackage{setspace}
+  - \usepackage[document]{ragged2e}
+  - \usepackage{graphicx}
+  - \usepackage{sectsty}\allsectionsfont{\raggedright}
+  - \usepackage{sectsty}\sectionfont{\centering\color{darkmidnightblue}}
+  - \usepackage{sectsty}\subsectionfont{\centering\color{darkmidnightblue}}
+  - \usepackage{titlesec}
+  - \usepackage[export]{adjustbox}
+  - \titlespacing{\section}{0pt}{24pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \titlespacing{\subsection}{0pt}{12pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \titlespacing{\subsubsection}{0pt}{12pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \usepackage{floatrow}
+  - \DeclareFloatSeparators{mysep}{\hskip-94em}
+  # - \floatsetup[figure]{capposition=beside,capbesidesep=mysep,capbesideposition={right, center}}
+  - \usepackage{float}
+  - \usepackage{wrapfig} 
+  - \newcommand{\blandscape}{\begin{landscape}}
+  # - \usepackage[font=small,labelfont=bf,labelsep=space]{caption}
+  # - \captionsetup{figurename=Fig.,tablename=Table}
+  # - \usepackage[labelfont=bf]{caption}
+  # - \captionsetup{font=footnotesize, textfont=footnotesize}
+  - \fancyfoot{} # cues the use of fancy footer
+  - \fancyhead[L]{Emilio M Bruna} # month & year on header left 
+  - \fancyhead[R]{`r format(Sys.time(), '%d %B %Y')`} # name and page on header right
+#Required for specifying captions t
+  # - \usepackage{indentfirst}
+  # - \setlength\parindent{22pt} # uncomment if you want indented paragraphs
+
 
 # https://pubs.usgs.gov/search?q=&startYear=2019&__ncforminfo=Rf6y9tBB_4xn4sDOJ7tdSPmxI5Eu33dcCKy8YpAAAQRE-JJvXyAJAosPJMziEEMnxQE_iCi7dgGWVwrbQe9Gpb9a-7115VxO
+
 ---
+# Publications by US Federal Personnel (Jan 2019 - May 2025)
 
-
+\bigskip
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE)
+
 library(tidyverse)
 library(janitor)
 library(gghighlight)
 library(kableExtra)
+# library(knitr)
+
+knitr::opts_chunk$set(echo = FALSE, message=FALSE,warning=FALSE)
+
+options(scipen=999)
 
 comma <- function(x) format(x, digits = 2, big.mark = ",")
+
+knitr::opts_chunk$set(fig.pos = 'H')
+
 ```
 
 
 
 
 
-```{r data, echo = FALSE, warning=FALSE,message = FALSE}
+```{r data }
 
 # Read data
 #  fed affils -------------------------------------------------------------
 # 
-fed_authors  <- readRDS("./data_clean/analysis_fed_pubs.rds") 
+papers_df  <- read_rds("./data_clean/papers_df_clean.rds")
 
-agency_authors<-read_rds("./data_clean/agency_authors.rds") 
-agency_authors<-agency_authors %>%   ungroup()
+
+
+authors_df  <- read_rds("./data_clean/authors_df_clean.rds") 
+# 
+# authors_df %>% filter(agency=="interior") %>% select(AF,authorID) %>% group_by(AF) %>% tally() %>% arrange(desc(n))
+
+
+# affils_df  <- readRDS("./data_clean/affils_df_clean.rds") 
 ```
 
-```{r totals, echo = FALSE, warning=FALSE,message = FALSE}
+```{r totals }
 
-total_pubs<-agency_authors %>% 
+total_pubs<-papers_df %>% 
   summarize(n=n_distinct(refID))
 
 # Total_authors (fed+non)
-total_authors<-fed_authors %>% 
+total_authors<-authors_df %>% 
   select(authorID) %>% 
   distinct() %>% 
   tally()
 
 
-total_fed_authors<-fed_authors %>% 
-  filter(fed_author==TRUE) %>% 
+total_federals<-authors_df %>% 
+  filter(federal==TRUE) %>% 
   select(authorID) %>% 
   distinct() %>% 
   tally()
 
-total_NOTfed_authors<-fed_authors %>% 
-  filter(fed_author==FALSE) %>% 
+total_NOTfederals<-authors_df %>% 
+  filter(federal==FALSE) %>% 
   select(authorID) %>% 
   distinct() %>% 
   tally() 
   
 
-first_authors <- fed_authors %>%
-  filter(fed_author == TRUE) %>%
-  filter(author_order == 1) %>%
-  drop_na(agency)
+first_authors <- authors_df %>%
+  filter(federal == TRUE) %>%
+  filter(author_order == 1) 
+
 
 prop_papers_fed_1st<-nrow(first_authors)/ total_pubs*100
 
-last_authors <- fed_authors %>%
+last_authors <- authors_df %>%
   group_by(refID) %>%
   slice_tail() %>%
   filter(author_order != 1) %>%
-  filter(fed_author == TRUE) %>%
-  drop_na(agency)
+  filter(federal == TRUE) 
 
 prop_papers_fed_last<-nrow(last_authors)/ total_pubs*100
 
 
-all_author_positions <- fed_authors %>%
-  filter(fed_author == TRUE) %>%
-  drop_na(agency) %>% 
-  select(refID,PY,PM,agency) %>% 
-  distinct() %>% 
+all_author_positions <- authors_df %>%
+  filter(federal == TRUE) %>%
+  distinct(refID,agency,.keep_all=TRUE) %>% 
   arrange(refID)
 
 ```
@@ -91,30 +147,136 @@ all_author_positions <- fed_authors %>%
 
 ## Summary: All Agencies
 
-### Total papers (2019-2025 to date)
+### Total papers (2019-2024)
+
+\bigskip
 
 - Total N = `r comma(total_pubs$n)`
 
 ### Total authors (2019-2025 to date)
 
+\bigskip
+
 - Total N = `r comma(total_authors$n)`
 
-- Federal Agency Authors: N = `r comma(total_fed_authors$n)`
+- Federal Agency Authors: N = `r comma(total_federals$n)`
 
-- Non-Federal Agency Authors: N = `r comma(total_NOTfed_authors$n)`
+- Non-Federal Agency Authors: N = `r comma(total_NOTfederals$n)`
+
 
 ### Author Position (2019-2025)
+\bigskip
 
-Articles with Federal Scientist in 1st Author Position:  `r comma(prop_papers_fed_1st)`%
+- Articles with Federal Author in 1st Author Position:  `r comma(prop_papers_fed_1st)`%
 
-Articles with Federal Scientist in Last Author position:  `r comma(prop_papers_fed_last)`%
+ - Articles with Federal Author in Last Author position:  `r comma(prop_papers_fed_last)`%
+
+\bigskip
+\bigskip
+
+### Number of authors per publication
+
+\bigskip
+
+```{r authors_per_pub }
+# Authors per pub
+
+auth_per_pub<-authors_df %>% 
+  group_by(refID) %>% 
+summarize(fed=sum(federal==TRUE),
+          nonFed=sum(federal==FALSE),
+          total=sum(fed+nonFed))
+
+auth_per_pub_means<-auth_per_pub %>% 
+  ungroup() %>% 
+  drop_na() %>% 
+  summarize(
+    avg_Fed=mean(fed),
+    sd_Fed=sd(fed),
+    avg_NonFed=mean(nonFed),
+    sd_NonFed=sd(nonFed),
+    avg_Total=mean(total),
+    sd_Total=sd(total)
+    ) %>%  
+ pivot_longer(
+    cols = starts_with("avg_"),
+    names_to = "author_category",
+    names_prefix = "avg_",
+    values_to = "mean_per_pub",
+    values_drop_na = TRUE
+  ) %>% 
+  mutate(sd=if_else(author_category=="Total",sd_Total,NA)) %>% 
+  mutate(sd=if_else(author_category=="NonFed",sd_NonFed,sd)) %>% 
+  mutate(sd=if_else(author_category=="Fed",sd_Fed,sd)) %>% 
+  select(-sd_Fed,-sd_NonFed,-sd_Total) %>% 
+  rename(SD=sd,
+         `Mean per Paper`=mean_per_pub,
+         `Author Category`=author_category)
+  
+
+auth_per_pub_means %>%
+kable(digits = 2,
+  format = "latex",
+  align = "lcc",
+  caption = "Avg No of Federal and NonFederal Authors Per Publication",
+  escape = FALSE,
+  row.names = FALSE,
+  booktabs = T,
+  linesep = ""
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = c("scale_down","hold_position"),
+    font_size = 12,
+    position = "center"
+  )
+
+```
+
+
+
+<!-- ## Journals -->
+
+```{r journals }
+
+journals <- papers_df %>%
+  select(refID, DI,SO, PY, PM) %>%
+  mutate_all(tolower)
+
+
+all_jrnls <- journals %>%
+  group_by(SO) %>%
+  tally() %>%
+  arrange(desc(n)) 
+
+
+top_X_jrnls <- journals %>%
+  group_by(SO) %>%
+  tally() %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 20)
+
+
+
+top_N_jrnls_peryr <-
+  journals %>%
+  group_by(PY, SO) %>%
+  tally() %>%
+  arrange(desc(PY), desc(n)) %>%
+  group_by(PY) %>%
+  slice_head(n = 5)
+
+```
+
 
 
 ### Total papers by year (2019-2025 to date)
-```{r pubs_year, echo = FALSE, warning=FALSE,message = FALSE}
+
+```{r pubs_year, fig.height = 4,fig.width=4}
 
 # papers by yr
-pubs_yr <- agency_authors %>%
+pubs_yr <- papers_df %>%
   group_by(PY) %>%
   tally() %>%
   arrange(PY)
@@ -133,40 +295,34 @@ pubs_yr <- agency_authors %>%
 #     bootstrap_options = c("hover"),
 #     # full_width = F,
 #     latex_options = c("scale_down"),
-#     # latex_options = c("hold_position"),
+#     latex_options = c("hold_position"),
 #     font_size = 12,
 #     position = "center"
 #   )
 
 pubs_yr %>% 
+  filter(PY<2025) %>% 
   ggplot(aes(x=PY, y=n)) +
   geom_bar(stat="identity")+
   expand_limits(y = 0)+
   theme_classic()+
-  gghighlight(PY == 2025)
+  scale_y_continuous(expand = c(0, 0), breaks=seq(0,85000,by=5000))+
+  scale_x_continuous( seq(2019, 2024, by=1))
+# +
+#   gghighlight(PY == 2025)
 ```
 
 
 
-  
-<!-- summary<- -->
-<!-- fed_papers %>%  -->
-<!--   group_by(PY,PM) %>%  -->
-<!--   tally()  -->
-
-
-
-
-<!-- unique(as.factor(all_trim$agency)) -->
-
-
 ### Articles Published Monthly (January-December 2019-2024)
 
+\bigskip
 
-```{r pubs_monthly, echo = FALSE, warning=FALSE,message = FALSE}
+```{r pubs_monthly1, fig.align='center',fig.cap="Articles per month (2019-2024).",fig.height = 4,fig.width=4}
+
 ### Papers per month per year 2019-2024
 pubs_mo_yr <-
-  fed_authors %>%
+  papers_df %>%
   group_by(PM, PY) %>%
   tally() %>%
   mutate(PM=as.numeric(PM),
@@ -189,12 +345,17 @@ pubs_mo_yr %>%
   geom_point()+
   expand_limits(y = 0)+
   theme_classic()+
-  scale_x_continuous(n.breaks = 13, limits = c(1, 12))+
-  scale_y_continuous(n.breaks = 20, limits = c(0, max(pubs_mo_yr %>% select(n))+500))+
+  scale_x_continuous( breaks=seq(1,12,by=1))+
+  scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_yr %>% select(n))+5000),by=2500))+
+  # scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_mo_yr %>% select(n))+500))+
   # gghighlight(min(n) < 50)
   gghighlight(PY == 2024)
+```
 
+\bigskip
+\bigskip
 
+```{r pubs_monthly2, fig.align='center',fig.cap="Articles per Quarter (2019-2024).",fig.height = 4,fig.width=4}
 
 pubs_per_quarter %>% 
   filter(PY<2025) %>% 
@@ -203,17 +364,25 @@ pubs_per_quarter %>%
   geom_point()+
   expand_limits(y = 0)+
   theme_classic()+
-  # scale_x_continuous(n.breaks = 4, limits = c(1, ))+
-  scale_y_continuous(n.breaks = 20, limits = c(0, max(pubs_per_quarter %>% select(n))+500))+
+  # scale_y_continuous(expand = c(0, 0), n.breaks = 4, limits = c(1, ))+
+  scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_per_quarter %>% select(n))+5000),by=2500))+
+  # scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_per_quarter %>% select(n))+500))+
   # gghighlight(min(n) < 50)
   gghighlight(PY == 2024)
 
 ```
 
 
-### Articles published Monthly (January-May 2019-2025)
 
-```{r fig_monthly_compare, echo = FALSE, warning=FALSE,message = FALSE}
+
+
+### Monthly publications from January 1 to May 31 (2019-2025)
+
+\bigskip
+
+```{r fig_monthly_compare, fig.align='center',fig.cap="Monthly publications from January 1 to May 31 (2019-2025).",fig.height = 4,fig.width=4}
+
+
 pubs_mo_yr %>%
   # mutate(PM=if_else(PY==2025,5,PM)) %>% ######## THIS IS KEY
   filter(PM<6) %>% 
@@ -222,64 +391,97 @@ pubs_mo_yr %>%
   geom_point()+
   expand_limits(y = 0)+
   theme_classic()+
-  scale_x_continuous(n.breaks = 5, limits = c(1, 5))+
-  scale_y_continuous(n.breaks = 15, limits = c(0, max(pubs_mo_yr %>% select(n))+500))+
+  scale_x_continuous( breaks=seq(1,5,by=1))+
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, max(pubs_mo_yr %>% select(n))+5000,by=2500))+
   # gghighlight(min(n) < 50)
   gghighlight(PY == 2025)
 
 ```
 
-### Total Publications January-May (2019-2025)
+### Total Publications between January 1 - May 31 (2019-2025)
 
-```{r fig_total_to_date, echo = FALSE, warning=FALSE,message = FALSE}
+\bigskip
+
+```{r fig_total_to_date1, fig.align='center',fig.cap="Total Publications between January 1 - May 31 (2019-2025).",fig.height = 4,fig.width=6}
 
 total_jan_may<-pubs_mo_yr %>%
   # mutate(PM=if_else(PY==2025,5,PM)) %>% ######## THIS IS KEY
   filter(PM<6) %>% 
   group_by(PY) %>% 
-  summarize(n=sum(n))
+  summarize(n=sum(n)) %>% 
+  mutate(n_diff=n-lag(n)) %>% 
+  mutate(perc_previous_yr=n_diff/lag(n)*100)
 
 
-n_2024<-total_jan_may %>% filter(PY==2024) %>% select(n)
-n_2025<-total_jan_may %>% filter(PY==2025) %>% select(n)
-perc_2425<-as.numeric((n_2025-n_2024)/n_2024*100)
+# n_2024<-total_jan_may %>% filter(PY==2024) %>% select(n)
+# n_2025<-total_jan_may %>% filter(PY==2025) %>% select(n)
+# perc_2425<-as.numeric((n_2025-n_2024)/n_2024*100)
+# diff_2425<-n_2025-n_2024
+
 
 total_jan_may %>% 
   ggplot(aes(x=PY, y=n)) +
   geom_bar(stat="identity")+
   expand_limits(y = 0)+
   theme_classic()+
-  annotate(geom="text", x=2024, y=(max(total_jan_may$n)-.01*max(total_jan_may$n)), label=n_2024,
+  annotate(geom="text", x=2024, y=(max(total_jan_may$n)-.02*max(total_jan_may$n)), label=(total_jan_may %>% filter(PY==2024) %>% select(n)),
                  color="navyblue")+
-  annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.01*max(total_jan_may$n)), label=n_2025,
+  annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.02*max(total_jan_may$n)), label=(total_jan_may %>% filter(PY==2025) %>% select(n)),
            color="navyblue")+
-  annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.1*max(total_jan_may$n)), label=paste("(",round(perc_2425,2),"%)",sep=""),
-           color="red")+
-  scale_y_continuous(n.breaks = 20, limits = c(0, max(total_jan_may %>% select(n))+500))+
-  scale_x_continuous(breaks=seq(2019,2025,by=1))+
+  
+  annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.13*max(total_jan_may$n)), label=paste("(", round((total_jan_may %>% filter(PY==2025) %>% select(perc_previous_yr)),2),"%)",sep=""),
+           color="red", size=4)+
+  scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(total_jan_may %>% select(n))+500),by=2000))+
+  # scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(total_jan_may %>% select(n))+500))+
+  scale_x_continuous( breaks=seq(2019,2025,by=1))+
   gghighlight(PY == 2025)
+```
 
 
-pubs_mo_yr %>%
-  filter(month<78) %>% 
-  ggplot(aes(x = month, y = n)) +
-  geom_line() +
-  geom_point() +
-  theme_classic() +
-  scale_x_continuous(n.breaks = 77, limits = c(1, 77)) +
-  scale_y_continuous(n.breaks = 20, limits = c(0, max(pubs_mo_yr %>% select(n)) + 500))+
-  # gghighlight(min(n) < 50)
-  gghighlight(PY == 2025)
+
+```{r fig_total_to_date2, fig.align='center',fig.cap="Percent change in articles published between Jan-May relative to the same period the previous year.",fig.height = 4,fig.width=4}
+# 
+# total_jan_may %>% 
+#   drop_na() %>% 
+#   ggplot(aes(x=PY, y=perc_previous_yr)) +
+#   geom_bar(stat="identity")+
+#   expand_limits(y = 0)+
+#   theme_classic()+
+#   annotate(geom="text", x=2025, y=(max(total_jan_may$perc_previous_yr,na.rm = TRUE)-.2*max(total_jan_may$perc_previous_yr)), label=paste("(", round((total_jan_may %>% filter(PY==2025) %>% select(perc_previous_yr)),2),"%)",sep=""),
+#            color="red", size=4)+
+#   scale_y_continuous(expand = c(0, 0), n.breaks = 30, limits = c((min(total_jan_may %>% select(perc_previous_yr))-10), (max(total_jan_may %>% select(perc_previous_yr))+5)))+
+#   scale_y_continuous(expand = c(0, 0), breaks=seq(2019,2025,by=1))+
+#   gghighlight(PY == 2025)
+```
+
+
+```{r fig_total_to_date3, fig.align='center',fig.cap="Articles Published Jan-May (2019-2025).",fig.height = 4,fig.width=4}
+
+# pubs_mo_yr %>%
+#   filter(month<78) %>% 
+#   ggplot(aes(x = month, y = n)) +
+#   geom_line() +
+#   geom_point() +
+#   theme_classic() +
+#   scale_y_continuous(expand = c(0, 0), n.breaks = 77, limits = c(1, 77)) +
+#   scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_mo_yr %>% select(n)) + 500))+
+#   # gghighlight(min(n) < 50)
+#   gghighlight(PY == 2025)
 
 
 ```
 
+\newpage
 
-## Agency-Specific Productivity
+## 20 Agencies producing the most Publications from 1 January 2019 to 31 May 2025.
+
+\bigskip
 
 
-```{r agency_n, echo = FALSE,warning=FALSE,message = FALSE}
-# 
+
+
+```{r agency_n,, fig.align='center',fig.cap="20 Agencies producing the most Publications from 1 January 2019 to 31 May 2025",fig.height = 8,fig.width=6}
+
 # total_pubs_per_agency <- agency_authors %>%
 #   select(-n_agencies, -refID) %>%
 #   filter(PY<2025) %>% 
@@ -292,20 +494,71 @@ pubs_mo_yr %>%
 #   arrange(n)
 # pubs_per_agency
 
-total_pubs_per_agency <- fed_authors %>% 
-  filter(fed_author==TRUE) %>% 
-  group_by(refID,agency,PY) %>% 
-  tally() %>% 
-  ungroup() %>% 
+total_pubs_per_agency <- authors_df %>% 
+  filter(federal==TRUE) %>% 
+  mutate(agency=if_else(agency=="us department of the interior", "interior",agency)) %>% 
+  mutate(agency=if_else(agency=="federal reserve system", "frs",agency)) %>% 
+  mutate(agency=if_else(agency=="us department of defense", "dod",agency)) %>% 
+  select(refID,agency) %>% 
+  distinct() %>% 
+  drop_na() %>% 
   group_by(agency) %>% 
-  tally() %>% 
-  arrange(n)
+  summarize(n=n_distinct(refID)) %>% 
+  arrange(desc(n))
+
+agencies_past_20<-total_pubs_per_agency %>% 
+  select(agency) %>% slice(21:nrow(total_pubs_per_agency)) %>% 
+  mutate(agency=toupper(agency)) %>%  
+  mutate(agency=if_else((agency=="STATE"|
+                          agency=="EDUCATION"|
+                          agency=="CONGRESS"|
+                          agency=="TREASURY"|
+                          agency=="LABOR"|
+                          agency=="OTHER"),
+                        str_to_title(agency),
+                        agency)
+  )
+
+# agencies_past_20[1,]<-paste("Other agencies: ",agencies_past_20[1,],sep="")
+# agencies_past_20[5,]<-paste(agencies_past_20[5,],"\n",sep="")
+# agencies_past_20[10,]<-paste(agencies_past_20[10,],"\n",sep="")
+# agencies_past_20[15,]<-paste(agencies_past_20[15,],"\n",sep="")
+# agencies_past_20[20,]<-paste(agencies_past_20[20,],"\n",sep="")
+
+  
+agencies_over_20_1<-paste(agencies_past_20$agency[1:10],collapse=",") 
+agencies_over_20_2<-paste(agencies_past_20$agency[11:25],collapse=",") 
+
+
+  # affils_df %>% 
+  # filter(federal==TRUE) %>% 
+  # group_by(agency,PY) %>% 
+  # tally() %>% 
+  # ungroup() %>% 
+  # group_by(agency) %>% 
+  # tally() %>% 
+  # arrange(n)
 
 
 
 total_pubs_per_agency %>%
+  slice_head(n=20) %>% 
+  mutate(agency=toupper(agency)) %>% 
+  mutate(agency=if_else((agency=="INTERIOR"|
+                          agency=="COMMERCE"|
+                          agency=="SMITHSONIAN"|
+                          agency=="COMMERCE"|
+                          agency=="STATE"|
+                          agency=="FEDERAL RESERVE SYSTEM"|
+                          agency=="OTHER"),
+                        str_to_title(agency),
+                        agency)
+  ) %>% 
+  rename(Agency=agency,
+         N=n) %>% 
 kable(digits = 2,
   format = "latex",
+  caption = "N = 20 agencies producing the most publications",
   align = "ll",
   escape = FALSE,
   row.names = FALSE,
@@ -315,37 +568,41 @@ kable(digits = 2,
   kable_styling(
     bootstrap_options = c("hover"),
     # full_width = F,
-    latex_options = c("scale_down"),
-    # latex_options = c("hold_position"),
+    latex_options = c("scale_down","hold_position"),
     font_size = 12,
     position = "center"
-  )
+  ) 
 
-
-agency_subset_over5K <- total_pubs_per_agency %>%
-  filter(n > 5000) %>%
-  select(agency,n) %>% 
-  arrange(desc(n))
-
-agency_subset_less5K <- total_pubs_per_agency %>%
-  filter(n < 5000) %>%
-  select(agency,n) %>% 
-  arrange(desc(n))
+# %>% 
+#   add_footnote(agencies_over_20,notation = "symbol") %>% 
+#   column_spec(2, width = "5em")
 
 ```
 
-### Publications per Agency (2019-2024)
+\bigskip  
+\bigskip  
 
-pubs_per_agency_tbl
+**_Other agencies:_** `r agencies_over_20_1`  
 
-### Agencies with > 5,000 Publications (2019-2024)
-
-#### Productivity January-May Relative to Previous Year January-May (2024-2025)
-
-```{r}
+`r agencies_over_20_2`
 
 
-agency_subset<-agency_subset_over5K$agency
+### Total Publications January - May (Agencies with  more than 10,000 articles only)
+
+
+```{r agency_n_decline_first1, fig.align='center',fig.cap="Percent change in publicaitons (Jan-May) relative to same period prvious year. Only agencies producing over 10000 articles between 2019-2024.",fig.height = 4,fig.width=6}
+
+agency_subset_over10K <- total_pubs_per_agency %>%
+  filter(n > 10000) %>%
+  select(agency,n) %>% 
+  arrange(desc(n))
+
+agency_subset_less10K <- total_pubs_per_agency %>%
+  filter(n < 10000) %>%
+  select(agency,n) %>% 
+  arrange(desc(n))
+
+agency_subset<-agency_subset_over10K$agency
 
 
 agency_n_decline_first <-
@@ -387,24 +644,75 @@ agency_n_decline_any <-
 
 agency_n_decline<-bind_rows(agency_n_decline_first,agency_n_decline_last,agency_n_decline_any) %>% mutate(PY=as.numeric(PY))
 
+
+agency_n_decline_sum<- agency_n_decline %>% 
+  filter(author_position=="any") %>% 
+  select(agency,PY,n) %>% 
+  group_by(PY) %>% 
+  summarize(n=sum(n)) %>% 
+  mutate(n_diff=n-lag(n)) %>% 
+  mutate(perc_previous_yr=n_diff/lag(n)*100)
+
+agency_n_decline_sum %>% 
+  ggplot(aes(x=PY, y=n)) +
+  geom_bar(stat="identity")+
+  expand_limits(y = 0)+
+  theme_classic()+
+  geom_hline(yintercept = 0)+
+  annotate(geom="text", x=2024, y=(max(agency_n_decline_sum$n)-.02*max(agency_n_decline_sum$n)), label=(agency_n_decline_sum %>% filter(PY==2024) %>% select(n)),
+                 color="navyblue")+
+  annotate(geom="text", x=2025, y=(max(agency_n_decline_sum$n)-.02*max(agency_n_decline_sum$n)), label=(agency_n_decline_sum %>% filter(PY==2025) %>% select(n)),
+           color="navyblue")+
+  annotate(geom="text", x=2025, y=(max(agency_n_decline_sum$n)-.17*max(agency_n_decline_sum$n)), label=paste("(", round((agency_n_decline_sum %>% filter(PY>2024) %>% select(perc_previous_yr)),2),"%)",sep=""),
+           color="red", size=4)+
+  scale_y_continuous(expand = c(0, 0), breaks=seq(0, max(agency_n_decline_sum %>% select(n))+5000,by=2500))+
+  scale_x_continuous( breaks=seq(2019,2025,by=1))+
+  gghighlight(PY == 2025)
+
+
+
+# 
+# agency_n_decline %>%
+#   filter(author_position=="any") %>% 
+#   filter(PY>2022) %>% 
+#   drop_na() %>%
+#   ggplot(aes(x = PY, y = n, group = agency, color = agency)) +
+#   # ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) +
+#   # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
+#   geom_point() +
+#   geom_line() +
+#   theme_classic() +
+#   facet_wrap(vars(agency), scales = "free")
+# +
+  # scale_y_continuous(expand = c(0, 0), breaks = c(2019, 2025)) 
+
+
 compare_agency_2425 <-
   agency_n_decline %>%
   drop_na() %>%
   filter(PY > 2023)
-
-agency_n_decline %>%
-  drop_na() %>%
-  filter(PY > 2023) %>%
-  ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) +
-  # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
-  geom_point() +
-  geom_line() +
-  theme_classic() +
-  facet_wrap(vars(author_position))+
-  scale_x_continuous(breaks = c(2019, 2025)) 
+# 
+# agency_n_decline %>%
+#   drop_na() %>%
+#   filter(PY > 2023) %>%
+#   ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) +
+#   # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
+#   geom_point() +
+#   geom_line() +
+#   theme_classic() +
+#   facet_wrap(vars(author_position))+
+#   scale_y_continuous(expand = c(0, 0), breaks = c(2019, 2025)) 
 # +
-  # scale_y_continuous(limits = c(0, 2000))+
+  # scale_y_continuous(expand = c(0, 0), limits = c(0, 2000))+
   # gghighlight((perc_previous < -.5))
+```
+
+### Publications per Agency (Agencies with > 10,000 Publications)
+
+<!-- #### Productivity January-May Relative to same period previous year -->
+
+
+```{r agency_n_decline_first2, fig.align='center',fig.cap="Percent change in articles published from previous Jan-May (2019-2024).",fig.height = 6,fig.width=4}
 
 agency_n_decline %>%
   drop_na() %>%
@@ -412,11 +720,15 @@ agency_n_decline %>%
   filter(PY > 2023) %>%
   ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
   geom_bar(stat = "identity", position = "dodge") +
-  scale_x_continuous(breaks = c(2024, 2025))+
+  scale_x_continuous(expand = c(0, 0), breaks = c(2024, 2025))+
   theme_classic() +
-  facet_wrap(vars(agency))+
+  theme(legend.position="none")+
+  geom_hline(yintercept = 0) +
+  facet_wrap(vars(agency),ncol = 3)+
   gghighlight(PY==2025)
+```
 
+```{r agency_n_decline_first3, fig.align='center',fig.cap="Papers Jan-May from agencies producing over 10000 articles (2019-2024).",fig.height = 4,fig.width=6}
 
 
 agency_n_decline %>%
@@ -425,27 +737,29 @@ agency_n_decline %>%
   filter(PY > 2023) %>%
   ggplot(aes(x = agency, y = perc_previous, fill = PY, group=agency)) +
   geom_bar(stat = "identity", position = "dodge") +
-  # scale_x_continuous(breaks = c(2024, 2025))+
+  # scale_y_continuous(expand = c(0, 0), breaks = c(2024, 2025))+
   theme_classic() +
+  theme(legend.position="none")+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  geom_hline(yintercept = 0) +
   facet_wrap(vars(PY))
 
-# scale_y_continuous(limits = c(0, 2000))+
+# scale_y_continuous(expand = c(0, 0), limits = c(0, 2000))+
 ```
 
 
 
 
 
-### Agencies with < 5,000 Publications (2019-2024)
+<!-- ### Agencies with < 5,000 Publications (2019-2024) -->
 
-#### Productivity January-May Relative to Previous Year January-May (2024-2025)
+<!-- #### Productivity January-May Relative to Previous Year January-May (2024-2025) -->
 
 
 
 ```{r}
 
-agency_subset<-agency_subset_less5K$agency
+agency_subset<-agency_subset_less10K$agency
 
 
 agency_n_decline_first <-
@@ -485,52 +799,67 @@ agency_n_decline_any <-
   mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>% 
   mutate(author_position="any")
 
+# scale_y_continuous(expand = c(0, 0), limits = c(0, 2000))+
+```
+
+
+
+```{r agency_n_decline1, fig.align='center',fig.cap="----- (2019-2024).",fig.height = 4,fig.width = 4}
+
 agency_n_decline<-bind_rows(agency_n_decline_first,agency_n_decline_last,agency_n_decline_any) %>% mutate(PY=as.numeric(PY))
 
 compare_agency_2425 <-
   agency_n_decline %>%
   drop_na() %>%
   filter(PY > 2023)
-
-agency_n_decline %>%
-  drop_na() %>%
-  filter(PY > 2023) %>%
-  ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) +
-  # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
-  geom_point() +
-  geom_line() +
-  theme_classic() +
-  facet_wrap(vars(author_position))+
-  scale_x_continuous(breaks = c(2019, 2025)) 
+# 
+# agency_n_decline %>%
+#   drop_na() %>%
+#   filter(PY > 2023) %>%
+#   ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) +
+#   # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
+#   geom_point() +
+#   geom_line() +
+#   theme_classic() +
+#   facet_wrap(vars(author_position))+
+#   scale_y_continuous(expand = c(0, 0), breaks = c(2019, 2025)) 
 # +
-  # scale_y_continuous(limits = c(0, 2000))+
+  # scale_y_continuous(expand = c(0, 0), limits = c(0, 2000))+
   # gghighlight((perc_previous < -.5))
+```
 
-agency_n_decline %>%
-  drop_na() %>%
-  filter(author_position=="any") %>% 
-  filter(PY > 2023) %>%
-  ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_x_continuous(breaks = c(2024, 2025))+
-  theme_classic() +
-  facet_wrap(vars(agency))+
-  gghighlight(PY==2025)
+```{r agency_n_decline2, fig.align='center',fig.cap="percent change from previous year in papers produced January-May.",fig.height = 5,fig.width=7}
+# 
+# agency_n_decline %>%
+#   drop_na() %>%
+#   filter(author_position=="any") %>% 
+#   filter(PY > 2023) %>%
+#   ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
+#   geom_bar(stat = "identity", position = "dodge") +
+#   scale_y_continuous(expand = c(0, 0), breaks = c(2024, 2025))+
+#   theme_classic() +
+#   facet_wrap(vars(agency))+
+#   gghighlight(PY==2025)
+
+```
 
 
 
-agency_n_decline %>%
-  drop_na() %>%
-  filter(author_position=="any") %>% 
-  filter(PY > 2023) %>%
-  ggplot(aes(x = agency, y = perc_previous, fill = PY, group=agency)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  # scale_x_continuous(breaks = c(2024, 2025))+
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  facet_wrap(vars(PY))
+```{r agency_n_decline3, fig.align='center',fig.cap="----- (2019-2024).",fig.height = 4,fig.width=4}
 
-# scale_y_continuous(limits = c(0, 2000))+
+
+# 
+# agency_n_decline %>%
+#   drop_na() %>%
+#   filter(author_position=="any") %>% 
+#   filter(PY > 2023) %>%
+#   ggplot(aes(x = agency, y = perc_previous, fill = PY, group=agency)) +
+#   geom_bar(stat = "identity", position = "dodge") +
+#   # scale_y_continuous(expand = c(0, 0), breaks = c(2024, 2025))+
+#   theme_classic() +
+#   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+#   facet_wrap(vars(PY))
+
 ```
 
 
