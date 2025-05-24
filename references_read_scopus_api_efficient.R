@@ -232,10 +232,12 @@ write_rds(affils_df,"./data_clean/affils_df.rds")
 papers_df<-names_standardizer(papers_df) %>% 
   ungroup() %>%
   select(-"@_fa") %>% 
-          group_by(scopus_article_id,SO,TI) %>% tally() %>% arrange(desc(n)) %>% 
-          distinct(scopus_article_id,SO,TI,.keep_all = TRUE) %>% 
-          mutate_all(tolower) %>% 
-          remove_empty(which = c("rows", "cols"))
+  # group_by(scopus_article_id,SO,TI) %>% 
+  # tally() %>% 
+  # arrange(desc(n)) %>% 
+  distinct(scopus_article_id,SO,TI,.keep_all = TRUE) %>% 
+  mutate_all(tolower) %>% 
+  remove_empty(which = c("rows", "cols"))
         
 write_rds(papers_df,"./data_clean/papers_df.rds")
 
@@ -250,195 +252,40 @@ authors_df<-names_standardizer(authors_df) %>%
 
 write_rds(authors_df,"./data_clean/authors_df.rds")
 
-
-
-# load and add usgs  ------------------------------------------------------
-
-
-
-names(papers_df)
-
-# KEEP ONLY ARTICLES on USGS LIST
-
-usgs<-read_csv("./usgs_publications.csv") %>% 
-  mutate_all(tolower) %>% 
-  select("refID"="Publication ID",
-         "AF"="Author(s)",
-         "Country",
-         "agency_3"="Contributing office(s)",
-         "State",
-         "City",
-         "BP"="First page",
-         "DI"="DOI",
-         "EP"="Last page", 
-         "IS"="Issue",
-         "PT"="Publication type",
-         "PY"="Year Published",
-         "SN"="ISSN (print)",
-         "EI"="ISSN (online)",
-         "SO"="CHORUS Journal Name",
-         "TI"="Title",
-         "VL"="Volume",
-         "URL"="CHORUS URL") %>% 
-  mutate("agency"="interior",
-         source="usgs",
-         "agency_2"="usgs") %>% 
-  filter(PT=="article") %>% 
-  mutate(PT="j")
-
-
-# find the doi on the usgs list that aren't on the main papers_df list
-
-usgs_DI<-as.data.frame(usgs$DI)|>
-  rename(DI=`usgs$DI`)
-
-papers_DI<-as.data.frame(papers_df$DI)|>
-  rename(DI=`papers_df$DI`)
-
-
-
-IN_papersdf<-semi_join(usgs_DI,papers_DI)
-NOT_in_papersdf<-anti_join(usgs_DI,papers_DI)
-
-
-# nrow(usgs_DI)
 # 
-# 
-# names_usgs<-as.data.frame(names(usgs))|>
-#   rename(names=`names(usgs)`)
-# names_all<-as.data.frame(names(papers_df_clean))|>
-#   rename(names=`names(papers_df_clean)`)
-# 
-# anti_join(names_usgs,names_all)
-# anti_join(names_all,names_usgs)
+#   
+# # load rds files
+# authors_df<-read_rds("./data_clean/authors_df.rds")
+# papers_df<-read_rds("./data_clean/papers_df.rds")
+# affils_df<-read_rds("./data_clean/affils_df.rds")
 # 
 
-
-write_rds(usgs, "./data_clean/usgs_papers_clean.rds")
-
-# usgs authors ------------------------------------------------------------
-
-
-
-usgs_authors<-usgs %>% 
-  select(refID,PY,source,agency,agency_2,agency_3,Country,State,City,AF) %>% 
-  separate_rows(AF, sep = "; ") %>% 
-  mutate(email = str_extract(AF, "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) %>% 
-  mutate(AF = str_remove(AF, "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) %>% 
-  # mutate(AF = str_remove(AF, fixed(email))) %>% 
-  mutate(federal=if_else(!is.na(email),TRUE,FALSE)) %>% 
-  group_by(refID) %>% 
-  mutate(author_order=row_number(),
-         affil_id=60011347,
-         entry_no=cur_group_id()) %>% 
-  mutate(AF=gsub(", jr."," jr.",AF)) %>% 
-  mutate(Country=gsub("united states","usa",Country)) %>% 
-  separate_wider_delim(AF,
-                       delim=", ",
-                       cols_remove = FALSE,
-                       names=c("surname","given_name"),
-                       too_many = "debug",
-                       too_few = "debug") %>% 
-  select(-AF_remainder,-AF_pieces) %>% 
-  separate_wider_delim(given_name,
-                       delim=" ",
-                       cols_remove = FALSE,
-                       names=c("init1","init2"),
-                       too_many = "debug",
-                       too_few = "debug") %>% 
-  mutate(given_name_remainder=gsub("jr.","",given_name_remainder)) %>% 
-  mutate(given_name_remainder=gsub("[.]","",given_name_remainder)) %>% 
-  mutate(given_name_remainder=gsub("iii","",given_name_remainder)) %>% 
-  mutate(init1 = str_sub(init1, 1, 1)) %>% 
-  mutate(init2 = str_sub(init2, 1, 1)) %>% 
-  mutate(first_middle_initials=paste(init1,".",init2,".",sep="")) %>% 
-  mutate(first_middle_initials=gsub("NA.NA.","",first_middle_initials)) %>% 
-  select(-c(given_name_ok,
-            given_name_pieces, 
-            given_name_remainder,
-            init1,
-            init2,
-            email,
-            AF_ok)
-  ) %>% 
-  rename(country=Country,
-         city=City,
-         state=State,
-  ) %>% 
-  mutate(AU=paste(surname,first_middle_initials, sep=",")) %>% 
-  mutate(AU=gsub("[.]","",AU)) %>% 
-  mutate(AU=ifelse(AU=="NA,",NA,AU)) %>%
-  group_by(AF) %>% 
-  mutate(authorID=cur_group_id()) %>% 
-  mutate(authorID=paste(authorID,"usgs",sep=""))
-
-
-
-names_usgs<-as.data.frame(names(usgs_authors))|>
-  rename(names=`names(usgs_authors)`)
-
-names_all<-as.data.frame(names(authors_df_clean))|>
-  rename(names=`names(authors_df_clean)`)
-
-anti_join(names_usgs,names_all)
-anti_join(names_all,names_usgs)
-
-
-write_rds(usgs_authors, "./data_clean/usgs_authors_clean.rds")
-
-
-
-  
-  
-  
-  
-  
-  
-  
-# load rds files
-authors_df<-read_rds("./data_clean/authors_df.rds")
-papers_df<-read_rds("./data_clean/papers_df.rds")
-affils_df<-read_rds("./data_clean/affils_df.rds")
-
-
-  # add refID ---------------------------------------------------------------
+# add refID ---------------------------------------------------------------
   
 papers_df$refID <- seq.int(nrow(papers_df))  
 papers_df<-papers_df %>% relocate(refID,.before=1)
 
-  
-  # create an entry number
-  # 1.1 means article 1 in csv 1, 2.1 is article 1 in csv2, etc. 
-  # papers_df$entry_no<-paste(papers_df$file_no,papers_df$entry_no,sep=".")
-  # combined_data_authors$entry_no<-paste(combined_data_authors$file_no,combined_data_authors$entry_no,sep=".")
-  # combined_data_affils$entry_no<-paste(combined_data_affils$file_no,combined_data_affils$entry_no,sep=".")
-  
-  # bring over the refiID from papers to authors ----------------------------
+
+# bring over the refiID from papers to authors ----------------------------
 paper_ID_nos<-papers_df %>% select(refID,source,entry_no)
 
 authors_df<-left_join(authors_df,paper_ID_nos) %>% 
   relocate(refID,.before=1)
 affils_df<-left_join(affils_df,paper_ID_nos) %>% 
   relocate(refID,.before=1)
-# 
-# paper_ID_nos<-data.frame(entry_no=papers_df$entry_no, refID=papers_df$refID)
-#   combined_data_authors<-merge(x = combined_data_authors, y = paper_ID_nos, by.x = c("entry_no"), by.y = c("entry_no"), all.x = TRUE)
-#   combined_data_affils<-merge(x = combined_data_affils, y = paper_ID_nos, by.x = c("entry_no"), by.y = c("entry_no"), all.x = TRUE)
-#   
-#   
-  rm(paper_ID_nos)
+   
+rm(paper_ID_nos)
   
-  # cleanup -----------------------------------------------------------------
+# cleanup -----------------------------------------------------------------
   
-  #remove text from scopus id
-  papers_df$scopus_article_id <- gsub("SCOPUS_ID:", "", papers_df$scopus_article_id)
+#remove text from scopus id
+papers_df$scopus_article_id <- gsub("scopus_id:", "", papers_df$scopus_article_id)
+  
+# STANDARDIZING PAPER INFO ------------------------------------------------
   
   
-  # STANDARDIZING PAPER INFO ------------------------------------------------
-  
-  
-  # publication yr ----------------------------------------------------------
-  papers_df$cover_date
+# publication yr ----------------------------------------------------------
+papers_df$cover_date
   papers_df <-papers_df %>% 
     separate(cover_date, c("PY2","PM","PD"), remove=FALSE,extra="merge")
   
@@ -509,7 +356,7 @@ affils_df<-left_join(affils_df,paper_ID_nos) %>%
   
   
   papers_df$DE<-gsub(" [|] ", "; ",papers_df$DE)
-  papers_df$PT[papers_df$PT == "Journal"] <- "J"
+  papers_df$PT[papers_df$PT == "journal"] <- "j"
   
   
   
@@ -522,7 +369,7 @@ affil_list<-read_csv("./data_clean/affil_code_name/complete_affil_list.csv") %>%
     mutate(federal=TRUE) %>% 
     select(-agency_full) %>% 
     distinct(affil_id,agency,city,.keep_all=TRUE) 
-  
+  affils_df$affil_id<-as.numeric(affils_df$affil_id)
   
 affils_df<-left_join(affils_df,affil_list,by="affil_id") %>% 
   replace_na(list(federal=FALSE)) %>% 
@@ -557,29 +404,10 @@ affils_df <-affils_df %>%
 rm(affil_list)
 
            
-  # cava de' tirreni aou s giovanni di dio e ruggiero d'arago
+# cava de' tirreni aou s giovanni di dio e ruggiero d'arago
 # u s president’s malaria initiative evolve project nigeria
 
  
-  
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   # merging the affiliation and author data dfs -----------------------------
   # combined_data_authors<-merge(x = authors_df, y = affils_df, by.x = c("affil_id","refID"), by.y = c("affil_id","refID"), all.x = TRUE)
@@ -653,13 +481,8 @@ authors_df<- left_join(authors_df,fed_bind)
      pubs_with_doi,
      pubs_with_doi_dupes,
      pubs_no_doi_dupes)
-  # These are the duplicates
-  # duplicated_papers<-papers_df[duplicated(papers_df), ]
-  # duplicated_authors<-authors_df[duplicated(authors_df), ]
-  # duplicated_affils<-affils_df[duplicated(affils_df), ]
-  # This removes them
-  # papers_df<-papers_df[!duplicated(papers_df), ]
-  # authors_df<-authors_df[!duplicated(authors_df), ]
+  
+  
   authors_df<-distinct(authors_df,
                        source,
                        author_order,
@@ -695,9 +518,11 @@ authors_df<- left_join(authors_df,fed_bind)
   levels(as.factor(affils_df$country))
   
   
-  affils_df$country[affils_df$country == "United States"] <- "usa"
+  affils_df$country[affils_df$country == "united states"] <- "usa"
   affils_df$country[affils_df$country == "virgin islands (u.s.)"] <- "us virgin islands"
-  affils_df$country[affils_df$country == "Viet Nam"] <- "vietnam"
+  affils_df$country[affils_df$country == "viet nam"] <- "vietnam"
+  affils_df$country[affils_df$country == "cote d'ivoire"] <- "ivory coast"
+  
   
   
   
@@ -707,129 +532,7 @@ authors_df<- left_join(authors_df,fed_bind)
   authors_df$authorID<-authors_df$SID
   authors_df$state<-NA
   authors_df$postal_code<-NA
-  # authors_df$authorID
-  # 
-  # affils_df$city
-  # affils_df$country
-  # # IN PROGRESS
-  # # need to combine author names from authors_df to get AF and AU
-  # 
-  # max_authors<-max(as.numeric(authors_df$author_order), na.rm=TRUE)
-  # 
-  # # library(tidyverse)
-  # # au_af_df<-authors_df %>% 
-  # #   select(refID, author_order, AF, AU) %>% 
-  # #   mutate(refID=as.numeric(refID)) %>% 
-  # #   mutate(author_order=as.numeric(author_order)) %>%
-  # #   arrange(refID,author_order) 
-  # 
-  # # Select the relevant columns
-  # au_af_df <- authors_df[, c("refID", "author_order", "AF", "AU")]
-  # 
-  # # Convert refID and author_order columns to numeric
-  # au_af_df$refID <- as.numeric(au_af_df$refID)
-  # au_af_df$author_order <- as.numeric(au_af_df$author_order)
-  # 
-  # # Arrange by refID and author_order
-  # au_af_df <- au_af_df[order(au_af_df$refID, au_af_df$author_order), ]
-  # 
-  # 
-  # 
-  # au_af_df$AF<-gsub("[.] ",".",au_af_df$AF)
-  # 
-  # # au_af_df<-au_af_df %>% 
-  # #   pivot_wider(values_from=AF:AU, names_from = author_order) %>% 
-  # #   unite("AF", starts_with("AF_"),na.rm=TRUE, sep=" ", remove=TRUE) %>% 
-  # #   unite("AU", starts_with("AU_"),na.rm=TRUE, sep=" ", remove=TRUE) 
-  # # 
-  # 
-  # # Pivot the data wider: Create columns for each author_order
-  # au_af_df_wide <- reshape(au_af_df, 
-  #                          timevar = "author_order", 
-  #                          idvar = "refID", 
-  #                          direction = "wide")
-  # 
-  # # Unite columns starting with "AF_" into a single "AF" column
-  # AF_columns <- grep("^AF.", names(au_af_df_wide))
-  # au_af_df_wide$AF <- apply(au_af_df_wide[, AF_columns], 1, function(x) paste(na.omit(x), collapse = " "))
-  # au_af_df_wide <- au_af_df_wide[, !names(au_af_df_wide) %in% names(au_af_df_wide)[AF_columns]]
-  # 
-  # # Unite columns starting with "AU_" into a single "AU" column
-  # AU_columns <- grep("^AU.", names(au_af_df_wide))
-  # au_af_df_wide$AU <- apply(au_af_df_wide[, AU_columns], 1, function(x) paste(na.omit(x), collapse = " "))
-  # au_af_df_wide <- au_af_df_wide[, !names(au_af_df_wide) %in% names(au_af_df_wide)[AU_columns]]
-  # 
-  # # Result is stored in `au_af_df_wide`
-  # au_af_df<-au_af_df_wide
-  # 
-  # au_af_df$AU<-gsub("[.]","",au_af_df$AU)
-  # 
-  # # Need to combine SID from all authors to get combined SID (equal to RID) in 
-  # 
-  # 
-  # # Select relevant columns
-  # ri_df <- authors_df[, c("refID", "author_order", "AF", "SID")]
-  # 
-  # # Convert refID and author_order to numeric
-  # ri_df$refID <- as.numeric(ri_df$refID)
-  # ri_df$author_order <- as.numeric(ri_df$author_order)
-  # 
-  # # Arrange by refID and author_order
-  # ri_df <- ri_df[order(ri_df$refID, ri_df$author_order), ]
-  # 
-  # # Create the RI column by pasting AF and SID with a "/"
-  # ri_df$RI <- paste(ri_df$AF, ri_df$SID, sep = "/")
-  # 
-  # # Remove AF and SID columns
-  # ri_df <- ri_df[, !(names(ri_df) %in% c("AF", "SID"))]
-  # 
-  # # Pivot wider: Create columns for each author_order
-  # ri_df_wide <- reshape(ri_df,
-  #                       timevar = "author_order",
-  #                       idvar = "refID",
-  #                       direction = "wide",
-  #                       sep = "_")
-  # 
-  # # Unite columns starting with "order_" into a single "RI" column
-  # order_columns <- grep("^RI_", names(ri_df_wide))
-  # ri_df_wide$RI <- apply(ri_df_wide[, order_columns], 1, function(x) paste(na.omit(x), collapse = ";"))
-  # ri_df_wide <- ri_df_wide[, !names(ri_df_wide) %in% names(ri_df_wide)[order_columns]]
-  # 
-  # # Result is stored in `ri_df_wide`
-  # ri_df <- ri_df_wide 
-  # 
-  # 
-  # 
-  # 
-  # # Perform a left join to combine au_af_df and ri_df by "refID"
-  # au_af_df <- merge(au_af_df, ri_df, by = "refID", all.x = TRUE)
-  # 
-  # 
-  # str(papers_df)
-  # papers_df$RI<-NULL
-  # papers_df$AF<-NULL
-  # papers_df$AU<-NULL
-  # 
-  # # papers_df<-left_join(papers_df,au_af_df,by="refID")
-  # # Perform a left join
-  # # names(papers_df)
-  # # names(au_af_df)
-  # papers_df <- merge(papers_df,au_af_df, by = "refID", all.x = TRUE)
-  # # 
-  # # papers_df$AF
-  # # papers_df$AU
-  # # papers_df$RI
-  # # 
-  # 
-  # rm(au_af_df,
-  #    au_af_df_wide,
-  #    duplicated_authors,
-  #    duplicated_papers,
-  #    ri_df,
-  #    split_pages,
-  #    split_pages_df,
-  #    ri_df_wide)
-  # 
+   
 
 library(tidyverse)
 papers_df %>% summarize(n_distinct(refID))
@@ -857,7 +560,7 @@ papers_df<-anti_join(papers_df,from_papers,by="refID")
 authors_df<-anti_join(authors_df,from_authors,by="refID")
 
 rm(from_papers,from_authors)
-library(janitor)
+
 # papers_df %>% 
 # separate_wider_delim(source,
 #                      delim = "_",
@@ -882,125 +585,215 @@ authors_df<-left_join(authors_df,affil_binder)
 # 2x to make sure all federal have agency
 
 
-# 
-# # usgs --------------------------------------------------------------------
-# 
-#  names(papers_df)
-# 
-# usgs<-read_csv("./usgs_publications.csv") %>% 
-#   mutate_all(tolower) %>% 
-#   select("refID"="Publication ID",
-#          "AF"="Author(s)",
-#          "Country",
-#          "agency_3"="Contributing office(s)",
-#          "State",
-#          "City",
-#          "BP"="First page",
-#          "DI"="DOI",
-#          "EP"="Last page", 
-#          "IS"="Issue",
-#          "PT"="Publication type",
-#          "PY"="Year Published",
-#          "SN"="ISSN (print)",
-#          "EI"="ISSN (online)",
-#          "SO"="CHORUS Journal Name",
-#          "TI"="Title",
-#          "VL"="Volume",
-#          "URL"="CHORUS URL") %>% 
-#   mutate("agency"="interior",
-#          source="usgs",
-#          "agency_2"="usgs") %>% 
-#   filter(PT=="article") %>% 
-#   mutate(PT="j")
-# 
-# 
-# names(usgs)
-# 
-# 
-# 
-# names_usgs<-as.data.frame(names(usgs))|>
-#   rename(names=`names(usgs)`)
-# names_all<-as.data.frame(names(papers_df_clean))|>
-#   rename(names=`names(papers_df_clean)`)
-# 
-# anti_join(names_usgs,names_all)
-# anti_join(names_all,names_usgs)
-# 
-# 
-# 
-# write_rds(usgs, "./data_clean/usgs_papers_clean.rds")
-# 
-# # usgs authors ------------------------------------------------------------
-# 
-# 
-# 
-# usgs_authors<-usgs %>% 
-#   select(refID,PY,source,agency,agency_2,agency_3,Country,State,City,AF) %>% 
-#   separate_rows(AF, sep = "; ") %>% 
-#   mutate(email = str_extract(AF, "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) %>% 
-#   mutate(AF = str_remove(AF, "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) %>% 
-#   # mutate(AF = str_remove(AF, fixed(email))) %>% 
-#   mutate(federal=if_else(!is.na(email),TRUE,FALSE)) %>% 
-#   group_by(refID) %>% 
-#   mutate(author_order=row_number(),
-#          affil_id=60011347,
-#          entry_no=cur_group_id()) %>% 
-#   mutate(AF=gsub(", jr."," jr.",AF)) %>% 
-#   mutate(Country=gsub("united states","usa",Country)) %>% 
-#   separate_wider_delim(AF,
-#                        delim=", ",
-#                        cols_remove = FALSE,
-#                        names=c("surname","given_name"),
-#                        too_many = "debug",
-#                        too_few = "debug") %>% 
-#   select(-AF_remainder,-AF_pieces) %>% 
-#   separate_wider_delim(given_name,
-#                        delim=" ",
-#                        cols_remove = FALSE,
-#                        names=c("init1","init2"),
-#                        too_many = "debug",
-#                        too_few = "debug") %>% 
-#   mutate(given_name_remainder=gsub("jr.","",given_name_remainder)) %>% 
-#   mutate(given_name_remainder=gsub("[.]","",given_name_remainder)) %>% 
-#   mutate(given_name_remainder=gsub("iii","",given_name_remainder)) %>% 
-#   mutate(init1 = str_sub(init1, 1, 1)) %>% 
-#   mutate(init2 = str_sub(init2, 1, 1)) %>% 
-#   mutate(first_middle_initials=paste(init1,".",init2,".",sep="")) %>% 
-#   mutate(first_middle_initials=gsub("NA.NA.","",first_middle_initials)) %>% 
-#   select(-c(given_name_ok,
-#             given_name_pieces, 
-#             given_name_remainder,
-#             init1,
-#             init2,
-#             email,
-#             AF_ok)
-#          ) %>% 
-#   rename(country=Country,
-#         city=City,
-#         state=State,
-#         ) %>% 
-#   mutate(AU=paste(surname,first_middle_initials, sep=",")) %>% 
-#   mutate(AU=gsub("[.]","",AU)) %>% 
-#   mutate(AU=ifelse(AU=="NA,",NA,AU)) %>%
-#            group_by(AF) %>% 
-#            mutate(authorID=cur_group_id()) %>% 
-#            mutate(authorID=paste(authorID,"usgs",sep=""))
-#   
-#          
-# 
-# names_usgs<-as.data.frame(names(usgs_authors))|>
-#   rename(names=`names(usgs_authors)`)
-# 
-# names_all<-as.data.frame(names(authors_df_clean))|>
-#   rename(names=`names(authors_df_clean)`)
-#   
-# anti_join(names_usgs,names_all)
-# anti_join(names_all,names_usgs)
-# 
-# 
-# write_rds(usgs_authors, "./data_clean/usgs_authors_clean.rds")
-# 
-# 
+
+
+
+write_rds(papers_df,"./data_clean/papers_df_preusgs.rds")
+write_rds(authors_df,"./data_clean/authors_df_preusgs.rds")
+write_rds(affils_df,"./data_clean/affils_df_preusgs.rds")
+
+
+
+
+# load and add usgs  ------------------------------------------------------
+
+
+
+
+
+# KEEP ONLY ARTICLES on USGS LIST
+
+usgs<-read_csv("./usgs_publications.csv") %>% 
+  mutate_all(tolower) %>% 
+  select("usgs_refID"="Publication ID",
+         "AF"="Author(s)",
+         "Country",
+         "agency_3"="Contributing office(s)",
+         "State",
+         "City",
+         "BP"="First page",
+         "DI"="DOI",
+         "EP"="Last page", 
+         "IS"="Issue",
+         "PT"="Publication type",
+         "PY"="Year Published",
+         "SN"="ISSN (print)",
+         "EI"="ISSN (online)",
+         "SO"="CHORUS Journal Name",
+         "TI"="Title",
+         "VL"="Volume",
+         "URL"="CHORUS URL") %>% 
+  mutate("agency"="interior",
+         source="usgs",
+         "agency_2"="usgs") %>% 
+  filter(PT=="article") %>% 
+  mutate(PT="j")
+
+
+
+# authors from usgs
+
+usgs_authors<-usgs %>% 
+  select(usgs_refID,PY,source,agency,agency_2,agency_3,Country,State,City,AF) %>% 
+  separate_rows(AF, sep = "; ") %>% 
+  mutate(email = str_extract(AF, "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) %>% 
+  mutate(AF = str_remove(AF, "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")) %>% 
+  # mutate(AF = str_remove(AF, fixed(email))) %>% 
+  mutate(federal=if_else(!is.na(email),TRUE,FALSE)) %>% 
+  group_by(usgs_refID) %>% 
+  mutate(author_order=row_number(),
+         affil_id=60011347,
+         entry_no=cur_group_id()) %>% 
+  mutate(AF=gsub(", jr."," jr.",AF)) %>% 
+  mutate(Country=gsub("united states","usa",Country)) %>% 
+  separate_wider_delim(AF,
+                       delim=", ",
+                       cols_remove = FALSE,
+                       names=c("surname","given_name"),
+                       too_many = "debug",
+                       too_few = "debug") %>% 
+  select(-AF_remainder,-AF_pieces) %>% 
+  separate_wider_delim(given_name,
+                       delim=" ",
+                       cols_remove = FALSE,
+                       names=c("init1","init2"),
+                       too_many = "debug",
+                       too_few = "debug") %>% 
+  mutate(given_name_remainder=gsub("jr.","",given_name_remainder)) %>% 
+  mutate(given_name_remainder=gsub("[.]","",given_name_remainder)) %>% 
+  mutate(given_name_remainder=gsub("iii","",given_name_remainder)) %>% 
+  mutate(init1 = str_sub(init1, 1, 1)) %>% 
+  mutate(init2 = str_sub(init2, 1, 1)) %>% 
+  mutate(first_middle_initials=paste(init1,".",init2,".",sep="")) %>% 
+  mutate(first_middle_initials=gsub("NA.NA.","",first_middle_initials)) %>% 
+  select(-c(given_name_ok,
+            given_name_pieces, 
+            given_name_remainder,
+            init1,
+            init2,
+            email,
+            AF_ok)
+  ) %>% 
+  rename(country=Country,
+         city=City,
+         state=State,
+  ) %>% 
+  mutate(AU=paste(surname,first_middle_initials, sep=",")) %>% 
+  mutate(AU=gsub("[.]","",AU)) %>% 
+  mutate(AU=ifelse(AU=="NA,",NA,AU)) %>%
+  group_by(AF) %>% 
+  mutate(authorID=cur_group_id()) %>% 
+  mutate(authorID=paste(authorID,"usgs",sep="")) %>% 
+  mutate(AU=gsub("NA","",AU),
+         AU=gsub(",",", ",AU),
+         AU=gsub("[(]","",AU)) %>% 
+  mutate_all(trimws)
+usgs_authors$AF<-trimws(usgs_authors$AF)
+usgs_authors$AU<-trimws(usgs_authors$AU)
+
+
+
+
+write_rds(usgs_authors, "./data_clean/usgs_authors_clean.rds")
+write_rds(usgs, "./data_clean/usgs_papers_clean.rds")
+
+
+
+
+# get a df of papers already in papers_df from usgs
+# get the federal usgs authors of those papers (doi, author order) and 
+# change the affiliation in papers_df
+
+
+usgs_DI<-usgs %>% 
+  select(DI,usgs_refID) %>% 
+  drop_na() 
+
+papers_DI<-papers_df %>% 
+  select(DI,refID) %>% 
+  drop_na()
+
+
+usgs_papers_in_papers_df<-semi_join(papers_DI,usgs_DI,by="DI") %>% 
+  select(DI)
+
+
+
+for_usgs__authors1<-semi_join(usgs,usgs_papers_in_papers_df) %>% select(usgs_refID,DI,PY)
+for_usgs__authors2<-semi_join(usgs_authors,for_usgs__authors1,by="usgs_refID")
+for_usgs__authors2<-left_join(for_usgs__authors2,for_usgs__authors1) %>% 
+  filter(federal==TRUE) %>% 
+  select(DI,AF,affil_id,author_order,PY,federal)
+
+refID_to_correct_authors<-semi_join(papers_df,for_usgs__authors2,by="DI") %>% 
+  select(refID,DI)
+
+for_usgs__authors2<-left_join(for_usgs__authors2,refID_to_correct_authors) %>% 
+  mutate(PY=as.numeric(PY))
+
+authors_df<-left_join(authors_df,for_usgs__authors2,by=c("refID","PY","author_order")) %>% 
+  mutate(federal.x=as.character(federal.x)) %>% 
+  mutate(federal.x=
+        case_when(
+             federal.y == "TRUE" ~ "TRUE",
+             .default = as.character(federal.x)
+           )
+  ) %>% 
+  mutate(affil_id.x=
+           case_when(
+             affil_id.y == "60011347" ~ "60011347",
+             .default = as.character(affil_id.y)
+           )
+  ) %>% 
+    select(-affil_id.y,
+         -federal.y) %>% 
+  rename(affil_id=affil_id.x,
+         federal=federal.x) %>% 
+  mutate(AF.y=if_else(AF.y==AF.x,NA,AF.y)) %>% 
+  select(-AF.y) %>% 
+  rename(AF=AF.x)
+
+
+         
+# now the ones that aren't in papers_df
+
+
+usgs_papers_NOT_in_papers_df<-anti_join(usgs_DI,papers_DI,by="DI") %>% 
+  select(DI)
+
+
+
+
+add_to_papers_df<-semi_join(usgs,usgs_papers_NOT_in_papers_df) %>% 
+  select(-c(Country,
+  agency_3,
+  State,
+  City,
+  URL,
+  agency,
+  agency_2)) %>% 
+  mutate(BP=as.numeric(BP),
+         EP=as.numeric(EP),
+         PY=as.numeric(PY))
+  
+add_to_authors_df<-usgs_authors %>% filter(usgs_refID%in%add_to_papers_df$usgs_refID) %>% 
+  mutate(from="usgs") %>% 
+  rename(refID=usgs_refID) %>% 
+  select(-c(agency_2,agency_3,country,city,from)) %>% 
+  mutate(affil_id=if_else(federal=="FALSE",NA,affil_id)) %>% 
+  mutate(federal=as.logical(federal),
+         PY=as.numeric(PY)) 
+
+# add to authors_df and papers_df -----------------------------------------
+authors_df<-authors_df %>% mutate(federal=as.logical(federal))
+authors_df<-bind_rows(authors_df,add_to_authors_df)
+
+add_to_papers_df<-add_to_papers_df %>% rename(refID=usgs_refID)
+papers_df<-bind_rows(papers_df,add_to_papers_df)
+
+
+
+
 
 
 # bind and save -----------------------------------------------------------
@@ -1008,30 +801,6 @@ authors_df<-left_join(authors_df,affil_binder)
 
 
 
-papers_usgs  <- papers_usgs %>% 
-  mutate(BP=as.numeric(BP),
-         EP=as.numeric(EP),
-         PY=as.numeric(PY))
-
-
-papers_df<-bind_rows(papers_df,papers_usgs) %>% 
-  mutate_all(tolower) %>% mutate_all(trimws)
-
-
-
-authors_usgs <- authors_usgs %>%
-  mutate(PY=as.numeric(PY),
-         entry_no=as.character(entry_no),
-         affil_id=as.character(affil_id),
-         author_order=as.numeric(author_order),
-         federal=as.logical(federal),
-         author_order=as.character(author_order)) 
-
-authors_df<-authors_df %>% 
-  mutate(federal=as.logical(federal),
-         PY=as.numeric(PY))
-authors_df<-bind_rows(authors_df,authors_usgs) %>% 
-  mutate_all(tolower) %>% mutate_all(trimws)
 
 
 # save all ----------------------------------------------------------------

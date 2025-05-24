@@ -83,7 +83,13 @@ knitr::opts_chunk$set(fig.pos = 'H')
 # Read data
 #  fed affils -------------------------------------------------------------
 # 
-papers_df  <- read_rds("./data_clean/papers_df_clean.rds")
+papers_df  <- read_rds("./data_clean/papers_df_clean.rds") %>% 
+  mutate(PM=
+           case_when(
+             is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
+             .default = as.numeric(PM)
+             )
+         )
 
 
 
