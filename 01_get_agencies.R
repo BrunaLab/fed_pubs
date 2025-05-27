@@ -51,7 +51,7 @@ install.packages("rscopus")
 library(rscopus)
 
 # Set your Scopus API key
-api_key <- "8d8d7b628fae6e1a5a04db969b0bca93"
+api_key <- "----"
 # 
 # # # Define the institution name
 # # institution_name <- "advanced research projects agency for health"
@@ -110,6 +110,12 @@ for (h in seq_along(need_affil_id$agency)) {
 }
 
 write_rds(datalist,"./data_raw/datalist_from_scopus.rds")
+
+
+
+# part II -----------------------------------------------------------------
+
+
 
 datalist<-read_rds("./data_raw/datalist_from_scopus.rds")
 
@@ -473,6 +479,183 @@ complete_affil_list<-full_join(fed_affiliations_list,affiliation_df_keep,by="sco
   mutate(affil_name_scopus=if_else(affil_name_scopus==affiliation,NA,affil_name_scopus)) %>% 
   select(-country.y) %>% 
   rename(country=country.x)
+
+
+
+fill_missing<-need_affil_id %>% select(cat1, cat2,agency_full=agency, acronym)
+complete_affil_list<-left_join(complete_affil_list,fill_missing)
+
+
+
+
+
+complete_affil_list<-complete_affil_list %>% 
+  mutate(agency_full=gsub("united states", "us",agency_full)) %>% 
+  mutate(agency_full=gsub("[.]", "",agency_full)) %>% 
+  mutate(agency_full=gsub("inter-american", "interamerican",agency_full)) %>% 
+  # mutate(agency_full=gsub("&nbsp;", "",agency_full)) %>% 
+  # mutate(agency_full=gsub("&nbsp;<span class="searchMatch">", " ",agency_full)) %>% 
+  filter(agency_full!="vietnam education foundation") %>% 
+  filter(agency_full!="northwest power planning council") %>% 
+  filter(agency_full!="north american electric reliability corporation") %>% 
+  filter(agency_full!="northwest power and conservation council") %>% 
+  filter(agency_full!="ecosystems research")  %>% 
+  filter(scopus_affil_id!=115199897)  %>% 
+  filter(scopus_affil_id!=115199897)  %>% 
+  filter(scopus_affil_id!=105311009)  %>% 
+  filter(scopus_affil_id!=60003954)  %>% 
+  filter(scopus_affil_id!=100346728)  %>% 
+  
+filter(scopus_affil_id!=116673115)  %>% 
+filter(scopus_affil_id!=60002753)  %>% 
+filter(scopus_affil_id!=116673115)  %>% 
+filter(scopus_affil_id!=112792726)  %>% 
+filter(scopus_affil_id!=60010695)  %>% 
+filter(scopus_affil_id!=127814663)  %>% 
+filter(scopus_affil_id!=114377074)  %>% 
+filter(scopus_affil_id!=119098994)  %>% 
+filter(scopus_affil_id!=123712881)  %>% 
+filter(scopus_affil_id!=127814663)  %>% 
+filter(scopus_affil_id!=110945231)  %>% 
+filter(scopus_affil_id!=100354036)  %>% 
+filter(scopus_affil_id!=60001559)  %>%
+  filter(scopus_affil_id!=100401363) %>% 
+  filter(scopus_affil_id!=100366327)  %>% 
+  mutate(agency_full=
+           case_when(
+             scopus_affil_id == 100505945 ~ "USFWS",
+             scopus_affil_id == 100335975 ~ "USFWS",
+             scopus_affil_id == 102024109 ~ "USFWS",
+             scopus_affil_id == 100842382 ~ "USFWS",
+             scopus_affil_id == 60023281 ~ "USFWS Sea Lamprey Management Program",
+             scopus_affil_id == 60071536 ~ "USDA Forest Service Palmer",
+             scopus_affil_id == 60074837 ~ "USFWS Columbia Ecological Services Office",
+             scopus_affil_id == 109179491 ~ "Veterans Administration",
+             scopus_affil_id == 112569590 ~ "Veterans Administration",
+             scopus_affil_id == 107563119 ~ "Veterans Administration",
+             scopus_affil_id == 124744472 ~ "Veterans Administration",
+             scopus_affil_id == 100526739 ~ "NASA",
+             scopus_affil_id == 109937768 ~ "NOAA",
+             .default = as.character(agency_full)
+           )
+  ) %>% 
+mutate(cat1=
+         case_when(
+           cat1=="independent" & agency_full == "engineer research and development center" ~ "dod",
+           agency == "epa" ~ "epa",
+           cat1=="independent" & agency_full == "medicaid and chip payment and access commission" ~ "congress",
+           cat1=="independent" & str_detect(agency_full,"naval") ~ "dod",
+           cat1=="independent" & str_detect(agency_full,"army") ~ "dod",
+           cat1=="independent" & agency_full == "advanced research projects agency for health" ~ "hhs",
+           cat1=="independent" & agency_full == "engineer research and development center" ~ "dod",
+           cat1=="independent" & agency_full == "medicare payment advisory commission" ~ "congress",
+           cat1=="independent" & agency_full == "university corporation for atmospheric research" ~ "nsf",
+           str_detect(agency_full,"coast guard") ~ "dhs",
+           str_detect(agency_full,"agency_full office of the chief signal officer") ~ "dod",
+           str_detect(agency_full,"office of national drug control policy") ~ "eop",
+           
+           
+           cat1=="independent" & str_detect(agency_full,"harry s. truman scholarship foundation") ~ "congress",
+           .default = as.character(cat1)
+       )
+) %>%
+  mutate(agency_full=
+           case_when(
+             scopus_affil_id== 60011972 ~ "Air Force Research Laboratory Information Directorate",
+             scopus_affil_id== 60011390 ~ "Air Force Office of Scientific Research",
+             scopus_affil_id== 60021080 ~ "Naval Air Warfare Center Weapons Division",
+             scopus_affil_id== 60019228 ~ "Air Force Research Laboratory",
+             scopus_affil_id== 60073971. ~ "Air Force Cambridge Research Laboratories",
+             scopus_affil_id== 60021630 ~ "Joint Base Langley-Eustis",
+             scopus_affil_id== 60001247 ~ "Hanscom AFB",
+             scopus_affil_id== 60029473 ~ "Tyndall Air Force Base",
+             scopus_affil_id== 60021888 ~ "NOAA Air Resources Laboratory - Field Research Division",
+             scopus_affil_id== 60076904 ~ "Air Force Materiel Command",
+             .default = as.character(agency_full)
+           )
+  ) %>%   
+  mutate(agency=
+           case_when(
+             scopus_affil_id== 60011972 ~ "dod",
+             scopus_affil_id== 60011390 ~ "dod",
+             scopus_affil_id== 60021080 ~ "dod",
+             scopus_affil_id== 60019228 ~ "dod",
+             scopus_affil_id== 60073971. ~ "dod",
+             scopus_affil_id== 60021630 ~ "dod",
+             scopus_affil_id== 60001247 ~ "dod",
+             scopus_affil_id== 60029473 ~ "dod",
+             scopus_affil_id== 60021888 ~ "noaa",
+             scopus_affil_id== 100378779 ~ "judiciary",
+      
+             scopus_affil_id== 60076904 ~ "dod",
+             str_detect(agency_full,"us forest service")~"usda",
+             str_detect(agency_full,"army research lab")~"dod",
+             
+             str_detect(agency_full,"international institute of tropical forestry")~"usda",
+             str_detect(agency_full,"government publishing office congress")~"congress",
+             
+             str_detect(agency_full,"national geodetic survey")~"noaa",
+             str_detect(agency_full,"national marine fisheries service")~"noaa",
+             str_detect(agency_full,"government publishing office congress")~"congress",
+             str_detect(agency_full,"us postal service")~"us postal service",
+             str_detect(agency_full,"national heart, lung, and blood institute")~"nih",
+            str_detect(agency_full,"national heart, lung, and blood institute")~"nih",
+            str_detect(agency_full,"national institute of arthritis and musculoskeletal and skin diseases")~"nih",
+            str_detect(agency_full,"national institute of general medical sciences")~"nih",
+            str_detect(agency_full,"national institute on deafness and other")~"nih",
+             str_detect(agency_full,"rocky mountain laboratories")~"nih",
+             str_detect(agency_full,"university corporation for atmospheric research")~"nsf",
+             str_detect(agency_full,"us army futures command")~"dod",
+             str_detect(agency_full,"us environmental protection agency")~"epa",
+             str_detect(agency_full,"us secret service")~"dhs",
+             str_detect(agency_full,"us environmental protection agency")~"epa",
+             str_detect(agency_full,"consumer product safety commission")~"cpsc",
+            str_detect(agency_full,"bureau of indian affairs")~"interior",
+            str_detect(agency_full,"general services administration")~"gsa",
+            str_detect(agency_full,"federal communications commission")~"fcc",
+            str_detect(agency_full,"securities and exchange commission")~"sec",
+            str_detect(agency_full,"institute of museum and library services")~"imls",
+            str_detect(agency_full,"consumer financial protection bureau")~"cfpb",
+            str_detect(agency_full,"frederick national laboratory for cancer research")~"nih",
+            str_detect(agency_full,"epidemic intelligence service")~"cdc",
+            str_detect(agency_full,"environmental protection agency")~"epa",
+            str_detect(agency_full,"us marine corps warfighting laboratory")~"dod",
+            str_detect(agency_full,"usps office of the inspector general")~"us postal service",
+            
+             
+             .default = as.character(agency)
+           )
+  ) %>%   
+  mutate(agency=
+           case_when(
+             str_detect(agency_full,"government accountability office") ~ "gao",
+             str_detect(agency_full,"coast guard") ~ "dhs",
+             .default = as.character(agency)
+           )
+  ) %>%  
+  mutate(affiliation=if_else(is.na(affiliation),agency_full,affiliation)) %>% 
+  mutate(affiliation=if_else(is.na(agency),cat1,agency)) %>% 
+  mutate(agency=if_else(is.na(agency),cat1,agency)) %>% 
+  mutate(agency=if_else(agency=="independent",agency_full,agency)) %>% 
+  mutate(agency=if_else(agency=="other",agency_full,agency)) %>% 
+  mutate(agency=if_else(agency=="other_and_quasi",agency_full,agency)) %>% 
+  mutate(agency=if_else(agency=="doi","interior",agency))
+
+
+names(complete_affil_list)
+dup<-complete_affil_list %>% group_by(agency_full) %>% summarize(n=n_distinct(agency)) %>% arrange(desc(n)) %>% filter(n>1)
+
+
+
+
+
+
+complete_affil_list<-complete_affil_list %>% select(-affiliation,-affil_name_scopus,-cat1,-cat2)
+
+# save complete_affil_list -----------------------------------------------
+
+
+
 
 
 write_csv(complete_affil_list,"./data_clean/complete_affil_list.csv")
