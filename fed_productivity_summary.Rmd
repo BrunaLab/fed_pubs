@@ -328,7 +328,7 @@ ggsave("./images/pubs_yr.png", width = 8, height = 8, units = "cm")
 #   gghighlight(PY == 2025)
 ```
 
-```{r  label = pubs_yr, echo = FALSE, fig.cap = "Publications per year (2019-2024)", out.width = '50%'}
+```{r  label = pubs_yr, echo = FALSE, fig.cap = "Publications per year (2019-2024)", out.width = '45%'}
 knitr::include_graphics("./images/pubs_yr.png")
 ```
 
@@ -372,7 +372,7 @@ pubs_mo_yr_1<-pubs_mo_yr %>%
  ggsave("./images/pubs_mo_yr_1.png", width = 10, height = 10, units = "cm")
 ```
 
-```{r  label = pubs_mo_yr_1, echo = FALSE, fig.cap = "Articles per month (2019-2024). Note: the the January-December peaks are likely due to journals journals publishing fewer than 12 issues per year. Smoothed out somewhat by converting to publications per quarter (see below).", out.width = '50%'}
+```{r  label = pubs_mo_yr_1, echo = FALSE, fig.cap = "Articles per month (2019-2024). Note: the the January-December peaks are likely due to journals journals publishing fewer than 12 issues per year. Smoothed out somewhat by converting to publications per quarter (see below).", out.width = '45%'}
 knitr::include_graphics("./images/pubs_mo_yr_1.png")
 ```
 
@@ -400,7 +400,7 @@ ggsave("./images/pubs_per_quarter_2.png", width = 10, height = 10, units = "cm")
 
 
 
-```{r  label = pubs_per_quarter_2, echo = FALSE, fig.cap = "Articles per Quarter (2019-2024).", out.width = '50%'}
+```{r  label = pubs_per_quarter_2, echo = FALSE, fig.cap = "Articles per Quarter (2019-2024).", out.width = '45%'}
 knitr::include_graphics("./images/pubs_per_quarter_2.png")
 ```
 
@@ -431,7 +431,7 @@ ggsave("./images/monthly_pubs_1.png", width = 10, height = 10, units = "cm")
 
 
 
-```{r  label = monthly_pubs_1, echo = FALSE, fig.cap = "Monthly publications from January 1 to May 31 (2019-2025).", out.width = '50%'}
+```{r  label = monthly_pubs_1, echo = FALSE, fig.cap = "Monthly publications from January 1 to May 31 (2019-2025).", out.width = '45%'}
 knitr::include_graphics("./images/monthly_pubs_1.png")
 ```
 
@@ -464,22 +464,26 @@ total_jan_may %>%
   expand_limits(y = 0)+
   theme_classic()+
   annotate(geom="text", x=2024, y=(max(total_jan_may$n)-.02*max(total_jan_may$n)), label=(total_jan_may %>% filter(PY==2024) %>% select(n)),
-                 color="navyblue")+
+                 color="navyblue", size=1)+
   annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.02*max(total_jan_may$n)), label=(total_jan_may %>% filter(PY==2025) %>% select(n)),
-           color="navyblue")+
+           color="navyblue", size=1)+
   
   annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.13*max(total_jan_may$n)), label=paste("(", round((total_jan_may %>% filter(PY==2025) %>% select(perc_previous_yr)),2),"%)",sep=""),
-           color="red", size=4)+
+           color="red", size=1)+
   scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(total_jan_may %>% select(n))+500),by=2000))+
   # scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(total_jan_may %>% select(n))+500))+
   scale_x_continuous( breaks=seq(2019,2025,by=1))+
+  theme(axis.title.y = element_text(size = 6))+
+  theme(axis.title.x =element_text(size = 6))+
+  theme(axis.text.y = element_text(size = 4))+
+  theme(axis.text.x =element_text(size = 4))+
   gghighlight(PY == 2025)
-ggsave("./images/fig_total_to_date_1.png", width = 4, height = 6, units = "cm")
+ggsave("./images/fig_total_to_date_1.png", width = 6, height = 4, units = "cm")
 ```
 
 
 
-```{r  label = fig_total_to_date_1_fig, echo = FALSE, fig.cap = "Monthly publications from January 1 to May 31 (2019-2025).", out.width = '100%'}
+```{r  label = fig_total_to_date_1_fig, echo = FALSE, fig.cap = "Monthly publications from January 1 to May 31 (2019-2025).", out.width = '70%'}
 knitr::include_graphics("./images/fig_total_to_date_1.png")
 ```
 
@@ -633,15 +637,15 @@ kable(digits = 2,
 \bigskip  
 \bigskip  
 
-**_Other agencies:_** 
+<!-- **_Other agencies:_**  -->
 
-`r agencies_over_20_1`  
-`r agencies_over_20_2`
-`r agencies_over_20_3`  
-`r agencies_over_20_4`
-`r agencies_over_20_5`  
-`r agencies_over_20_6`
-`r agencies_over_20_7`  
+<!-- `r agencies_over_20_1`   -->
+<!-- `r agencies_over_20_2` -->
+<!-- `r agencies_over_20_3`   -->
+<!-- `r agencies_over_20_4` -->
+<!-- `r agencies_over_20_5`   -->
+<!-- `r agencies_over_20_6` -->
+<!-- `r agencies_over_20_7`   -->
 
 
 ### Total Publications January - May (Agencies with  more than 10,000 articles only)
@@ -717,16 +721,20 @@ agency_n_decline_sum<-agency_n_decline_sum %>%
   theme_classic()+
   geom_hline(yintercept = 0)+
   annotate(geom="text", x=2024, y=(max(agency_n_decline_sum$n)-.02*max(agency_n_decline_sum$n)), label=(agency_n_decline_sum %>% filter(PY==2024) %>% select(n)),
-                 color="navyblue")+
+                 color="navyblue", size=1)+
   annotate(geom="text", x=2025, y=(max(agency_n_decline_sum$n)-.02*max(agency_n_decline_sum$n)), label=(agency_n_decline_sum %>% filter(PY==2025) %>% select(n)),
-           color="navyblue")+
+           color="navyblue", size=1)+
   annotate(geom="text", x=2025, y=(max(agency_n_decline_sum$n)-.17*max(agency_n_decline_sum$n)), label=paste("(", round((agency_n_decline_sum %>% filter(PY>2024) %>% select(perc_previous_yr)),2),"%)",sep=""),
-           color="red", size=4)+
+           color="red", size=1)+
   scale_y_continuous(expand = c(0, 0), breaks=seq(0, max(agency_n_decline_sum %>% select(n))+5000,by=2500))+
   scale_x_continuous( breaks=seq(2019,2025,by=1))+
+  theme(axis.title.X = element_text(size = 6))+
+  theme(axis.title.Y = element_text(size = 6))+
+  theme(axis.text.y = element_text(size = 4))+
+  theme(axis.text.x =element_text(size = 4))+
   gghighlight(PY == 2025)
 
-ggsave("./images/agency_n_decline_sum.png", width = 6, height = 9, units = "cm")
+ggsave("./images/agency_n_decline_sum.png", width = 6, height = 4, units = "cm")
 
 # 
 # agency_n_decline %>%
@@ -767,7 +775,7 @@ compare_agency_2425 <-
 
 
 
-```{r  label = agency_n_decline_sum, echo = FALSE, fig.cap = "Percent change in publicaitons (Jan-May) relative to same period prvious year. Only agencies producing over 10000 articles between 2019-2024.", out.width = '60%'}
+```{r  label = agency_n_decline_sum, echo = FALSE, fig.cap = "Percent change in publicaitons (Jan-May) relative to same period prvious year. Only agencies producing over 10000 articles between 2019-2024.", out.width = '70%'}
 knitr::include_graphics("./images/agency_n_decline_sum.png")
 ```
 
@@ -800,7 +808,7 @@ ggsave("./images/agency_n_decline_2.png", width = 6, height = 9, units = "cm")
 
 
 
-```{r  label = agency_n_decline_2, echo = FALSE, fig.cap = "Percent change in articles published from previous Jan-May (2019-2024).", out.width = '60%'}
+```{r  label = agency_n_decline_2, echo = FALSE, fig.cap = "Percent change in articles published from previous Jan-May (2019-2024).", out.width = '70%'}
 knitr::include_graphics("./images/agency_n_decline_2.png")
 ```
 
@@ -828,7 +836,7 @@ ggsave("./images/agency_n_decline_3.png", width = 6, height = 9, units = "cm")
 
 
 
-```{r  label = agency_n_decline_3, echo = FALSE, fig.cap = "Papers Jan-May from agencies producing over 10000 articles (2019-2024).", out.width = '50%'}
+```{r  label = agency_n_decline_3, echo = FALSE, fig.cap = "Papers Jan-May from agencies producing over 10000 articles (2019-2024).", out.width = '70%'}
 knitr::include_graphics("./images/agency_n_decline_3.png")
 ```
 
