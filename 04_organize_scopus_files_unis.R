@@ -2,43 +2,46 @@ library(janitor)
 library(tidyverse)
 library(progress)
 library(fs)
-
-# bind the subfiles for each category and check for dupes ------------------
-
-data_dir_affils<-"./data_raw/affils/"
-csv_files_affils <- fs::dir_ls(data_dir_affils, regexp = "\\.csv$")
-affils_df <- csv_files_affils %>%
-  map_dfr(~ read_csv(.x))
-
-
-data_dir_papers<-"./data_raw/papers"
-csv_files_papers <- fs::dir_ls(data_dir_papers, regexp = "\\.csv$")
-papers_df <- csv_files_papers %>%
-    map_dfr(~ {
-      df <- read_csv(.x) 
-      # Convert all columns to character type BEFORE returning
-      df <- df %>% 
-        mutate_all(as.character)
-      
-      return(df)  
-    })
-
-
-data_dir_authors<-"./data_raw/authors"
-csv_files_authors <- fs::dir_ls(data_dir_authors, regexp = "\\.csv$")
-authors_df <- csv_files_authors %>%
-  map_dfr(~ read_csv(.x))
+# 
+# # bind the subfiles for each category and check for dupes ------------------
+# 
+# data_dir_affils<-"./data_raw/scopus_api/affils/"
+# csv_files_affils <- fs::dir_ls(data_dir_affils, regexp = "\\.csv$")
+# affils_df <- csv_files_affils %>%
+#   map_dfr(~ read_csv(.x))
+# 
+# 
+# data_dir_papers<-"./data_raw/scopus_api/papers"
+# csv_files_papers <- fs::dir_ls(data_dir_papers, regexp = "\\.csv$")
+# papers_df <- csv_files_papers %>%
+#     map_dfr(~ {
+#       df <- read_csv(.x) 
+#       # Convert all columns to character type BEFORE returning
+#       df <- df %>% 
+#         mutate_all(as.character)
+#       
+#       return(df)  
+#     })
+# 
+# 
+# data_dir_authors<-"./data_raw/scopus_api/authors"
+# csv_files_authors <- fs::dir_ls(data_dir_authors, regexp = "\\.csv$")
+# authors_df <- csv_files_authors %>%
+#   map_dfr(~ read_csv(.x))
 
 
 # standardize the csv column names   --------------------------------------
 
-
+papers_df<-read_csv("./data_raw/scopus_api/unis_files/papers_df_uni1.csv")
+affils_df<-read_csv("./data_raw/scopus_api/unis_files/affils_df_uni1.csv")
+authors_df<-read_csv("./data_raw/scopus_api/unis_files/authors_df_uni1.csv")
 # names(affils_df)
-source("./code/name_standardizer.R")
+
+source("./code/names_standardizer_univ.R")
 
 # ----- affils
   
-affils_df<-names_standardizer(affils_df) %>%
+affils_df<-names_standardizer_univ(affils_df) %>%
   ungroup() %>%
   select(-"@_fa") %>% 
   distinct(affil_id,affiliation,city,country,.keep_all = TRUE) %>% 
@@ -53,11 +56,13 @@ affils_df<-names_standardizer(affils_df) %>%
          ) %>% 
   remove_empty(c("rows", "cols"))
   
+# write_rds(affils_df,"./data_intermediate/affils_df.rds")
 
+write_rds(affils_df,"./data_intermediate/affils_df_uni.rds")
 
 # ----- papers
 
-papers_df<-names_standardizer(papers_df) %>% 
+papers_df<-names_standardizer_univ(papers_df) %>% 
   ungroup() %>%
   select(-"@_fa") %>% 
   # group_by(scopus_article_id,SO,TI) %>% 
@@ -66,37 +71,32 @@ papers_df<-names_standardizer(papers_df) %>%
   distinct(scopus_article_id,SO,TI,.keep_all = TRUE) %>% 
   mutate_all(tolower) %>% 
   remove_empty(which = c("rows", "cols"))
-      
+        
+# write_rds(papers_df,"./data_intermediate/papers_df.rds")
 
+write_rds(papers_df,"./data_intermediate/papers_df_uni.rds")
 
 # ----- authors 
 
-authors_df<-names_standardizer(authors_df) %>%
+authors_df<-names_standardizer_univ(authors_df) %>%
   ungroup() %>%
   select(-"@_fa",
          -"afid.@_fa") %>% 
   remove_empty(which = c("rows", "cols")) %>% 
   mutate_all(tolower)
 
-# write_rds(authors_df,"./data_intermediate/authors_df_uni.rds")
-# write_rds(papers_df,"./data_intermediate/papers_df_uni.rds")
-# write_rds(affils_df,"./data_intermediate/affils_df_uni.rds")
+write_rds(authors_df,"./data_intermediate/authors_df_uni.rds")
+# write_rds(authors_df,"./data_intermediate/authors_df.rds")
 
-write_rds(affils_df,"./data_intermediate/affils_df.rds")  
-write_rds(papers_df,"./data_intermediate/papers_df.rds")
-write_rds(authors_df,"./data_intermediate/authors_df.rds")
-
-
-# affils_df<-read_rds("./data_intermediate/affils_df.rds")  
 # add refID ---------------------------------------------------------------
   
 papers_df$refID <- seq.int(nrow(papers_df))  
 papers_df<-papers_df %>% relocate(refID,.before=1)
 
 
-# bring over the refID from papers to authors ----------------------------
+# bring over the refiID from papers to authors ----------------------------
 paper_ID_nos<-papers_df %>% select(refID,source,entry_no)
-
+authors_df$source
 authors_df<-left_join(authors_df,paper_ID_nos) %>% 
   relocate(refID,.before=1)
 affils_df<-left_join(affils_df,paper_ID_nos) %>% 
@@ -107,25 +107,35 @@ rm(paper_ID_nos)
 # cleanup -----------------------------------------------------------------
   
 
-source("./code/papers_df_cleanup.R")
-papers_df<-papers_df_cleanup(papers_df)
+source("./code/papers_df_cleanup_unis.R")
 
 
-# IDENTIFY FEDERAL AFFILIATIONS -------------------------------------------
+papers_df<-papers_df_cleanup_unis(papers_df)
 
-## NEED TO CONFIRM THE DOD CDC ESP. INTENRATIONAL
 
-source("./code/ID_fed_affiliations.R")
-affils_df<-ID_fed_affiliations(affils_df)
-affils_df<-affils_df %>% 
-  rename(agency=agency_short)
+
+
+# add univ affiliations ---------------------------------------------------
+source("./code/ID_univ_affiliations.R")
+affils_df<-ID_univ_affiliations(affils_df)
+
+
+# 
+# # IDENTIFY FEDERAL AFFILIATIONS -------------------------------------------
+#   source("./code/ID_fed_affiliations.R")
+# affils_df_temp<-ID_fed_affiliations(affils_df)
+# 
+
+  
 # summary <- affils_df_temp %>% 
 # group_by(agency) %>% 
 #   tally() %>% 
 #   arrange(desc(n)) %>% 
 #   drop_na()
-
-
+# 
+#   affils_df<-affils_df_temp
+#   rm(affils_df_temp)
+  
 #   
 # # this will make sure there is only one row, the "alternative names) will all be spread out
 # 
@@ -140,13 +150,13 @@ affils_df<-affils_df %>%
 
 # affils_df2 %>% group_by(affil_id) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
 
-
+  
 
 # ADD FEDERAL AFFILIATIONS TO AUTHORS_DF ----------------------------------
 
-    source("./code/ID_fed_authors.R")
+    source("./code/ID_univ_authors.R")
   
-  authors_df<-ID_fed_authors(authors_df,affils_df)
+  authors_df<-ID_univ_authors(authors_df,affils_df)
   
   
 
@@ -196,7 +206,7 @@ affils_df<-affils_df %>%
                        first_middle_initials,
                        affil_id,
                        OI,
-                       federal,
+                       univ,
                        .keep_all=TRUE)
   
   # affils_df<-affils_df[!duplicated(affils_df), ]
@@ -250,45 +260,51 @@ affils_df<-left_join(affils_df,PY_binder)
 
 names(PY_binder)
 names(affils_df)
-affil_binder<-affils_df %>% select(affil_id,federal,agency)
+affil_binder<-affils_df %>% select(affil_id,univ)
 affil_binder$affil_id<-as.character(affil_binder$affil_id)
 authors_df<-left_join(authors_df,affil_binder)
 # 2x to make sure all federal have agency
 
-write_rds(papers_df,"./data_intermediate/papers_df_preusgs.rds")
-write_rds(authors_df,"./data_intermediate/authors_df_preusgs.rds")
-write_rds(affils_df,"./data_intermediate/affils_df_preusgs.rds")
+# write_rds(papers_df,"./data_intermediate/papers_df_preusgs.rds")
+# write_rds(authors_df,"./data_intermediate/authors_df_preusgs.rds")
+# write_rds(affils_df,"./data_intermediate/affils_df_preusgs.rds")
 
-write_rds(need_to_find_authors,"./data_intermediate/need_to_find_authors.rds")
-write_rds(need_to_find_papers,"./data_intermediate/need_to_find_papers.rds")
-
-
+write_rds(need_to_find_authors,"./data_intermediate/need_to_find_authors_uni.rds")
+write_rds(need_to_find_papers,"./data_intermediate/need_to_find_papers_uni.rds")
 
 
 
-# MERGE WITH USGS ---------------------------------------------------------
-
-
-
-source("./code/merge_with_usgs.R")
-usgs_results<-merge_with_usgs(authors_df,papers_df)
-papers_df<-usgs_results$papers
-authors_df<-usgs_results$authors
+# 
+# 
+# # MERGE WITH USGS ---------------------------------------------------------
+# 
+# 
+# 
+# source("./code/merge_with_usgs.R")
+# usgs_results<-merge_with_usgs(authors_df,papers_df)
+# papers_df<-usgs_results$papers
+# authors_df<-usgs_results$authors
 
 
 # SAVE CLEAN FILES --------------------------------------------------------
 
 
 
-authors_df %>% summarize(n=n_distinct(refID))
-authors_df %>%  filter(federal==TRUE) %>% summarize(n=n_distinct(refID))
+# authors_df %>% summarize(n=n_distinct(refID))
+# authors_df %>%  filter(federal==TRUE) %>% summarize(n=n_distinct(refID))
 
 
-authors_df<-authors_df %>% relocate(c(federal, agency),.before=1)
+authors_df<-authors_df %>% relocate(univ,.before=1)
+
+authors_df<-authors_df %>% 
+  mutate(focal_uni=if_else(is.na(univ),FALSE,TRUE)) %>% 
+  relocate(focal_uni,.before=1)
 
 
-write_rds(papers_df,"./data_clean/papers_df_clean.rds")
-write_rds(authors_df,"./data_clean/authors_df_clean.rds")
-write_rds(affils_df,"./data_clean/affils_df_clean.rds")
+
+write_rds(papers_df,"./data_clean/papers_df_uni_clean.rds")
+write_rds(authors_df,"./data_clean/authors_df_uni_clean.rds")
+write_rds(affils_df,"./data_clean/affils_df_uni_clean.rds")
+
 
 
