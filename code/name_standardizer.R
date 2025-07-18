@@ -63,15 +63,15 @@ names_standardizer <- function(combined_data) {
   
   combined_data<-replace(combined_data, combined_data =="", NA)  
   # 
-  combined_data<-combined_data %>%
-    mutate(source=str_replace(source, "./data_raw/scopus_api/papers/scopus_", "")) %>%
-    mutate(source=str_replace(source, "_papers", "")) %>%
-    mutate(source=str_replace(source, "./data_raw/scopus_api/authors/scopus_", "")) %>%
-    mutate(source=str_replace(source, "_authors", "")) %>%
-    mutate(source=str_replace(source, "./data_raw/scopus_api/affils/scopus_", "")) %>%
-    mutate(source=str_replace(source, "_affils", "")) %>%
-    
-    relocate(entry_no,.before = 1)
+  # combined_data<-combined_data %>%
+  #   mutate(source_file=str_replace(source_file, "./data_raw/scopus_api/papers/scopus_", "")) %>%
+  #   mutate(source_file=str_replace(source_file, "_papers", "")) %>%
+  #   mutate(source_file=str_replace(source_file, "./data_raw/scopus_api/authors/scopus_", "")) %>%
+  #   mutate(source_file=str_replace(source_file, "_authors", "")) %>%
+  #   mutate(source_file=str_replace(source_file, "./data_raw/scopus_api/affils/scopus_", "")) %>%
+  #   mutate(source_file=str_replace(source_file, "_affils", "")) %>%
+  #   
+  #   relocate(entry_no,.before = 1)
   
   return(combined_data)
 }  
