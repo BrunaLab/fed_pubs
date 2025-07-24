@@ -12,10 +12,126 @@ library(janitor)
 # https://www.youtube.com/watch?v=FbznaCOXbcU
 
 
+papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
+
+papers_df <- papers_df %>% 
+  mutate(PM=
+           case_when(
+             is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
+             .default = as.numeric(PM)
+           )
+  ) %>% 
+  remove_empty(c("rows","cols")) %>% 
+  tibble()
+
+
+# papers_df %>% filter(is.na(PM))
+
+authors_df <- setDT(readRDS("./data_clean/authors_df_clean.rds"))
+
+
+
+
+
+
+# make rds of papers with fed 1st author ----------------------------------
+
+
+fed_first_authors <- authors_df %>%
+  remove_empty(c("rows","cols")) %>% 
+  filter(federal == TRUE) %>%
+  filter(author_order == 1) %>% 
+  distinct()
+
+papers_with_fed_first<-papers_df %>% 
+  filter(refID%in%fed_first_authors$refID) %>% 
+  distinct(scopus_article_id,.keep_all=TRUE) 
+
+
+
+# fed_last_authors <- authors_df %>%
+#   group_by(refID) %>%
+#   slice_tail() %>%
+#   filter(author_order != 1) %>%
+#   filter(federal == TRUE) 
+
+
+
+
+# papers_with_fed_last<-papers_df %>% 
+#   filter(refID%in%fed_last_authors$refID) %>% 
+#   distinct(scopus_article_id,.keep_all=TRUE) 
+
+
+
+# fed_first_authors %>% 
+#   tally()
+
+# fed_last_authors %>% 
+#   ungroup() %>% 
+#   summarize(n=n_distinct(refID))
+
+
+# papers_with_fed_first %>% 
+#   group_by(PY) %>% 
+#   tally()
 # 
-fed_pubs<-readRDS("./data_clean/analysis_fed_pubs.rds")
-source("./code/keyword_splitter.R")
-keywords_all <- keyword_splitter(fed_pubs)
+# 
+# papers_with_fed_last %>% 
+#   group_by(PY) %>% 
+#   tally()
+
+# unique(authors_df$agency)
+
+
+all_authors_df_for_fed_1st_papers<-authors_df %>% 
+  filter(refID%in%fed_first_authors$refID) 
+
+# all_authors_df_for_fed_last_papers<-authors_df %>% 
+#   filter(refID%in%fed_last_authors$refID) 
+
+
+
+
+
+PY_for_authors_df<-papers_with_fed_first %>% 
+  select(refID,PY,PM) 
+fed_first_authors <- fed_first_authors %>% 
+  left_join(PY_for_authors_df)
+
+
+# PY_for_last_authors_df<-papers_with_fed_last %>% 
+#   select(refID,PY,PM) 
+# fed_last_authors <- fed_last_authors %>% 
+#   left_join(PY_for_last_authors_df)
+
+
+
+all_authors_df_for_fed_1st_papers<-authors_df %>% 
+  filter(refID%in%fed_first_authors$refID) %>% 
+  left_join(PY_for_authors_df)
+
+
+
+# all_authors_df_for_fed_last_papers<-authors_df %>% 
+#   filter(refID%in%fed_last_authors$refID) %>% 
+#   left_join(PY_for_last_authors_df)
+
+# rm(PY_for_authors_df,PY_for_last_authors_df)
+
+# first and last authors
+# papers_first_last<-bind_rows(papers_with_fed_first,papers_with_fed_last)
+# fed_first_last_authors<-bind_rows(fed_first_authors,fed_last_authors)
+
+
+# set focal datasets ------------------------------------------------------
+
+papers_dataset<-papers_with_fed_first
+authors_data_set<-fed_first_authors
+
+
+# source("./code/keyword_splitter.R")
+# keywords_fed <- keyword_splitter(papers_dataset)
 # pubs<-all_scopus_api[[1]]
 # authors<-all_scopus_api[[2]]
 
@@ -41,26 +157,26 @@ keywords_all <- keyword_splitter(fed_pubs)
 
 
 # split KWs up & arrange as column ----------------------------------------
+# 
+
+
 
 source("./code/keyword_splitter.R")
-keywords_all <- keyword_splitter(combined_data_papers)
-
-
-
-pubs2025<-combined_data_papers %>% filter(PY==2025)
-pubs2024<-combined_data_papers %>% filter(PY==2024)
-pubs2019<-combined_data_papers %>% filter(PY==2019)
+keywords_all_yrs_fed <- keyword_splitter(papers_dataset)
+pubs2025<-papers_dataset %>% filter(PY==2025)
+pubs2024<-papers_dataset %>% filter(PY==2024)
+pubs2019<-papers_dataset %>% filter(PY==2019)
 
 keywords_2025 <- keyword_splitter(pubs2025)
 keywords_2024 <- keyword_splitter(pubs2024)
 keywords_2019 <- keyword_splitter(pubs2019)
 
-keywords_all <- distinct(keywords_all, refID, original, .keep_all = TRUE)
+keywords_allkeywords_all_yrs_fed <- distinct(keywords_all_yrs_fed, refID, original, .keep_all = TRUE)
 keywords_2025 <- distinct(keywords_2025, refID, original, .keep_all = TRUE)
 keywords_2024 <- distinct(keywords_2024, refID, original, .keep_all = TRUE)
 keywords_2019 <- distinct(keywords_2019, refID, original, .keep_all = TRUE)
 # keywords_tropical_jrnls<-keyword_splitter(tropical_data)
-write_csv(keywords_all, "./data_clean/keywords_all.csv")
+write_csv(keywords_all_yrs_fed, "./data_clean/keywords_all_yrs_fed.csv")
 
 # write_csv(keywords_all, "./bibliometrics/data_intermediate/keywords_tropical.csv")
 

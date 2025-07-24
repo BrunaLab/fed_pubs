@@ -28,7 +28,7 @@ total_pubs_to_month_x <- function(pubs_mo, PM_max) {
     annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.02*max(total_jan_may$n)), label=(total_jan_may %>% filter(PY==2025) %>% select(n)),
              color="navyblue", size=4)+
     
-    annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.07*max(total_jan_may$n)), label=paste("(", round((total_jan_may %>% filter(PY==2025) %>% select(perc_previous_yr)),2),"%)",sep=""),
+    annotate(geom="text", x=2025, y=(max(total_jan_may$n)-.13*max(total_jan_may$n)), label=paste("(", round((total_jan_may %>% filter(PY==2025) %>% select(perc_previous_yr)),2),"%)",sep=""),
              color="red", size=4)+
     scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(total_jan_may %>% select(n))+500),by=3000))+
     # scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(total_jan_may %>% select(n))+500))+
@@ -38,6 +38,6 @@ total_pubs_to_month_x <- function(pubs_mo, PM_max) {
     theme(axis.text.y = element_text(size = 12))+
     theme(axis.text.x =element_text(size = 12))+
     gghighlight(PY == 2025)
-  ggsave("./images/total_pubs_to_month_x.png", width = 6, height = 4, units = "in")
+  ggsave("./images/total_pubs_to_month_x_uni.png", width = 6, height = 4, units = "in")
   return(total_pubs_to_month_x_fig)
 }

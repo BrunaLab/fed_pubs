@@ -1,7 +1,7 @@
 merge_with_usgs <- function(authors_df,papers_df) {
   
   usgs_authors<-read_rds("./data_intermediate/usgs_authors_clean.Rds")
-  usgs_papers<-read_rds("./data_intermediate/usgs_papers_clean.rds")
+  usgs<-read_rds("./data_intermediate/usgs_papers_clean.rds")
   
   # get a df of papers already in papers_df from usgs
   # get the federal usgs authors of those papers (doi, author order) and 
@@ -14,9 +14,11 @@ merge_with_usgs <- function(authors_df,papers_df) {
   
   # by DOI
   
-  # usgs<-read_csv("./data_raw/scopus_api/fed_files/usgs_with_doi.csv") 
-  usgs_with_DI<-usgs_papers %>% filter(!is.na(DI))
-  usgs_already_in_papers_df<-papers_df %>% filter(DI%in%usgs_with_DI$DI) %>% select(refID,DI)
+  usgs<-read_csv("./data_raw/scopus_api/fed_files/usgs_with_doi.csv") %>% 
+    mutate(index=row_number())
+  
+  
+  usgs_already_in_papers_df<-papers_df %>% filter(DI%in%usgs$DI) %>% select(refID,DI)
   
   
   authors_df_usgs_check<-authors_df %>%
@@ -40,7 +42,7 @@ merge_with_usgs <- function(authors_df,papers_df) {
     separate(given_name,c("first","middle"),extra = "merge")
   
   
-  usgs_authors_clean<-usgs_authors %>% 
+  usgs_authors_clean<-read_rds("./data_intermediate/usgs_authors_clean.rds") %>% 
     select(surname,AF, given_name, federal,email) %>% 
     arrange(desc(federal)) %>% 
     separate(given_name,c("first","middle"),extra = "merge") 
@@ -52,8 +54,8 @@ merge_with_usgs <- function(authors_df,papers_df) {
     filter((federal.x=="TRUE" & federal.y=="TRUE")|(federal.x=="FALSE" & federal.y=="FALSE")) %>% 
     distinct()
   
-  fed_check_usgs_remain<-anti_join(fed_check_usgs,fed_check_usgs_match) %>% distinct(SID,federal.x,federal.y,.keep_all=TRUE)
-  fed_check_usgs_remain<-fed_check_usgs_remain %>% 
+  fed_check_usgs_remnain<-anti_join(fed_check_usgs,fed_check_usgs_match) %>% distinct(SID,federal.x,federal.y,.keep_all=TRUE)
+  fed_check_usgs_remnain<-fed_check_usgs_remnain %>% 
     mutate(federal.x=if_else(federal.y=="TRUE","TRUE",federal.x)) %>% 
     arrange(desc(federal.y),federal.x) %>% 
     select(SID,federal.x) %>% 
@@ -61,101 +63,28 @@ merge_with_usgs <- function(authors_df,papers_df) {
   
   
   authors_df<-authors_df %>%
-    left_join(fed_check_usgs_remain,by="SID") %>% 
+    left_join(fed_check_usgs_remnain,by="SID") %>% 
     mutate(federal=if_else(federal.x=="TRUE",TRUE,federal)) %>% 
     select(-federal.x)
   
   
-  authors_df %>% distinct(surname,given_name,.keep_all=TRUE) %>% group_by(surname,given_name) %>% tally(n_distinct(federal))
   
   
   
+  usgs2<-read_csv("./data_raw/scopus_api/fed_files/usgs_no_doi.csv")
   
-  # <-read_csv("./data_raw/scopus_api/fed_files/usgs_no_doi.csv")
-  usgs_papers_no_doi<-usgs_papers %>% filter(is.na(DI))
-  match_title<-papers_df %>% filter(TI%in%usgs_papers_no_doi$TI) 
-  
-  usgs_already_in_papers_df<-papers_df %>% filter(DI%in%usgs_with_DI$DI) %>% select(refID,DI)
-  
-  # usgs_pubs<-read_rds("./data_intermediate/usgs_papers_clean.rds")
-  # 
-  
-  usgs_pubs_to_add1<-anti_join(usgs_papers,usgs_already_in_papers_df,by="DI")
-  usgs_pubs_to_add2<-semi_join(usgs_papers,match_title,by="TI") 
-  
-  usgs_papers_NOT_in_papers_df<-bind_rows(usgs_pubs_to_add1,usgs_pubs_to_add2) %>% 
-    select(-c(Country,
-              agency_3,
-              State,
-              City,
-              URL,
-              agency,
-              agency_2)) 
-  
-  # 
-  # 
-  # usgs_authors<-read_rds("./data_intermediate/usgs_authors_clean.rds") 
-  # 
-  
-  add_to_authors_df<-usgs_authors %>% filter(usgs_refID%in%usgs_papers_NOT_in_papers_df$usgs_refID) %>% 
-    mutate(from="usgs") %>% 
-    rename(refID=usgs_refID) %>% 
-    select(-c(agency_2,agency_3,country,city,from)) %>% 
-    mutate(affil_id=if_else(federal=="FALSE",NA,affil_id)) %>% 
-    mutate(federal=as.logical(federal))
-  # ,
-  #          PY=as.numeric(PY)) 
-  # 
-  # add to authors_df and papers_df -----------------------------------------
-  authors_df<-authors_df %>% mutate(federal=as.logical(federal))
-  add_to_authors_df$author_order<-as.integer(add_to_authors_df$author_order)
-  authors_df$author_order<-as.integer(authors_df$author_order)
-  
-  authors_df$authorID<-as.character(authors_df$authorID)
-  add_to_authors_df$authorID<-as.character(add_to_authors_df$authorID)
-  
-  add_to_authors_df$PY<-as.numeric(add_to_authors_df$PY)
-  
-  add_to_authors_df$entry_no<-as.integer(add_to_authors_df$entry_no)
-  
-  # add_to_authors_df: are any of these federal in the main df?
+  match_title<-papers_df %>% filter(TI%in%usgs2$TI) 
   
   
+  usgs_already_in_papers_df<-papers_df %>% filter(DI%in%usgs$DI) %>% select(refID,DI)
+  
+  usgs_pubs<-read_rds("./data_intermediate/usgs_papers_clean.rds")
   
   
-  add_to_authors_df_trim<-  add_to_authors_df %>% 
-    select(AF,surname,given_name,federal,affil_id) %>% 
-    mutate(federal=as.character(federal)) %>% 
-    distinct() %>% 
-    mutate(affil_id=as.integer(affil_id))
+  usgs_pubs_to_add1<-anti_join(usgs_pubs,usgs_already_in_papers_df,by="DI")
+  usgs_pubs_to_add2<-semi_join(usgs_pubs,match_title,by="TI") 
   
-  
-  
-  
-  authors_df_fed_check<-authors_df %>% 
-    select(AF,surname,given_name,federal,SID,affil_id) %>% 
-    mutate(federal=as.character(federal)) %>% 
-    distinct() 
-  
-  # add_to_authors_df<-left_join(add_to_authors_df_trim,authors_df_fed_check,by="affil_id")
-  
-  names<-names(authors_df)
-  names2<-names(add_to_authors_df)
-  names<-intersect(names,names2)
-  
-  
-  add_to_authors_df<-add_to_authors_df %>% mutate(affil_id=as.numeric(affil_id)) %>% select(all_of(names)) 
-  
-  add_to_papers_df<-usgs_papers_NOT_in_papers_df %>% rename(refID=usgs_refID)
-  
-  add_to_papers_df$PY<-as.numeric(add_to_papers_df$PY)
-  
-  papers_df$BP<-as.character(papers_df$BP)
-  papers_df$EP<-as.character(papers_df$EP)
-  
-  papers_df<-bind_rows(papers_df,add_to_papers_df)
-  
-  return(list(papers=papers_df,authors=authors_df))
+  usgs_pubs_to_add<-bind_rows(usgs_pubs_to_add1,usgs_pubs_to_add2)
   
   
   
@@ -169,7 +98,7 @@ merge_with_usgs <- function(authors_df,papers_df) {
   
   
   
-  usgs_DI<-usgs_pubs_to_add %>% 
+  usgs_DI<-usgs %>% 
     select(DI,usgs_refID) %>% 
     drop_na() 
   

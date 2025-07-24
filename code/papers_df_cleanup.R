@@ -21,6 +21,11 @@ papers_df_cleanup <- function(papers_df) {
       PG = EP - BP
     )
   
+  
+  
+  
+  
+  
   # Add missing columns with NA (only if they don't exist)
   missing_cols <- c("AF", "AU", "CA", "C1", "C3", "CR", "EM", "ID", "JI", "NR", 
                     "PU", "RI", "OI", "RP", "SC", "WC", "AR", "Z9", "WE")
@@ -32,7 +37,7 @@ papers_df_cleanup <- function(papers_df) {
   
   # Reorder columns
   desired_order <- c(
-    "refID", "source_file","scopus_article_id", "AB", "AF", "AU", "CA", "BP", "C1", "C3", "CR", 
+    "refID", "source_file","entry_no","scopus_article_id", "AB", "AF", "AU", "CA", "BP", "C1", "C3", "CR", 
     "DE", "DI", "DT", "EM", "EP", "FU", "ID", "IS", "JI", "NR", "PD", "PG", 
     "PT", "PU", "PY", "PY2", "RI", "OI", "PM", "RP", "SC", "SN", "EI", "SO", 
     "TC", "TI", "UT", "VL", "WC", "Z9", "AR", "WE"

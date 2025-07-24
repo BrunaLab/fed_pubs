@@ -13,10 +13,11 @@ total_pubs_per_year <- function(pubs_yr, PY_max) {
     theme(axis.title.x =element_text(size = 14))+
     theme(axis.text.y = element_text(size = 12))+
     theme(axis.text.x =element_text(size = 12))+
+    scale_x_continuous(expand = c(0, 0), breaks=seq(from=min(pubs_yr$PY),to=PY_max,by=1), limits = c(min(pubs_yr$PY),max(pubs_yr$PY)))+
     scale_y_continuous(expand = c(0, 0), breaks=seq(0,max(pubs_yr$n)+5000,by=5000), limits = c(0, max(pubs_yr$n)+5000))
      
   
-  ggsave("./images/total_pubs_per_yr.png", width = 8, height = 8, units = "in")
+  ggsave("./images/total_pubs_per_yr_uni.png", width = 8, height = 8, units = "in")
   
   return(pubs_yr_fig)
 }

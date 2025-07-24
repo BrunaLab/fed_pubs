@@ -6,46 +6,92 @@ library(data.table)
 # #####################################
 # data_dir<-"./data_raw/scopus_api/unis"
 # data_dir<-"./data_raw/scopus_api/unis_files"
-data_dir<-"./data_raw/scopus_api/fed_files/redux"
-dir = TRUE
-include_all=FALSE
 # #####################################
 
 
+# STILL NEED TO DO THE ones for the big ID that i couldnt loop
 
+# BIND OF CSVS WITHIN A YEAR
+# data_dir<-"./data_raw/scopus_api/fed_files/redux"
+
+data_dir<-"./data_raw/scopus_api/unis_files"
+
+# dir = TRUE
+# include_all=FALSE
 folder<-c(
-  "2019",
-  "2020",
-  "2021",
-  "2022",
-  "2023",
-  "2024",
-  "2025",
-  "misc")
+  "2019", # 1
+  "2020", # 2
+  "2021", # 3
+  "2022", # 4
+  "2023", # 5
+  "2024", # 6
+  "2025") # 7
 
 
-folder_count<-folder[2]
 
 
+
+folder_id <- seq_along(folder)
+
+    for  (k in folder_id) {
 
 # affils load -------------------------------------------------------------
 
 # Define folder paths
 
-folder_path_papers  <- file.path(data_dir, "papers",folder_count)
-folder_path_authors <- file.path(data_dir, "authors",folder_count)
-folder_path_affils  <- file.path(data_dir, "affils",folder_count)
+folder_path_papers  <- file.path(data_dir, "papers",folder[k])
+folder_path_authors <- file.path(data_dir, "authors",folder[k])
+folder_path_affils  <- file.path(data_dir, "affils",folder[k])
+
 
 # Validate structure
 validate_csv_structure <- function(...) {
   folders <- list(...)
   file_counts <- map_int(folders, ~ length(list.files(.x, pattern = "\\.csv$", full.names = TRUE)))
-  
+
   if (any(file_counts == 0) || length(unique(file_counts)) != 1) {
-    stop("ERROR: Either the file path is incorrect OR folders contain non-CSV or mismatched files.")
+    
+    
+    
+    papers_list<-list.files(folder_path_papers) %>% 
+      tibble() %>% 
+      rename(file=".") %>% 
+      mutate(file=str_remove(file,"scopus_affil_")) %>% 
+      mutate(file=str_remove(file,"_papers.csv")) %>% 
+      mutate(file=str_remove(file,"_papers ")) %>% 
+      mutate(folder="papers")
+    
+    
+    authors_list<-list.files(folder_path_authors) %>% 
+      tibble() %>% 
+      rename(file=".") %>% 
+      mutate(file=str_remove(file,"scopus_affil_")) %>% 
+      mutate(file=str_remove(file,"_authors.csv")) %>% 
+      mutate(file=str_remove(file,"_authors ")) %>% 
+      mutate(folder="authors")
+    
+    affils_list<-list.files(folder_path_affils)%>% 
+      tibble() %>% 
+      rename(file=".") %>% 
+      mutate(file=str_remove(file,"scopus_affil_")) %>% 
+      mutate(file=str_remove(file,"_affils.csv")) %>% 
+      mutate(file=str_remove(file,"_affils_.csv")) %>% 
+      mutate(file=str_remove(file,"_affils_ ")) %>% 
+      mutate(folder="affils")
+    
+    file_checker<-full_join(papers_list,authors_list,by="file") %>% 
+      full_join(affils_list,by="file") %>% 
+      filter(is.na(folder)|is.na(folder.x)|is.na(folder.y)) %>% 
+      rename(papers=folder.x,
+             authors=folder.y,
+             affils=folder)
+    
+    print(file_checker)
+    
+    stop("ERROR: Either the file path is incorrect OR folders contain non-CSV or mismatched files. Here is the file mismatch.")
   }
   
-  message("Now processing all references files")
+  message("All files are csvs. If comparing multiple folders, all have the same number of files.")
 }
 
 
@@ -120,19 +166,6 @@ rm(dt_list)
 
 
 
-# 
-# cvs_binder_authors <- function(csv_files_authors) {
-#   
-#   authors_df <- csv_files_authors %>%
-#     map_dfr(~ read_csv(.x),
-#             .id = "source")
-#   
-# }
-# 
-# 
-# authors_df<-cvs_binder_authors(csv_files_authors_all)
-
-  
   # papers binder -----------------------------------------------------------
   # data_dir_papers<-"./data_raw/scopus_api/unis_files/papers"
   data_dir_papers<-folder_path_papers
@@ -154,60 +187,6 @@ rm(dt_list)
   rm(dt_list)
   
   
-  # 
-  # cvs_binder_papers <- function(csv_files_papers) {
-  #   
-  #   papers_df <- csv_files_papers %>%
-  #     map_dfr(~ read_csv(.x) %>% 
-  #             mutate(
-  #               `prism:eIssn` = as.character(`prism:eIssn`),
-  #               `prism:issn` = as.character(`prism:issn`),
-  #                    `prism:coverDate` = as.character(`prism:coverDate`)
-  #                    ),
-  #             .id = "source_file")
-  #   
-  # }
-  
-  
-  
-  # 
-  # 
-  # cvs_binder_papers <- function(csv_files_papers) {
-  #   
-  #   papers_df <- csv_files_papers %>%
-  #     map_dfr(~ {
-  #       df <- read_csv(.x) 
-  #       
-  #       # Ensure consistent column names across files
-  #       required_columns <- c("prism:eIssn", "prism:issn", "prism:coverDate") # Add any other necessary columns
-  #       missing_cols <- setdiff(required_columns, names(df))
-  #       
-  #       # Add missing columns as NA
-  #       if (length(missing_cols) > 0) {
-  #         df[missing_cols] <- NA
-  #       }
-  #       
-  #       # Convert all columns to character type BEFORE returning
-  #       df <- df %>% 
-  #         mutate_all(as.character)
-  #       
-  #       return(df)  
-  #     }, .id = "source_file")
-  #   
-  #   return(papers_df)
-  # }
-  # 
-  # 
-  # papers_df_1<-cvs_binder_papers(csv_files_papers_all)
-  # write_csv(papers_df_1,"./data_raw/papers_df_uni1.csv")
-  
-  
-  # 
-  # papers_df<-cvs_binder_papers(csv_files_papers_all)
-  # 
-  # 
-  
-  
   # standardize the csv column names   --------------------------------------
   
   
@@ -216,9 +195,9 @@ rm(dt_list)
   
   # ----- affils
   
-  affils_df<-names_standardizer(affils_df) %>%
-    ungroup() %>%
-    # select(-"@_fa") %>% 
+  affils_df<-names_standardizer(affils_df) 
+    affils_df<-affils_df %>% 
+    select(-"@_fa") %>% 
     # distinct(affil_id,affiliation,city,country,.keep_all = TRUE) %>% 
     mutate_all(tolower) %>% 
     mutate(country=as.factor(country),
@@ -238,7 +217,7 @@ rm(dt_list)
   
   papers_df<-names_standardizer(papers_df) %>% 
     ungroup() %>%
-    # select(-"@_fa") %>% 
+    select(-"@_fa") %>% 
     # group_by(scopus_article_id,SO,TI) %>% 
     # tally() %>% 
     # arrange(desc(n)) %>% 
@@ -249,16 +228,21 @@ rm(dt_list)
   
   # ----- authors 
   
-  authors_df<-names_standardizer(authors_df) %>%
-    ungroup() %>%
-    select(-"@_fa",
-           -"afid.@_fa") %>% 
+  authors_df<-names_standardizer(authors_df) %>% 
+  ungroup() %>%
+    select(-"@_fa") %>% 
+    # select(-"@_fa",
+    #        -"afid.@_fa") %>% 
     remove_empty(which = c("rows", "cols")) %>% 
     mutate_all(tolower)
   
   
-
-# edit source_file and add refID ----------------------------------------------
+  
+  
+  
+  
+  
+# edit source_file  ----------------------------------------------
 papers_df<-papers_df %>% 
   # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
     mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
@@ -271,6 +255,7 @@ papers_df<-papers_df %>%
     mutate_all(as.character) 
   
   # papers_df$refID
+  # papers_df$entry_no
   
 authors_df<-authors_df %>% 
   # mutate(source_file = str_replace(source_file, folder_path_authors, "")) %>% 
@@ -291,6 +276,38 @@ authors_df<-authors_df %>%
     mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
     relocate(refID,.before=1) %>% 
     mutate_all(as.character) 
+  
+  
+  # papers_df cleanup   --------------------------------------
+  
+  
+  
+  source("./code/papers_df_cleanup.R")
+  
+  papers_df<-papers_df_cleanup(papers_df)
+  
+  # papers_df$refID
+  # papers_df$source_file
+  names(papers_df)
+
+  
+  
+  
+  # IDENTIFY FEDERAL AFFILIATIONS -------------------------------------------
+  
+  ## NEED TO CONFIRM THE DOD CDC ESP. INTENRATIONAL
+  
+  source("./code/ID_fed_affiliations.R")
+  affils_df<-ID_fed_affiliations(affils_df)
+  
+  
+  
+  
+  # ADD FEDERAL AFFILIATIONS TO AUTHORS_DF ----------------------------------
+  
+  source("./code/ID_fed_authors.R")
+  
+  authors_df<-ID_fed_authors(authors_df,affils_df)
   
 # check to see if any records failed to load  -----------------------------
 
@@ -373,7 +390,7 @@ authors_df<-authors_df %>%
   
   dupe_pubs_clean<-dupe_pubs %>% 
     group_by(DI,TI) %>% 
-    arrange(AB,DE,page_range) %>% 
+    arrange(AB,DE,BP) %>% 
     slice_head(n=1)
   
   papers_df<-bind_rows(papers_df,dupe_pubs_clean)
@@ -401,66 +418,27 @@ authors_df<-authors_df %>%
   
 # save --------------------------------------------------------------------
 
-  
-  
-  write_csv(affils_df,paste("./data_raw/affils/",folder_count,"/affils_df_",folder_count,".csv",sep=""))
-  write_csv(authors_df,paste("./data_raw/authors/",folder_count,"/authors_df_",folder_count,".csv",sep=""))
-  write_csv(papers_df,paste("./data_raw/papers/",folder_count,"/papers_df_",folder_count,".csv",sep=""))
-  
-  
-  write_csv(incompletes_to_remove,paste("./data_raw/incompletes_removed_",folder_count,".csv",sep=""))
-  
-  
-  
+  # # FOR WITHIN YEAR BINDING - FEDS
   # 
+  # write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
+  # write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
+  # write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
   # 
-  # papers_df_1<-cvs_binder_papers(csv_files_papers_all[1:5000])
-  # write_csv(papers_df_1,"./data_raw/papers_df_1.csv")
-  # papers_df_2<-cvs_binder_papers(csv_files_papers_all[5001:10000])
-  # write_csv(papers_df_2,"./data_raw/papers_df_2.csv")
-  # papers_df_3<-cvs_binder_papers(csv_files_papers_all[10001:13431])
-  # write_csv(papers_df_3,"./data_raw/papers_df_3.csv")
+  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
+  # # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder_count,".csv",sep=""))
+  
+  # # FOR WITHIN YEAR BINDING - UNIS
   # 
-  # papers_df_4<-cvs_binder_papers(csv_files_papers_all)
-  # write_csv(papers_df_4,"./data_raw/papers_df_4.csv")
-  # papers_df_5<-cvs_binder_papers(csv_files_papers_all)
-  # write_csv(papers_df_5,"./data_raw/papers/papers_df_5.csv")
+  write_csv(affils_df,paste("./data_raw/affils/year_files_uni/affils_df_",folder[k],".csv",sep=""))
+  write_csv(authors_df,paste("./data_raw/authors/year_files_uni/authors_df_",folder[k],".csv",sep=""))
+  write_csv(papers_df,paste("./data_raw/papers/year_files_uni/papers_df_",folder[k],".csv",sep=""))
+
+  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
+  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder[k],".csv",sep=""))
+  
   
 
+    }
   
-  
-  
-  # authors_df_1<-cvs_binder_authors(csv_files_authors_all)
-  # write_csv(authors_df_1,"./data_raw/authors_df_uni1.csv")
-  # 
-  # 
-  # authors_df_1<-cvs_binder_authors(csv_files_authors_all[1:5000])
-  # write_csv(authors_df_1,"./data_raw/authors_df_1.csv")
-  # authors_df_2<-cvs_binder_authors(csv_files_authors_all[5001:10000])
-  # write_csv(authors_df_2,"./data_raw/authors_df_2.csv")
-  # authors_df_3<-cvs_binder_authors(csv_files_authors_all[10001:13431])
-  # write_csv(authors_df_3,"./data_raw/authors_df_3.csv")
-  # 
-  # authors_df_4<-cvs_binder_authors(csv_files_authors_all)
-  # write_csv(authors_df_4,"./data_raw/authors_df_4.csv")
-  # authors_df_5<-cvs_binder_authors(csv_files_authors_all)
-  # write_csv(authors_df_5,"./data_raw/authors/authors_df_5.csv")
-  
-  
-  
-  
-  # affils_df_1<-cvs_binder_affils(csv_files_affils_all)
-  # write_csv(affils_df_1,"./data_raw/affils_df_uni1.csv")
-  # 
-  # affils_df_1<-cvs_binder_affils(csv_files_affils_all[1:5000])
-  # write_csv(affils_df_1,"./data_raw/affils_df_1.csv")
-  # affils_df_2<-cvs_binder_affils(csv_files_affils_all[5001:10000])
-  # write_csv(affils_df_2,"./data_raw/affils_df_2.csv")
-  # affils_df_3<-cvs_binder_affils(csv_files_affils_all[10001:13431])
-  # write_csv(affils_df_3,"./data_raw/affils_df_3.csv")
-  # affils_df_4<-cvs_binder_affils(csv_files_affils_all)
-  # write_csv(affils_df_4,"./data_raw/affils_df_4.csv")
-  # affils_df_5<-cvs_binder_affils(csv_files_affils_all)
-  # write_csv(affils_df_5,"./data_raw/affils/affils_df_5.csv")
   
   

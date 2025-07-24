@@ -238,6 +238,7 @@ ID_fed_affiliations <- function(affils_df) {
     mutate(federal = case_when(
       affil_id %in% c(
         112838889,
+        60006762,
         128561286,
         128464417,
         100641183,
@@ -993,7 +994,7 @@ ID_fed_affiliations <- function(affils_df) {
   
   affils_df<-affils_df %>% 
     rename(agency=agency_short) %>% 
-    select(-`@_fa`)
+    mutate(federal=if_else(is.na(federal),FALSE,federal))
   
   return(affils_df)
 }

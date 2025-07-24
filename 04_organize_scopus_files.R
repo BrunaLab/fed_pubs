@@ -12,8 +12,7 @@ folder<-c(
   "2022",
   "2023",
   "2024",
-  "2025",
-  "misc")
+  "2025")
 
 folder<-folder[1]
 
@@ -21,12 +20,26 @@ folder<-folder[1]
 # df <- fread("C:\\Users\\Bob\\Desktop\\data.csv")
 
 
-
 # Load files and bind
 # Define folder paths
 folder_path_affils <- paste("./data_raw/affils/",folder,sep="")
 folder_path_papers <- paste("./data_raw/papers/",folder,sep="")
 folder_path_authors <- paste("./data_raw/authors/",folder,sep="")
+
+
+
+# BIND OF THE ANNUAL CSVS
+
+data_dir<-"./data_raw"
+
+
+# Load files and bind
+# Define folder paths
+folder_path_affils <- "./data_raw/affils/"
+folder_path_papers <- "./data_raw/papers/"
+folder_path_authors <- "./data_raw/authors/"
+
+
 
 
 # affil binder -----------------------------------------------------------
@@ -93,48 +106,9 @@ dt_list <- lapply(dataFls, function(file) {
 papers_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
 rm(dt_list)
 
+all_papers_df_fed.csv
 
-# 
-# 
-# 
-# # affils load -------------------------------------------------------------
-# 
-# 
-# 
-# data_dir_affils<-paste("./data_raw/affils/",folder,"/",sep="")
-# csv_files_affils <- fs::dir_ls(data_dir_affils, regexp = "\\.csv$")
-# affils_df <- csv_files_affils %>%
-#   map_dfr(~ read_csv(.x))
-# 
-# 
-# # papers load -------------------------------------------------------------
-# 
-# 
-# data_dir_papers<-paste("./data_raw/papers/",folder,"/",sep="")
-# csv_files_papers <- fs::dir_ls(data_dir_papers, regexp = "\\.csv$")
-# papers_df <- csv_files_papers %>%
-#     map_dfr(~ {
-#       df <- read_csv(.x) 
-#       # Convert all columns to character type BEFORE returning
-#       df <- df %>% 
-#         mutate_all(as.character)
-#       
-#       return(df)  
-#     })
-# 
-# 
-# # authors_load ------------------------------------------------------------
-# 
-# 
-# data_dir_authors<-paste("./data_raw/authors/",folder,"/",sep="")
-# csv_files_authors <- fs::dir_ls(data_dir_authors, regexp = "\\.csv$")
-# authors_df <- csv_files_authors %>%
-#   map_dfr(~ read_csv(.x))
-
-# 
 # # standardize the csv column names   --------------------------------------
-# 
-# 
 # # names(affils_df)
 source("./code/name_standardizer.R")
 # 
@@ -174,9 +148,6 @@ papers_df<-names_standardizer(papers_df) %>%
 # # ----- authors 
 # 
 authors_df<-names_standardizer(authors_df) %>%
-  ungroup() %>%
-  select(-"@_fa",
-         -"afid.@_fa") %>%
   remove_empty(which = c("rows", "cols")) %>%
   mutate_all(tolower)
 
@@ -237,6 +208,7 @@ papers_df<-papers_df_cleanup(papers_df)
 
 source("./code/ID_fed_affiliations.R")
 affils_df<-ID_fed_affiliations(affils_df)
+
 
 # foo<-fed_affils %>%
 #   group_by(affil_id, affiliation, agency_short) %>%
@@ -510,6 +482,13 @@ authors_df_trim %>%  filter(federal==TRUE) %>% summarize(n=n_distinct(refID))
 affils_df_trim %>%  filter(federal==TRUE) %>% summarize(n=n_distinct(affil_id))
 
 authors_df_trim <-authors_df_trim %>% relocate(c(federal, agency),.before=1)
+
+# binding the annuals
+write_rds(papers_df_trim,"./data_clean/papers_df_clean.rds")
+write_rds(authors_df_trim,"./data_clean/authors_df_clean.rds")
+write_rds(affils_df_trim,"./data_clean/affils_df_clean.rds")
+
+
 
 
 write_rds(papers_df_trim,paste("./data_clean/papers_df_clean_",folder,".rds",sep=""))

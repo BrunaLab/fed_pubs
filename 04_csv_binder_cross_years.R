@@ -1,0 +1,209 @@
+library(janitor)
+library(tidyverse)
+library(progress)
+library(fs)
+library(data.table)
+# #####################################
+# data_dir<-"./data_raw/scopus_api/unis"
+# data_dir<-"./data_raw/scopus_api/unis_files"
+# #####################################
+
+
+
+# BIND OF THE ANNUAL CSVS
+
+data_dir<-"./data_raw"
+
+# folder_count<-"year_files_fed"
+# folder_count<-"year_files_uni"
+
+
+# Define folder paths -----------------------------------------------------
+
+
+
+folder_path_papers  <- file.path(data_dir, "papers",folder_count)
+folder_path_authors <- file.path(data_dir, "authors",folder_count)
+folder_path_affils  <- file.path(data_dir, "affils",folder_count)
+
+
+# bind the csv's together -------------------------------------------------
+# fs::dir_ls(data_dir)
+# binder using fs package wrapper for purrr
+# https://www.gerkelab.com/blog/2018/09/import-directory-csv-purrr-readr/
+
+# affil binder -----------------------------------------------------------
+# data_dir_affils<-"./data_raw/scopus_api/unis_files/affils"
+data_dir_affils<-folder_path_affils
+csv_files_affils_all <- fs::dir_ls(data_dir_affils, regexp = "\\.csv$")
+
+
+
+dataDir <- data_dir_affils  # Update this path
+dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
+
+# Read and tag each file
+dt_list <- lapply(dataFls, function(file) {
+  dt <- fread(file, fill = TRUE)
+  dt[, source_file := basename(file)]  # Add column with filename
+  return(dt)
+})
+
+# Combine all tagged data tables
+affils_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
+rm(dt_list)
+# 
+# cvs_binder_affils <- function(csv_files_affils) {
+#   
+#   affils_df <- csv_files_affils %>%
+#     map_dfr(~ read_csv(.x),
+#             .id = "source")
+#   
+# }
+# 
+# 
+# 
+# affils_df<-cvs_binder_affils(csv_files_affils_all)
+
+
+
+# author binder -----------------------------------------------------------
+
+# data_dir_authors<-"./data_raw/scopus_api/unis_files/authors"
+data_dir_authors<-folder_path_authors
+csv_files_authors_all <- fs::dir_ls(data_dir_authors, regexp = "\\.csv$")
+
+
+dataDir <- data_dir_authors  # Update this path
+dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
+
+# Read and tag each file
+dt_list <- lapply(dataFls, function(file) {
+  dt <- fread(file, fill = TRUE)
+  dt[, source_file := basename(file)]  # Add column with filename
+  return(dt)
+})
+
+# Combine all tagged data tables
+authors_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
+rm(dt_list)
+
+
+
+
+  
+  # papers binder -----------------------------------------------------------
+
+
+  # data_dir_papers<-"./data_raw/scopus_api/unis_files/papers"
+  data_dir_papers<-folder_path_papers
+  csv_files_papers_all <- fs::dir_ls(data_dir_papers, regexp = "\\.csv$")
+  
+  
+  dataDir <- data_dir_papers  # Update this path
+  dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
+  
+  # Read and tag each file
+  dt_list <- lapply(dataFls, function(file) {
+    dt <- fread(file, fill = TRUE)
+    dt[, source_file := basename(file)]  # Add column with filename
+    return(dt)
+  })
+  
+  # Combine all tagged data tables
+  papers_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
+  rm(dt_list)
+  
+  
+  
+# edit source_file   ----------------------------------------------
+  papers_df<-papers_df %>% 
+    # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
+    mutate(source_file = str_replace(source_file, ".csv", ""))
+  
+  authors_df<-authors_df %>% 
+    # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
+    mutate(source_file = str_replace(source_file, ".csv", ""))
+  
+  affils_df<-affils_df %>% 
+    # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
+    mutate(source_file = str_replace(source_file, ".csv", ""))
+  
+  
+  
+
+# id duplicate papers -----------------------------------------------------
+
+  
+  dupe_pub_scopusID<-papers_df %>% 
+    group_by(scopus_article_id) %>% 
+    tally() %>% 
+    filter(n>1) %>% 
+    arrange(desc(n))
+  dupe_pub_scopusID
+  
+  
+  papers_df<-papers_df %>% 
+    distinct(scopus_article_id,.keep_all = TRUE) 
+  
+  
+  dupe_pubs<-papers_df %>% group_by(DI,TI) %>% 
+    tally() %>%  
+    arrange(desc(n)) %>% 
+    filter(n>1) %>% 
+    filter(!is.na(DI))
+  
+  dupe_pubs<- papers_df %>% filter(DI%in%dupe_pubs$DI) %>% 
+    relocate(SO,.before=1) %>% 
+    relocate(TI,.before=1) %>% 
+    relocate(DI,.before=1) %>% 
+    arrange(DI,TI,SO) %>% 
+    tibble()
+  
+  papers_df<-anti_join(papers_df,dupe_pubs)
+  
+  dupe_pubs_clean<-dupe_pubs %>% 
+    group_by(DI,TI) %>% 
+    arrange(AB,DE,BP) %>% 
+    slice_head(n=1)
+  
+  papers_df<-bind_rows(papers_df,dupe_pubs_clean)
+  
+  pubs_to_keep<-papers_df %>% 
+    select(refID) %>% 
+    distinct()
+  
+  pubs_to_keep$refID
+  
+  # filter out incompletes
+  
+  papers_df<-papers_df %>% 
+    filter(refID%in% pubs_to_keep$refID)
+  
+  
+  authors_df<-authors_df %>% 
+    filter(refID%in% pubs_to_keep$refID)
+  
+  affils_df<-affils_df %>% 
+    filter(refID%in% pubs_to_keep$refID)
+  
+  
+  
+# save --------------------------------------------------------------------
+
+  # FOR CROSS YEAR BINDING
+  
+  # FEDS 
+  # write_csv(affils_df,paste("./data_raw/affils/all_affils_df_fed.csv",sep=""))
+  # write_csv(authors_df,paste("./data_raw/authors/all_authors_df_fed.csv",sep=""))
+  # write_csv(papers_df,paste("./data_raw/papers/all_papers_df_fed.csv",sep=""))
+  
+  
+  # UNI
+  write_csv(affils_df,paste("./data_raw/affils/all_affils_df_uni.csv",sep=""))
+  write_csv(authors_df,paste("./data_raw/authors/all_authors_df_uni.csv",sep=""))
+  write_csv(papers_df,paste("./data_raw/papers/all_papers_df_uni.csv",sep=""))
+  
+  
+  
+  
