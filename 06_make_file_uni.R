@@ -4,26 +4,86 @@ library(janitor)
 library(data.table)
 
 
-papers_df  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) 
-papers_df <- papers_df %>% 
+papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) %>% 
   mutate(PM=
            case_when(
              is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
              .default = as.numeric(PM)
            )
   ) %>% 
-  remove_empty(c("rows","cols")) %>% 
-  tibble()
-  
+  mutate(PT=if_else(PT=="j","journal",PT))
 
-papers_df %>% filter(is.na(PM))
 
-authors_df <- setDT(readRDS("./data_clean/authors_df_uni_clean.rds"))
 
+# chose any publication types or titles to remove -------------------------
+# TITLE WORDS
+# editor's
+# preface
+# foreward
+#  - reply
+
+# ARTICLE TYPE
+# unique(papers_df$DT)
+# "book chapter"
+# "article"
+# "letter"
+# "review"
+# "note"
+# "data paper"
+# "editorial" 
+
+# papers_df %>% filter(DT=="editorial") %>% select(TI)
+
+
+# make rds of papers with fed 1st author ----------------------------------
 
 
 
 # make rds of papers with fed 1st author ----------------------------------
+
+
+
+# papers_df %>% filter(is.na(PM))
+
+authors_df_complete <- setDT(readRDS("./data_clean/authors_df_uni_clean.rds")) 
+
+
+
+
+# chose any publication types or titles to remove -------------------------
+# TITLE WORDS
+# editor's
+# preface
+# foreward
+#  - reply
+
+# ARTICLE TYPE
+# unique(papers_df$DT)
+# "book chapter"
+# "article"
+# "letter"
+# "review"
+# "note"
+# "data paper"
+# "editorial" 
+
+# papers_df %>% filter(DT=="editorial") %>% select(TI)
+
+# authors_df %>% filter(is.na(agency)) %>% group_by(federal) %>% tally()
+
+papers_df_complete %>% 
+  group_by(DT) %>% 
+  tally() %>% 
+  mutate(perc=n/sum(n)*100)
+
+papers_df <- papers_df_complete %>% 
+  filter(DT!="editorial") %>% 
+  filter(DT!="letter") 
+
+authors_df<-authors_df_complete %>% 
+  filter(refID%in%papers_df$refID)
+
+
 
 unique(authors_df$uni)
 
@@ -332,7 +392,7 @@ uni_n_decline_sum<- uni_n_decline %>%
   mutate(n_diff=n-lag(n)) %>%
   mutate(perc_previous_yr=n_diff/lag(n)*100)
 # 
-# ggsave("./images/uni_n_decline_sum.png", width = 4, height = 6, units = "in")
+# ggsave("./docs/images/uni_n_decline_sum.png", width = 4, height = 6, units = "in")
 
 uni_n_decline_sum_fig<-uni_n_decline_sum %>%
   ggplot(aes(x=PY, y=n)) +
@@ -356,7 +416,7 @@ uni_n_decline_sum_fig<-uni_n_decline_sum %>%
   theme(axis.text.x =element_text(size = 12))+
   gghighlight(PY == 2025)
 
-ggsave("./images/uni_n_decline_sum.png", width = 6, height = 4, units = "in")
+ggsave("./docs/images/uni_n_decline_sum.png", width = 6, height = 4, units = "in")
 
 
 
@@ -419,5 +479,5 @@ uni_n_decline_2<-
     size = 10, color = "navy"))+
   gghighlight(PY==2025)
 
-ggsave("./images/uni_n_decline_2.png", width = 6, height = 9, units = "in")
+ggsave("./docs/images/uni_n_decline_2.png", width = 6, height = 9, units = "in")
 

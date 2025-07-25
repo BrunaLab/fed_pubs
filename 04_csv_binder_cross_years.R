@@ -1,26 +1,21 @@
+
+# intro -------------------------------------------------------------------
+
+# this takes the consolidated CSVs for each year and binds into one single CSV
+
 library(janitor)
 library(tidyverse)
 library(progress)
 library(fs)
 library(data.table)
-# #####################################
-# data_dir<-"./data_raw/scopus_api/unis"
-# data_dir<-"./data_raw/scopus_api/unis_files"
-# #####################################
-
-
-
-# BIND OF THE ANNUAL CSVS
 
 data_dir<-"./data_raw"
 
 # folder_count<-"year_files_fed"
-# folder_count<-"year_files_uni"
+folder_count<-"year_files_uni"
 
 
 # Define folder paths -----------------------------------------------------
-
-
 
 folder_path_papers  <- file.path(data_dir, "papers",folder_count)
 folder_path_authors <- file.path(data_dir, "authors",folder_count)
@@ -33,7 +28,7 @@ folder_path_affils  <- file.path(data_dir, "affils",folder_count)
 # https://www.gerkelab.com/blog/2018/09/import-directory-csv-purrr-readr/
 
 # affil binder -----------------------------------------------------------
-# data_dir_affils<-"./data_raw/scopus_api/unis_files/affils"
+
 data_dir_affils<-folder_path_affils
 csv_files_affils_all <- fs::dir_ls(data_dir_affils, regexp = "\\.csv$")
 
@@ -76,9 +71,6 @@ authors_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
 rm(dt_list)
 
 
-
-
-  
   # papers binder -----------------------------------------------------------
 
 
@@ -103,17 +95,14 @@ rm(dt_list)
   
   
   
-# edit source_file   ----------------------------------------------
+# edit the `source_file` columns   ----------------------------------------------
   papers_df<-papers_df %>% 
-    # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
     mutate(source_file = str_replace(source_file, ".csv", ""))
   
   authors_df<-authors_df %>% 
-    # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
     mutate(source_file = str_replace(source_file, ".csv", ""))
   
   affils_df<-affils_df %>% 
-    # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
     mutate(source_file = str_replace(source_file, ".csv", ""))
   
   
@@ -121,6 +110,10 @@ rm(dt_list)
 
 # id duplicate papers -----------------------------------------------------
 
+  # (sometimes early version of paper posted 
+  #  in one year but only in print in the next)
+  ## also I searched for some files in all years but saved in 2025 folder. 
+  # easier to filter here than move and risk copying incorrectly
   
   dupe_pub_scopusID<-papers_df %>% 
     group_by(scopus_article_id) %>% 

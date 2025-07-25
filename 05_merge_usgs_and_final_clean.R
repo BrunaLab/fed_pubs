@@ -1,16 +1,28 @@
+# into --------------------------------------------------------------------
+# 
+# This will take the super-file of all years together, 
+# add the usgs articles, remove duplicates, and check / edit federal 
+# affiliations
+
+
 library(janitor)
 library(tidyverse)
 library(progress)
 library(fs)
 library(data.table)
-# bind the subfiles for each category and check for dupes ------------------
 
 
-# Load files and bind
+
+# LOAD FILES -----------------------------------------------------------
+
 # Define folder paths
-folder_path_affils <- "./data_raw/affils/"
-folder_path_papers <- "./data_raw/papers/"
-folder_path_authors <- "./data_raw/authors/"
+# folder_path_affils <- "./data_raw/affils/year_files_uni"
+# folder_path_papers <- "./data_raw/papers/year_files_uni"
+# folder_path_authors <- "./data_raw/authors/year_files_uni"
+
+folder_path_affils <- "./data_raw/affils/year_files_fed"
+folder_path_papers <- "./data_raw/papers/year_files_fed"
+folder_path_authors <- "./data_raw/authors/year_files_fed"
 
 
 
@@ -80,16 +92,6 @@ papers_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
 rm(dt_list)
 
 
-# MERGE WITH USGS ---------------------------------------------------------
-
-
-
-source("./code/merge_with_usgs.R")
-usgs_results<-merge_with_usgs(authors_df,papers_df)
-papers_df<-usgs_results$papers
-authors_df<-usgs_results$authors
-
-
 
 
 # IDENTIFY FEDERAL AFFILIATIONS -------------------------------------------
@@ -108,6 +110,18 @@ source("./code/ID_fed_authors.R")
 
 authors_df<-ID_fed_authors(authors_df,affils_df)
 
+
+
+
+# MERGE WITH USGS ---------------------------------------------------------
+
+source("./code/merge_with_usgs.R")
+usgs_results<-merge_with_usgs(authors_df,papers_df)
+papers_df<-usgs_results$papers
+authors_df<-usgs_results$authors
+
+
+
 # 
 # # ADD FEDERAL AFFILIATIONS TO AUTHORS_DF ----------------------------------
 # 
@@ -119,7 +133,7 @@ authors_df<-ID_fed_authors(authors_df,affils_df)
   # there are some where affil not brought over as fed or not or
   # missing affil_id but can try to infer and fill in
   # authors_df %>% select(AF,federal) %>% distinct() %>% group_by(AF) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
-  authors_df %>% select(author_url,federal) %>% distinct() %>% group_by(author_url) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
+  # authors_df %>% select(author_url,federal) %>% distinct() %>% group_by(author_url) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
 
 
 # final edits of agency and affils ---------------------------------------
@@ -130,32 +144,32 @@ papers_df<-papers_df %>%
     is.na(source)~"scopus",
     .default = as.character(source)
   ))
-
-affils_df<-affils_df %>% 
-mutate(agency=case_when(
-  agency=="nphs" & federal==TRUE~"usphs",
-  agency=="usgs" & federal==TRUE~"interior",
-  .default = as.character(agency)
-)
-) %>% 
-mutate(agency_primary=agency) %>% 
-mutate(agency_primary=case_when(
-  agency_primary=="irs"~"treasury",
-  agency_primary=="usphs"~"hhs",
-  agency_primary=="nih"~"hhs",
-  agency_primary=="cdc"~"hhs",
-  agency_primary=="fda"~"hhs",
-  agency_primary=="nist"~"commerce",
-  agency_primary=="noaa"~"commerce",
-  agency_primary=="usaid"~"state",
-  agency_primary=="faa"~"dot",
-  agency_primary=="dea"~"doj",
-  agency_primary=="dha"~"dod",
-  agency_primary=="fema"~"dhs",
-  agency_primary=="usphs"~"hha",
-  .default = as.character(agency_primary)
-)
-)
+# 
+# affils_df<-affils_df %>% 
+# mutate(agency=case_when(
+#   agency=="nphs" & federal==TRUE~"usphs",
+#   agency=="usgs" & federal==TRUE~"interior",
+#   .default = as.character(agency)
+# )
+# ) %>% 
+# mutate(agency_primary=agency) %>% 
+# mutate(agency_primary=case_when(
+#   agency_primary=="irs"~"treasury",
+#   agency_primary=="usphs"~"hhs",
+#   agency_primary=="nih"~"hhs",
+#   agency_primary=="cdc"~"hhs",
+#   agency_primary=="fda"~"hhs",
+#   agency_primary=="nist"~"commerce",
+#   agency_primary=="noaa"~"commerce",
+#   agency_primary=="usaid"~"state",
+#   agency_primary=="faa"~"dot",
+#   agency_primary=="dea"~"doj",
+#   agency_primary=="dha"~"dod",
+#   agency_primary=="fema"~"dhs",
+#   agency_primary=="usphs"~"hha",
+#   .default = as.character(agency_primary)
+# )
+# )
 
 
 # remove useless columns

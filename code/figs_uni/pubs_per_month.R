@@ -22,7 +22,7 @@ pubs_per_month <- function(pubs_mo, PY_max) {
     # gghighlight(min(n) < 50)
     gghighlight(PY == 2024)
   
-  ggsave("./images/pubs_per_month_uni.png", width = 10, height = 10, units = "in")
+  ggsave("./docs/images/pubs_per_month_uni.png", width = 10, height = 10, units = "in")
   
   return(pubs_mo_fig)
 }

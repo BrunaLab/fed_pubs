@@ -101,7 +101,7 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     # gghighlight(min(n) < 50)
     # gghighlight(PY == 2025)
   
-  ggsave("./images/pubs_mo_cum_fig_uni.png", width = 10, height = 10, units = "in")
+  ggsave("./docs/images/pubs_mo_cum_fig_uni.png", width = 10, height = 10, units = "in")
   
   return(pubs_mo_cum_fig)
 }

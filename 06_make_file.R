@@ -10,34 +10,59 @@ library(fs)
 library(data.table)
 
 
-papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
-
-papers_df <- papers_df %>% 
+papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) %>% 
   mutate(PM=
            case_when(
              is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
              .default = as.numeric(PM)
            )
   ) %>% 
-  remove_empty(c("rows","cols")) %>% 
-  tibble()
+  mutate(PT=if_else(PT=="j","journal",PT))
+  
+  
+# make rds of papers with fed 1st author ----------------------------------
+
   
 
 # papers_df %>% filter(is.na(PM))
 
-authors_df <- setDT(readRDS("./data_clean/authors_df_clean.rds")) 
+authors_df_complete <- setDT(readRDS("./data_clean/authors_df_clean.rds")) 
 
 
-#TODO: m,ake sure 60006762 unif serv univ - federal  and that if agency = federal TRUE
-eg 100310669_2021-1
-manke agency na = fedeeral FALSE 
-# %>% 
-#   mutate(federal=if_else(is.na(federal),FALSE,federal))
-         
-         
+
+
+# chose any publication types or titles to remove -------------------------
+# TITLE WORDS
+# editor's
+# preface
+# foreward
+#  - reply
+
+# ARTICLE TYPE
+# unique(papers_df$DT)
+# "book chapter"
+# "article"
+# "letter"
+# "review"
+# "note"
+# "data paper"
+# "editorial" 
+
+# papers_df %>% filter(DT=="editorial") %>% select(TI)
+
 # authors_df %>% filter(is.na(agency)) %>% group_by(federal) %>% tally()
 
+papers_df_complete %>% 
+  group_by(DT) %>% 
+  tally() %>% 
+  mutate(perc=n/sum(n)*100)
 
+papers_df <- papers_df_complete %>% 
+  filter(DT!="editorial") %>% 
+  filter(DT!="letter") 
+
+authors_df<-authors_df_complete %>% 
+  filter(refID%in%papers_df$refID)
 
 # summary calculations ----------------------------------------------------
 
@@ -390,14 +415,19 @@ write_csv(journals_n_perc_annual_first,"./docs/summary_info/journals_n_perc_annu
 
 # pubs per agency ---------------------------------------------------------
 
+# paper_type<-papers_df %>% select(refID,DT,PT)
+# first_authors2<-first_authors %>% left_join(paper_type,by="refID")
+
 
 total_pubs_per_agency_first <- first_authors %>% 
   # mutate(agency=if_else(agency=="us department of the interior", "interior",agency)) %>% 
   # mutate(agency=if_else(agency=="federal reserve system", "frs",agency)) %>% 
   # mutate(agency=if_else(agency=="us department of defense", "dod",agency)) %>% 
+  # select(refID,DT,agency,agency_primary) %>% 
   select(refID,agency,agency_primary) %>% 
   distinct() %>% 
   drop_na() %>% 
+  # group_by(agency,agency_primary,DT) %>% 
   group_by(agency,agency_primary) %>% 
   summarize(n=n_distinct(refID)) %>% 
   ungroup() %>% 
@@ -711,7 +741,7 @@ agency_n_decline_sum_fig<-agency_n_decline_sum %>%
   theme(axis.text.x =element_text(size = 12))+
   gghighlight(PY == 2025)
 
-ggsave("./images/agency_n_decline_sum.png", width = 6, height = 4, units = "in")
+ggsave("./docs/images/agency_n_decline_sum.png", width = 6, height = 4, units = "in")
 
 
 
@@ -774,7 +804,7 @@ agency_n_decline_2<-
     size = 10, color = "navy"))+
   gghighlight(PY==2025)
 
-ggsave("./images/agency_n_decline_2.png", width = 6, height = 9, units = "in")
+ggsave("./docs/images/agency_n_decline_2.png", width = 6, height = 9, units = "in")
 
 
 
@@ -938,7 +968,7 @@ agency_primary_n_decline_sum_fig<-agency_primary_n_decline_sum %>%
   theme(axis.text.x =element_text(size = 12))+
   gghighlight(PY == 2025)
 
-ggsave("./images/agency_primary_n_decline_sum.png", width = 6, height = 4, units = "in")
+ggsave("./docs/images/agency_primary_n_decline_sum.png", width = 6, height = 4, units = "in")
 
 
 
@@ -1001,4 +1031,4 @@ agency_primary_n_decline_2<-
     size = 10, color = "navy"))+
   gghighlight(PY==2025)
 
-ggsave("./images/agency_primary_n_decline_2.png", width = 6, height = 9, units = "in")
+ggsave("./docs/images/agency_primary_n_decline_2.png", width = 6, height = 9, units = "in")

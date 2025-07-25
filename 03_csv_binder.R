@@ -1,21 +1,22 @@
+
+# intro -------------------------------------------------------------------
+# 
+# this binds the csv files downloaded for a given year into a single
+# csv file. They are then bound together with `csv_binder_cross_years.R` 
+# The fed affiliations are NOT corrected here - they are added and corrected 
+# in `merge_usgs_and_final_cleaner.R`
+
 library(janitor)
 library(tidyverse)
 library(progress)
 library(fs)
 library(data.table)
-# #####################################
-# data_dir<-"./data_raw/scopus_api/unis"
-# data_dir<-"./data_raw/scopus_api/unis_files"
-# #####################################
+
+# 
 
 
-# STILL NEED TO DO THE ones for the big ID that i couldnt loop
-
-# BIND OF CSVS WITHIN A YEAR
-
-
-# data_dir<-"./data_raw/scopus_api/unis_files"
-data_dir<-"./data_raw/scopus_api/fed_files/redux"
+data_dir<-"./data_raw/scopus_api/unis_files"
+# data_dir<-"./data_raw/scopus_api/fed_files/redux"
 
 folder<-c(
   "2019", # 1
@@ -34,7 +35,8 @@ folder_id <- seq_along(folder)
 
     for  (k in folder_id) {
 
-# affils load -------------------------------------------------------------
+
+# FILE CHECK AND VALIDATION -----------------------------------------------
 
 # Define folder paths
 
@@ -100,7 +102,7 @@ validate_csv_structure(folder_path_affils)
 validate_csv_structure(folder_path_papers, folder_path_authors, folder_path_affils)
 
 
-# bind the csv's together -------------------------------------------------
+# BIND THE CSVs FOR A GIVEN YEAR ------------------------------------------
 
 
 
@@ -108,13 +110,11 @@ validate_csv_structure(folder_path_papers, folder_path_authors, folder_path_affi
 # binder using fs package wrapper for purrr
 # https://www.gerkelab.com/blog/2018/09/import-directory-csv-purrr-readr/
 
-# affil binder ----------------------------------------------------------
 
-# data_dir_affils<-"./data_raw/scopus_api/unis_files/affils"
+# BIND AFFILIATION CSVs ---------------------------------------------------
+
 data_dir_affils<-folder_path_affils
 csv_files_affils_all <- fs::dir_ls(data_dir_affils, regexp = "\\.csv$")
-
-
 
 dataDir <- data_dir_affils  # Update this path
 dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
@@ -131,8 +131,9 @@ affils_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
 rm(dt_list)
 
 
-# author binder -----------------------------------------------------------
-# data_dir_authors<-"./data_raw/scopus_api/unis_files/authors"
+
+# BIND AUTHOR CSVs --------------------------------------------------------
+
 data_dir_authors<-folder_path_authors
 csv_files_authors_all <- fs::dir_ls(data_dir_authors, regexp = "\\.csv$")
 
@@ -151,10 +152,8 @@ dt_list <- lapply(dataFls, function(file) {
 authors_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
 rm(dt_list)
 
+# BIND PAPERS CSVs --------------------------------------------------------
 
-
-  # papers binder -----------------------------------------------------------
-  # data_dir_papers<-"./data_raw/scopus_api/unis_files/papers"
   data_dir_papers<-folder_path_papers
   csv_files_papers_all <- fs::dir_ls(data_dir_papers, regexp = "\\.csv$")
   
@@ -174,10 +173,9 @@ rm(dt_list)
   rm(dt_list)
   
   
-  # standardize the csv column names   --------------------------------------
-  
-  
-  # names(affils_df)
+
+# STANDARDIZE THE COLUMN NAMES --------------------------------------------
+
   source("./code/name_standardizer.R")
   
   # ----- affils
@@ -218,76 +216,57 @@ rm(dt_list)
   
   
   
-# edit the 'source_file' column  ----------------------------------------
+
+# EDIT THE 'SOURCE FILE' COULMN & ADD A REFID -----------------------------
+
+  # ----- papers 
 papers_df<-papers_df %>% 
-    # df<-tibble(x=c("scopus_affil_60000650_2025_1_papers.csv"))
-  # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
     mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
-    # mutate(source_file = str_replace(source_file, "/scopus_affil_", "")) %>% 
-    # mutate(source_file = str_replace(source_file, "_papers.csv", "")) %>% 
     separate(source_file,c("source_file","left_over"),"_papers",remove=TRUE,extra="warn") %>% 
     select(-left_over) %>% 
-    # separate(source_file,c("source_file","left_over"),folder[k],remove=TRUE,extra="warn") %>% 
-    #   select(-left_over) %>% 
     mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
     relocate(refID,.before=1) %>% 
     mutate_all(as.character) 
   
-  # papers_df$refID
-  # papers_df$entry_no
+  # ----- authors 
   
 authors_df<-authors_df %>% 
-  # mutate(source_file = str_replace(source_file, folder_path_authors, "")) %>% 
   mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
     mutate(source_file = str_replace(source_file, "/scopus_affil_", "")) %>% 
     separate(source_file,c("source_file","left_over"),"_authors",remove=TRUE,extra="warn") %>% 
   select(-left_over) %>% 
-  # separate(source_file,c("source_file","left_over"),folder[k],remove=TRUE,extra="warn") %>% 
-  # select(-left_over) %>% 
   mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
   relocate(refID,.before=1) %>% 
   mutate_all(as.character) 
 
-# authors_df$refID
-# authors_df$entry_no
+# ----- affils 
 
-# affils_df$source_file
   affils_df<-affils_df %>%   
-  # mutate(source_file = str_replace(source_file, folder_path_affils, "")) %>% 
   mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
-  # mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
   separate(source_file,c("source_file","left_over"),"_affils",remove=TRUE,extra="warn") %>% 
     select(-left_over) %>% 
-    # separate(source_file,c("source_file","left_over"),folder[k],remove=TRUE,extra="warn") %>% 
-    # select(-left_over) %>% 
     mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
     relocate(refID,.before=1) %>% 
     mutate_all(as.character) 
   
-  # affils_df$refID
-  # affils_df$entry_no
-  
   # papers_df cleanup   --------------------------------------
   
-  
+  # extracts PM and PY from cover date, split page range into 
+  # BP and EP, seletcs columns to match refsplitr in case you want
+  # to do mapping
   
   source("./code/papers_df_cleanup.R")
   
   papers_df<-papers_df_cleanup(papers_df)
   
-  # papers_df$refID
-  # papers_df$source_file
-  names(papers_df)
-
   
   
-# check to see if any records failed to load  -----------------------------
+# check to see if any files failed to load  -----------------------------
 
   pb_chk<-papers_df %>% 
     select(source_file,entry_no) %>% 
     distinct() %>% 
     mutate(papers="yes")
-  
   
   au_chk<-authors_df %>% 
     select(source_file,entry_no)%>% 
@@ -295,29 +274,19 @@ authors_df<-authors_df %>%
     mutate_all(as.character) %>% 
     mutate(authors="yes")
   
-    # 
-    # 
-    # mutate(source_file = str_replace(source_file, "_authors.csv", "")) 
-  
   af_chk<-affils_df %>% 
     select(source_file,entry_no)%>% 
     distinct() %>% 
     mutate("affils"="yes")
-    # mutate(source_file = str_replace(source_file, "_affils.csv", "")) 
-  
-  # setdiff(pb_chk,au_chk)
-
+    
   file_check<-full_join(pb_chk,au_chk,by=c("source_file","entry_no"))
   file_check<-full_join(file_check,af_chk) 
     
   file_check<-file_check %>% 
     filter(is.na(papers) | is.na(affils) |is.na(authors))
   
-  
-  
-  # remove those where one of three csv files is missingwhere  --------------
-  
-  # this is usally editorials etc. with no authors listed  
+  # remove those where info from one of the three csv files is missing  -----
+  # this is usually editorials etc. with no authors listed  
   
   incompletes_to_remove<-papers_df %>% 
     filter(source_file%in% file_check$source_file)
@@ -327,21 +296,13 @@ authors_df<-authors_df %>%
   
 # check for duplicate pubs and remove -------------------------------------
 
-  # dupe_pubs<-papers_df %>% 
-  #   group_by(scopus_article_id) %>% 
-  #   tally() %>% 
-  #   filter(n>1) %>% 
-  #   arrange(desc(n))
-  
-  
   papers_df<-papers_df %>% 
     distinct(scopus_article_id,.keep_all = TRUE) 
   
-  # fiklter out trade journals
+  # filter out trade journals
   
   papers_df<-papers_df %>% 
   filter(PT!="trade journal")
-  
   
   dupe_pubs<-papers_df %>% group_by(DI,TI) %>% 
     tally() %>%  
@@ -390,24 +351,23 @@ authors_df<-authors_df %>%
 
   # # FOR WITHIN YEAR BINDING - FEDS
   # 
-  write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
-  write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
-  write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
-
-  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
-  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder_count,".csv",sep=""))
+  # write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
+  # write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
+  # write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
+  # 
+  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
+  
   
   # # FOR WITHIN YEAR BINDING - UNIS
   # 
-  # write_csv(affils_df,paste("./data_raw/affils/year_files_uni/affils_df_",folder[k],".csv",sep=""))
-  # write_csv(authors_df,paste("./data_raw/authors/year_files_uni/authors_df_",folder[k],".csv",sep=""))
-  # write_csv(papers_df,paste("./data_raw/papers/year_files_uni/papers_df_",folder[k],".csv",sep=""))
+  write_csv(affils_df,paste("./data_raw/affils/year_files_uni/affils_df_",folder[k],".csv",sep=""))
+  write_csv(authors_df,paste("./data_raw/authors/year_files_uni/authors_df_",folder[k],".csv",sep=""))
+  write_csv(papers_df,paste("./data_raw/papers/year_files_uni/papers_df_",folder[k],".csv",sep=""))
 
-  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
-  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder[k],".csv",sep=""))
+  
+  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder[k],".csv",sep=""))
   
   
-
     }
   
   

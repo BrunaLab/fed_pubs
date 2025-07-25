@@ -9,7 +9,8 @@ ID_fed_affiliations <- function(affils_df) {
       "united states" = "usa",
       "virgin islands (u.s.)" = "us virgin islands",
       "viet nam" = "vietnam",
-      "cote d'ivoire" = "ivory coast"
+      "cote d'ivoire" = "ivory coast",
+      "timor-leste" = "east timor"
     ))
 
 
@@ -291,8 +292,6 @@ ID_fed_affiliations <- function(affils_df) {
         str_detect(affiliation, "california department") ~ FALSE,
         str_detect(affiliation, "corteva agriscience") ~ FALSE,
         str_detect(affiliation, "inova ") ~ FALSE,
-        str_detect(affiliation, "university") ~ FALSE,
-        str_detect(affiliation, "uniformed services university ") ~ TRUE,
         TRUE ~ federal
       ),
       agency_short = case_when(
@@ -393,7 +392,6 @@ ID_fed_affiliations <- function(affils_df) {
           country == "usa" & str_detect(affiliation, "national estuary program") ~ "interior",
           country == "usa" & str_detect(affiliation, "division of strategic national stockpile") ~ "hhs",
           country == "usa" & str_detect(affiliation, "bureau of oceans and international environmental") ~ "nsf",
-          country == "usa" & str_detect(affiliation, "us dot university transportation center for") ~ "dot",
           country == "usa" & str_detect(affiliation, "bureau of ocean energy management") ~ "interior",
           str_detect(affiliation, "us department of energy") ~ "doe",
           str_detect(affiliation, "us geological survey") ~ "interior",
@@ -420,7 +418,7 @@ ID_fed_affiliations <- function(affils_df) {
           str_detect(affiliation, " us antarctic program") ~ "nsf",
           str_detect(affiliation, " niaid/nih international centers for excellence in ") ~ "nih",
           str_detect(affiliation, " us centers for disease control") ~ "cdc",
-          str_detect(affiliation, "uniformed services university of the health sciences") ~ "dod",
+          
           str_detect(affiliation, "walter reed") ~ "dod",
           str_detect(affiliation, "us agency_shortfor international development") ~ "usaid",
           country == "usa" & str_detect(affiliation, "national park") ~ "interior",
@@ -486,7 +484,6 @@ ID_fed_affiliations <- function(affils_df) {
           affiliation == "wrair" ~ "dod",
           affiliation == "us combat casualty care research program" ~ "dod",
           affiliation == "defense intelligence agency" ~ "dod",
-          affiliation == "national defense university" ~ "dod",
           affiliation == "northwest national laboratory" ~ "dod",
           affiliation == "99th medical group" ~ "dod",
           affiliation == "88th medical group" ~ "dod",
@@ -715,7 +712,6 @@ ID_fed_affiliations <- function(affils_df) {
           country == "usa" & str_detect(affiliation, "us aid") ~ "usaid",
           country == "usa" & str_detect(affiliation, "afit") ~ "dod",
           country == "usa" & str_detect(affiliation, "carl r darnall") ~ "dod",
-          country == "usa" & str_detect(affiliation, "national defense university") ~ "dod",
           str_detect(affiliation, "va health") ~ "va",
           str_detect(affiliation, "va north texas healthcare system") ~ "va",
           str_detect(affiliation, "va office of information and technology") ~ "va",
@@ -984,17 +980,97 @@ ID_fed_affiliations <- function(affils_df) {
       TRUE ~ agency_short
     ))
 
-
-
-  fed_status_fix <- fed_status_fix %>%
-    mutate(federal = if_else(!is.na(agency_short), TRUE, FALSE)) %>%
-    distinct()
-
+  
+  
   affils_df <- bind_rows(fed_status_fix, fed_status_ok)
+
+  
+  # UNIVERSITY IS KIND OF A PAIN BECAUSE THERE ARE SEVERAL "FEDERAL" UNIVERSITIES
+  # so did seperately
+  affils_df <- affils_df %>%
+    mutate(
+      federal =
+        case_when(str_detect(affiliation, "university") ~ FALSE,
+                  .default = as.logical(federal)
+        )
+    )   %>%
+    mutate(
+      agency_short =
+        case_when(
+          str_detect(affiliation, "marine corps university") ~ "dod",
+          str_detect(affiliation, "army university press") ~ "dod",
+          country == "usa" & str_detect(affiliation, "us dot university transportation center for") ~ "dot",
+          country == "usa" & str_detect(affiliation, "national defense university") ~ "dod",
+          country == "usa" & str_detect(affiliation, "usaf air university culture") ~ "dod",
+          country == "usa" & str_detect(affiliation, "air force engineering university") ~ "dod",
+          country == "usa" & str_detect(affiliation, "national defense university") ~ "dod",
+          str_detect(affiliation, "uniformed services university ") ~ "dod",
+          str_detect(affiliation, "uniformed services university of the health sciences") ~ "dod",
+          TRUE ~ agency_short
+        )
+    ) %>% 
+    mutate(
+      federal =
+        case_when(
+          str_detect(affiliation, "marine corps university") ~ TRUE,
+          str_detect(affiliation, "army university press") ~ TRUE,
+          country == "usa" & str_detect(affiliation, "us dot university transportation center for") ~ TRUE,
+          country == "usa" & str_detect(affiliation, "national defense university") ~ TRUE,
+          country == "usa" & str_detect(affiliation, "usaf air university culture") ~ TRUE,
+          country == "usa" & str_detect(affiliation, "air force engineering university") ~ TRUE,
+          country == "usa" & str_detect(affiliation, "national defense university") ~ TRUE,
+          str_detect(affiliation, "uniformed services university ") ~ TRUE,
+          str_detect(affiliation, "uniformed services university of the health sciences") ~ TRUE,
+          TRUE ~ federal
+        )
+    ) %>% 
+    mutate(
+      agency_short =
+        case_when(
+          # foundation is hard - NSF is gov, but  park and cdc foundations are not. 
+          # leave to end of run
+          affiliation == "cdc foundation" ~ NA, 
+          TRUE ~ agency_short
+        )
+    )
+  # 
+  
   
   affils_df<-affils_df %>% 
+    mutate(agency=case_when(
+      agency=="nphs" & federal==TRUE~"usphs",
+      agency=="usgs" & federal==TRUE~"interior",
+      .default = as.character(agency)
+    )
+    ) %>% 
+    mutate(agency_primary=agency) %>% 
+    mutate(agency_primary=case_when(
+      agency_primary=="irs"~"treasury",
+      agency_primary=="usphs"~"hhs",
+      agency_primary=="nih"~"hhs",
+      agency_primary=="cdc"~"hhs",
+      agency_primary=="fda"~"hhs",
+      agency_primary=="nist"~"commerce",
+      agency_primary=="noaa"~"commerce",
+      agency_primary=="usaid"~"state",
+      agency_primary=="faa"~"dot",
+      agency_primary=="dea"~"doj",
+      agency_primary=="dha"~"dod",
+      agency_primary=="fema"~"dhs",
+      agency_primary=="usphs"~"hha",
+      .default = as.character(agency_primary)
+    )
+    )
+  
+  
+  # affils_df %>% filter(federal==FALSE) %>% select(agency_short) %>% distinct()
+  # affils_df %>% filter(federal==TRUE) %>% select(agency_short) %>% distinct() %>% arrange(agency_short)
+  affils_df<-affils_df %>% 
     rename(agency=agency_short) %>% 
-    mutate(federal=if_else(is.na(federal),FALSE,federal))
+    mutate(federal=if_else(!is.na(agency),TRUE,federal))
+  # affils_df %>% filter(federal==FALSE) %>% select(agency) %>% distinct()
+  # affils_df %>% filter(federal==TRUE) %>% select(agency) %>% distinct() %>% arrange(agency)
+  
   
   return(affils_df)
 }

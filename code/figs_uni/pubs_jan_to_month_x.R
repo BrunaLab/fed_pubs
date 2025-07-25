@@ -35,7 +35,7 @@ pubs_jan_to_month_x <- function(pubs_mo, PM_max) {
       fontface ="plain", color = "black", size = 3,vjust=-.2
     )
   
-  ggsave("./images/monthly_pubs_to_date_uni.png", width = 10, height = 10, units = "in")
+  ggsave("./docs/images/monthly_pubs_to_date_uni.png", width = 10, height = 10, units = "in")
   
   return(monthly_pubs_1)
 }
