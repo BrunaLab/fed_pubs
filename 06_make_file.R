@@ -9,9 +9,7 @@ library(progress)
 library(fs)
 library(data.table)
 
-#TODO: m,ake sure 60006762 unif serv univ - federal  and that if agency = federal TRUE
-eg 100310669_2021-1
-manke agency na = fedeeral FALSE 
+
 papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
 
 papers_df <- papers_df %>% 
@@ -25,10 +23,16 @@ papers_df <- papers_df %>%
   tibble()
   
 
-papers_df %>% filter(is.na(PM))
+# papers_df %>% filter(is.na(PM))
 
-authors_df <- setDT(readRDS("./data_clean/authors_df_clean.rds")) %>% 
-  mutate(federal=if_else(is.na(federal),FALSE,federal))
+authors_df <- setDT(readRDS("./data_clean/authors_df_clean.rds")) 
+
+
+#TODO: m,ake sure 60006762 unif serv univ - federal  and that if agency = federal TRUE
+eg 100310669_2021-1
+manke agency na = fedeeral FALSE 
+# %>% 
+#   mutate(federal=if_else(is.na(federal),FALSE,federal))
          
          
 # authors_df %>% filter(is.na(agency)) %>% group_by(federal) %>% tally()

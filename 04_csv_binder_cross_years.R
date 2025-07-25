@@ -52,19 +52,6 @@ dt_list <- lapply(dataFls, function(file) {
 # Combine all tagged data tables
 affils_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
 rm(dt_list)
-# 
-# cvs_binder_affils <- function(csv_files_affils) {
-#   
-#   affils_df <- csv_files_affils %>%
-#     map_dfr(~ read_csv(.x),
-#             .id = "source")
-#   
-# }
-# 
-# 
-# 
-# affils_df<-cvs_binder_affils(csv_files_affils_all)
-
 
 
 # author binder -----------------------------------------------------------

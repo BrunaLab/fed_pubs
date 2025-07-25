@@ -165,14 +165,17 @@ source("./code/keyword_splitter.R")
 keywords_all_yrs_fed <- keyword_splitter(papers_dataset)
 pubs2025<-papers_dataset %>% filter(PY==2025)
 pubs2024<-papers_dataset %>% filter(PY==2024)
+pubs2023<-papers_dataset %>% filter(PY==2023)
 pubs2019<-papers_dataset %>% filter(PY==2019)
 
 keywords_2025 <- keyword_splitter(pubs2025)
 keywords_2024 <- keyword_splitter(pubs2024)
+keywords_2023 <- keyword_splitter(pubs2023)
 keywords_2019 <- keyword_splitter(pubs2019)
 
-keywords_allkeywords_all_yrs_fed <- distinct(keywords_all_yrs_fed, refID, original, .keep_all = TRUE)
+keywords_all_yrs_fed<- distinct(keywords_all_yrs_fed, refID, original, .keep_all = TRUE)
 keywords_2025 <- distinct(keywords_2025, refID, original, .keep_all = TRUE)
+keywords_2023 <- distinct(keywords_2024, refID, original, .keep_all = TRUE)
 keywords_2024 <- distinct(keywords_2024, refID, original, .keep_all = TRUE)
 keywords_2019 <- distinct(keywords_2019, refID, original, .keep_all = TRUE)
 # keywords_tropical_jrnls<-keyword_splitter(tropical_data)
@@ -182,12 +185,43 @@ write_csv(keywords_all_yrs_fed, "./data_clean/keywords_all_yrs_fed.csv")
 
 
 # N DISTINCT KEYWORDS
-
+keywords_all<-keywords_all_yrs_fed
 keywords_all %>% 
   select(original) %>% 
   summarize(n=n_distinct(original))
 
+kw100_2019<-keywords_2019 %>% 
+  group_by(original) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  slice_head(n=100)
+kw100_2023<-
+keywords_2023 %>% 
+  group_by(original) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  slice_head(n=100)
 
+kw100_2024<-
+  keywords_2024 %>% 
+  group_by(original) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  slice_head(n=100)
+
+kw100_2025<-keywords_2025 %>% 
+  group_by(original) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  slice_head(n=100)
+
+
+
+keywords_2019 %>% 
+  group_by(original) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  slice_head(n=100)
 
 
 top_100<-

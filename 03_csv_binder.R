@@ -12,12 +12,11 @@ library(data.table)
 # STILL NEED TO DO THE ones for the big ID that i couldnt loop
 
 # BIND OF CSVS WITHIN A YEAR
-# data_dir<-"./data_raw/scopus_api/fed_files/redux"
 
-data_dir<-"./data_raw/scopus_api/unis_files"
 
-# dir = TRUE
-# include_all=FALSE
+# data_dir<-"./data_raw/scopus_api/unis_files"
+data_dir<-"./data_raw/scopus_api/fed_files/redux"
+
 folder<-c(
   "2019", # 1
   "2020", # 2
@@ -109,7 +108,8 @@ validate_csv_structure(folder_path_papers, folder_path_authors, folder_path_affi
 # binder using fs package wrapper for purrr
 # https://www.gerkelab.com/blog/2018/09/import-directory-csv-purrr-readr/
 
-# affil binder -----------------------------------------------------------
+# affil binder ----------------------------------------------------------
+
 # data_dir_affils<-"./data_raw/scopus_api/unis_files/affils"
 data_dir_affils<-folder_path_affils
 csv_files_affils_all <- fs::dir_ls(data_dir_affils, regexp = "\\.csv$")
@@ -129,19 +129,6 @@ dt_list <- lapply(dataFls, function(file) {
 # Combine all tagged data tables
 affils_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
 rm(dt_list)
-# 
-# cvs_binder_affils <- function(csv_files_affils) {
-#   
-#   affils_df <- csv_files_affils %>%
-#     map_dfr(~ read_csv(.x),
-#             .id = "source")
-#   
-# }
-# 
-# 
-# 
-# affils_df<-cvs_binder_affils(csv_files_affils_all)
-
 
 
 # author binder -----------------------------------------------------------
@@ -209,19 +196,13 @@ rm(dt_list)
              )
     ) %>% 
     remove_empty(c("rows", "cols"))
-  # 
-  # affils_df<-affils_df %>% 
-  #   mutate(source_file=gsub("_.csv",".csv",source_file))
   
+    
   # ----- papers
   
   papers_df<-names_standardizer(papers_df) %>% 
     ungroup() %>%
     select(-"@_fa") %>% 
-    # group_by(scopus_article_id,SO,TI) %>% 
-    # tally() %>% 
-    # arrange(desc(n)) %>% 
-    # distinct(scopus_article_id,.keep_all = TRUE) %>% 
     mutate_all(tolower) %>% 
     remove_empty(which = c("rows", "cols"))
   
@@ -231,25 +212,23 @@ rm(dt_list)
   authors_df<-names_standardizer(authors_df) %>% 
   ungroup() %>%
     select(-"@_fa") %>% 
-    # select(-"@_fa",
-    #        -"afid.@_fa") %>% 
     remove_empty(which = c("rows", "cols")) %>% 
     mutate_all(tolower)
   
   
   
   
-  
-  
-  
-# edit source_file  ----------------------------------------------
+# edit the 'source_file' column  ----------------------------------------
 papers_df<-papers_df %>% 
+    # df<-tibble(x=c("scopus_affil_60000650_2025_1_papers.csv"))
   # mutate(source_file = str_replace(source_file, folder_path_papers, "")) %>% 
     mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
     # mutate(source_file = str_replace(source_file, "/scopus_affil_", "")) %>% 
     # mutate(source_file = str_replace(source_file, "_papers.csv", "")) %>% 
     separate(source_file,c("source_file","left_over"),"_papers",remove=TRUE,extra="warn") %>% 
     select(-left_over) %>% 
+    # separate(source_file,c("source_file","left_over"),folder[k],remove=TRUE,extra="warn") %>% 
+    #   select(-left_over) %>% 
     mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
     relocate(refID,.before=1) %>% 
     mutate_all(as.character) 
@@ -263,20 +242,30 @@ authors_df<-authors_df %>%
     mutate(source_file = str_replace(source_file, "/scopus_affil_", "")) %>% 
     separate(source_file,c("source_file","left_over"),"_authors",remove=TRUE,extra="warn") %>% 
   select(-left_over) %>% 
+  # separate(source_file,c("source_file","left_over"),folder[k],remove=TRUE,extra="warn") %>% 
+  # select(-left_over) %>% 
   mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
   relocate(refID,.before=1) %>% 
   mutate_all(as.character) 
 
+# authors_df$refID
+# authors_df$entry_no
+
+# affils_df$source_file
   affils_df<-affils_df %>%   
   # mutate(source_file = str_replace(source_file, folder_path_affils, "")) %>% 
   mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
   # mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
   separate(source_file,c("source_file","left_over"),"_affils",remove=TRUE,extra="warn") %>% 
     select(-left_over) %>% 
+    # separate(source_file,c("source_file","left_over"),folder[k],remove=TRUE,extra="warn") %>% 
+    # select(-left_over) %>% 
     mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
     relocate(refID,.before=1) %>% 
     mutate_all(as.character) 
   
+  # affils_df$refID
+  # affils_df$entry_no
   
   # papers_df cleanup   --------------------------------------
   
@@ -291,23 +280,6 @@ authors_df<-authors_df %>%
   names(papers_df)
 
   
-  
-  
-  # IDENTIFY FEDERAL AFFILIATIONS -------------------------------------------
-  
-  ## NEED TO CONFIRM THE DOD CDC ESP. INTENRATIONAL
-  
-  source("./code/ID_fed_affiliations.R")
-  affils_df<-ID_fed_affiliations(affils_df)
-  
-  
-  
-  
-  # ADD FEDERAL AFFILIATIONS TO AUTHORS_DF ----------------------------------
-  
-  source("./code/ID_fed_authors.R")
-  
-  authors_df<-ID_fed_authors(authors_df,affils_df)
   
 # check to see if any records failed to load  -----------------------------
 
@@ -340,8 +312,6 @@ authors_df<-authors_df %>%
     
   file_check<-file_check %>% 
     filter(is.na(papers) | is.na(affils) |is.na(authors))
-  
-  file_check
   
   
   
@@ -420,21 +390,21 @@ authors_df<-authors_df %>%
 
   # # FOR WITHIN YEAR BINDING - FEDS
   # 
-  # write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
-  # write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
-  # write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
-  # 
-  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
-  # # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder_count,".csv",sep=""))
+  write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
+  write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
+  write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
+
+  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
+  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder_count,".csv",sep=""))
   
   # # FOR WITHIN YEAR BINDING - UNIS
   # 
-  write_csv(affils_df,paste("./data_raw/affils/year_files_uni/affils_df_",folder[k],".csv",sep=""))
-  write_csv(authors_df,paste("./data_raw/authors/year_files_uni/authors_df_",folder[k],".csv",sep=""))
-  write_csv(papers_df,paste("./data_raw/papers/year_files_uni/papers_df_",folder[k],".csv",sep=""))
+  # write_csv(affils_df,paste("./data_raw/affils/year_files_uni/affils_df_",folder[k],".csv",sep=""))
+  # write_csv(authors_df,paste("./data_raw/authors/year_files_uni/authors_df_",folder[k],".csv",sep=""))
+  # write_csv(papers_df,paste("./data_raw/papers/year_files_uni/papers_df_",folder[k],".csv",sep=""))
 
   # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
-  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder[k],".csv",sep=""))
+  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder[k],".csv",sep=""))
   
   
 
