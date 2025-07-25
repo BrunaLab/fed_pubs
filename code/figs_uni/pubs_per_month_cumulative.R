@@ -67,7 +67,8 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
   
   
   pubs_mo_cum_fig<-plot_data %>% 
-    mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>%
+    mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
+    mutate(label = if_else(PY == "avg", NA, as.character(label))) %>% 
     ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY)) +
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
@@ -82,12 +83,20 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     theme(axis.text.x =element_text(size = 12))+
     theme(axis.title.y = element_text(size = 14))+
     theme(axis.title.x =element_text(size = 14))+
+    theme(legend.position="none")+
     annotate(geom="text", x=PM_max+0.5,
-             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))-3500),
-             label=paste("(", round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,")",sep=""),
+             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))-1500),
+             # label=paste("(", round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,")",sep=""),
+             label=paste(round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,sep=""),
              # label=(round(perc_change %>% filter(PY==2025 & PM==6) %>% select(perc_previous))),
-             color="#8B0000",
-             size=4)+
+             color="black",
+             size=3)+
+    annotate(geom="text", x=PM_max+0.5,
+             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))-2500),
+             label=paste("(", round(perc_change_avg),"% from 2019-2024 avg.)",sep=""),
+             # label=(round(perc_change %>% filter(PY==2025 & PM==6) %>% select(perc_previous))),
+             color="black",
+             size=3)+
     # annotate(geom="text", x=PM_max+0.5,
     #          y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))-2000),
     #          label="2025",
@@ -95,12 +104,16 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     #          color="#8B0000",
     #          size=5)+
     scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_mo_cumulative %>% select(cumul_pubs))+500))+
-    geom_label_repel(aes(label = label),
-                     nudge_x = .2,
-                     na.rm = TRUE)
-    # gghighlight(min(n) < 50)
-    # gghighlight(PY == 2025)
-  
+    geom_label(aes(label = label), nudge_x = 0.25, size = 3) 
+    # geom_label_repel(aes(label = label),
+    #                  nudge_x = .6,
+    #                  na.rm = TRUE)
+  # +
+  #   # gghighlight(min(n) < 50)
+  #   gghighlight(PY == "2025")
+  # # +
+  #   gghighlight(PY == "avg")
+  # 
   ggsave("./docs/images/pubs_mo_cum_fig_uni.png", width = 10, height = 10, units = "in")
   
   return(pubs_mo_cum_fig)

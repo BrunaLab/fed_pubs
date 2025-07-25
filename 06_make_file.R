@@ -786,7 +786,7 @@ agency_n_decline_2<-
   agency_n_decline %>%
   drop_na() %>%
   # filter(author_position=="any") %>%
-  filter(PY > 2021) %>%
+  filter(PY > 2023) %>%
   ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
   geom_bar(stat = "identity", position = "dodge") +
   scale_x_continuous(expand = c(0, 0), breaks = c(2024, 2025))+

@@ -325,31 +325,35 @@ agencies_over_20<-paste(
 
 
 
-### Articles indexed Monthly/Quarterly (2019-2024)
+
+### Publications Indexed Quarterly January 1 - December 31 (2019-2024)
 
 \bigskip
-
-
-```{r  label = pubs_mo_yr_1, echo = FALSE, fig.cap = "Articles per month (2019-2024). Note: the the January-December peaks are likely due to journals journals publishing fewer than 12 issues per year. Smoothed out somewhat by converting to publications per quarter (see below).", out.width = '75%'}
-knitr::include_graphics("../docs/images/pubs_per_month.png", error = FALSE)
-
-```
-<!-- \bigskip -->
-<!-- \bigskip -->
 
 ```{r  label = pubs_quarterly, echo = FALSE, fig.cap = "Articles per Quarter (2019-2024).", out.width = '75%'}
 knitr::include_graphics("../docs/images/pubs_per_quarter.png", error=FALSE)
 ```
 
+### Publications Indexed Monthly January 1 - December 31 (2019-2024)
+
+\bigskip
+
+```{r  label = pubs_monthly, echo = FALSE, fig.cap = "Articles indexed per mobnth (2019-2024).", out.width = '75%'}
+knitr::include_graphics("../docs/images/pubs_per_month.png", error=FALSE)
+```
+
+
 ### Publications Indexed Monthly January 1 - July 31 (2019-2025)
 
 \bigskip
+
 
 ```{r  label = monthly_pubs_1, echo = FALSE, fig.cap = "Monthly publications from January 1 to June 30 (2019-2025).", out.width = '75%'}
 
 knitr::include_graphics("images/monthly_pubs_to_date.png", error=FALSE)
 
 ```
+
 
 
 
@@ -378,7 +382,7 @@ knitr::include_graphics("../docs/images/total_pubs_to_month_x.png", error=FALSE)
 
 
 
-```{r agency_n_decline_first1, fig.align='center',fig.cap="Percent change in publicaitons (Jan-May) relative to same period prvious year. Only agencies producing over 10000 articles between 2019-2024.",out.width = '50%'}
+```{r agency_n_decline_first1, fig.align='center',fig.cap="Percent change in publicaitons (Jan-May) relative to same period prvious year. Only agencies producing over 5000 1st author publicaitons between 2019-2025 included.",out.width = '50%'}
 knitr::include_graphics("../docs/images/agency_n_decline_sum.png", error=FALSE)
 
 ```
