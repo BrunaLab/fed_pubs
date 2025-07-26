@@ -38,6 +38,6 @@ total_pubs_to_month_x <- function(pubs_mo, PM_max) {
     theme(axis.text.y = element_text(size = 12))+
     theme(axis.text.x =element_text(size = 12))+
     gghighlight(PY == 2025)
-  ggsave("./docs/images/total_pubs_to_month_x_uni.png", width = 6, height = 4, units = "in")
+  ggsave("./docs/images/total_pubs_to_month_x_uni.png", width = 6, height = 4, units = "in", device='png', dpi=700)
   return(total_pubs_to_month_x_fig)
 }

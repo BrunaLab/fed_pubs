@@ -32,7 +32,7 @@ pubs_per_quarter <- function(pubs_mo, PY_max) {
     # scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_per_quarter %>% select(n))+500))+
     # gghighlight(min(n) < 50)
     gghighlight(PY == 2024)
-  ggsave("./docs/images/pubs_per_quarter_uni.png", width = 10, height = 10, units = "in")
+  ggsave("./docs/images/pubs_per_quarter_uni.png", width = 6, height = 4, units = "in", device='png', dpi=700)
   
   return(pubs_per_quarter_fig)
   

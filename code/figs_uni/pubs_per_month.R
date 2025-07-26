@@ -2,7 +2,9 @@ pubs_per_month <- function(pubs_mo, PY_max) {
   
   library(gghighlight)
   pubs_mo_fig<-pubs_mo %>% 
-    filter(PY<PY_max+1) %>% 
+    filter(PY<PY_max) %>%
+    mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
+    mutate(label = if_else(PY == "avg", NA, as.character(label))) %>% 
     ggplot(aes(x=month_name, y=n,group=PY,color=PY)) +
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
@@ -18,11 +20,14 @@ pubs_per_month <- function(pubs_mo, PY_max) {
     theme(axis.title.x =element_text(size = 14))+
     scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_mo %>% select(n))+500))+
     scale_x_discrete(labels=c(month))+
-    
-    # gghighlight(min(n) < 50)
     gghighlight(PY == 2024)
-  
-  ggsave("./docs/images/pubs_per_month_uni.png", width = 10, height = 10, units = "in")
+    # geom_label(aes(label = label, nudge_x = 0.25, size = 3))
+  # +
+  #   
+  #   # gghighlight(min(n) < 50)
+  #   
+  # 
+  ggsave("./docs/images/pubs_per_month_uni.png", width = 6, height = 4, units = "in", device='png', dpi=700)
   
   return(pubs_mo_fig)
 }

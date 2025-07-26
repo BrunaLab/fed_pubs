@@ -1,277 +1,441 @@
 ---
-title: Declining Scientific Productivity by US Government Researchers
+title             : "The title"
+shorttitle        : "Title"
 
-# Use letters for affiliations, numbers to show equal authorship (if applicable) and to indicate the corresponding author
-author:
-  - name: Emilio M. Bruna
-    affiliation: a,1,2
-  - name: Bob Security
-    affiliation: a,b
-address:
-  - code: a
-    address: University of Florida, Center for Latin American Studies, PO Box 115530, Gainesville, FL, 32611-0430
-  - code: b
-    address: University of Florida, Department of Wildlife Ecology & Conservation, PO Box 110430, Gainesville, FL, 32611-0430
+author: 
+  - name          : "First Author"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "Postal address"
+    email         : "my@email.com"
+    role: # Contributorship roles (e.g., CRediT, https://credit.niso.org/)
+      - "Conceptualization"
+      - "Writing - Original Draft Preparation"
+      - "Writing - Review & Editing"
+  - name          : "Ernst-August Doelle"
+    affiliation   : "1,2"
+    role:
+      - "Writing - Review & Editing"
+      - "Supervision"
 
-corresponding_author:
-  code: 2
-  text: "To whom correspondence should be addressed. E-mail: embruna@ufl.edu"
+affiliation:
+  - id            : "1"
+    institution   : "Wilhelm-Wundt-University"
+  - id            : "2"
+    institution   : "Konstanz Business School"
 
-# For footer text
-lead_author_surname: Bruna
+authornote: |
+  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
 
-## Remove this if not required    
-# equal_authors:
-#   code: 1
-#   text: "A.O.(Author One) and A.T. (Author Two) contributed equally to this work (remove if not applicable)."
+  Enter author note here.
 
+  significance statement: Explain the significance of the research at a level understandable to an undergraduate-educated scientist outside their field of specialty. Include no more than 120 words
 
-author_contributions: |
-  Please provide details of author contributions here.
-
-## Remove this if not required
-conflict_of_interest: |
-  The authors declare no conflicts of interest.
 
 abstract: |
-  Please provide an abstract of no more than 250 words in a single paragraph. Abstracts should explain to the general reader the major contributions of the article. References in the abstract must be cited in full within the abstract itself and cited in the text.
+  Explain to the general reader the major contributions of the article. Include no more than 250 words. Cite all references in the abstract in full within the abstract itself AND in the text
+  
+  <!-- https://tinyurl.com/ybremelq -->
+  
+keywords          : "keywords"
+wordcount         : "X"
 
+bibliography      : "r-references.bib"
 
-significance: |
-  Authors must submit a 120-word maximum statement about the significance of their research paper written at a level understandable to an undergraduate educated scientist outside their field of speciality. The primary goal of the Significance Statement is to explain the relevance of the work in broad context to a broad readership. The Significance Statement appears in the paper itself and is required for all research papers.
+floatsintext      : no
+linenumbers       : yes
+draft             : no
+mask              : no
 
-acknowledgements: |
-  Please include your acknowledgments here, set in a single paragraph. Please do not include any acknowledgments in the Supporting Information, or anywhere else in the manuscript.
+figurelist        : no
+tablelist         : no
+footnotelist      : no
 
-keywords:
-  - one
-  - two
-  - optional
-  - optional
-  - optional
-
-## must be one of: pnasresearcharticle (usual two-column layout), pnasmathematics (one column layout), or pnasinvited (invited submissions only)
-pnas_type: pnasresearcharticle
-
-bibliography: pnas-sample.bib
-csl: pnas.csl
-
-## change to true to add optional line numbering
-lineno: true
-
-output: rticles::pnas_article
+classoption       : "man"
+output            : papaja::apa6_pdf
 ---
 
+```{r setup, include = FALSE}
+library("papaja")
+r_refs("fed_pubs.bib")
+```
 
-This PNAS journal template is provided to help you write your work in the
-correct journal format. Instructions for use are provided below.
-
-Note: please start your introduction without including the word
-"Introduction" as a section heading (except for math articles in the
-Physical Sciences section); this heading is implied in the first
-paragraphs.
-
-Guide to using this template {.unnumbered}
-========================================
-
-Please note that whilst this template provides a preview of the typeset
-manuscript for submission, to help in this preparation, it will not
-necessarily be the final publication layout. For more detailed
-information please see the [PNAS Information for
-Authors](http://www.pnas.org/site/authors/format.xhtml).
-
-
-Author Affiliations {#author-affiliations .unnumbered}
--------------------
-
-Include department, institution, and complete address, with the
-ZIP/postal code, for each author. Use lower case letters to match
-authors with institutions, as shown in the example. Authors with an
-ORCID ID may supply this information at submission.
-
-Submitting Manuscripts {#submitting-manuscripts .unnumbered}
-----------------------
-
-All authors must submit their articles at
-[PNAScentral](http://www.pnascentral.org/cgi-bin/main.plex). If you are
-using Overleaf to write your article, you can use the "Submit to PNAS"
-option in the top bar of the editor window.
-
-Format {#format .unnumbered}
-------
-
-Many authors find it useful to organize their manuscripts with the
-following order of sections; Title, Author Affiliation, Keywords,
-Abstract, Significance Statement, Results, Discussion, Materials and
-methods, Acknowledgments, and References. Other orders and headings are
-permitted.
-
-Manuscript Length {#manuscript-length .unnumbered}
------------------
-Brief Reports describe observations of immediate impact that may hold potential to initiate new avenues of research, provide compelling new data on controversies of broad interest and long-standing questions, or present a concise conceptual advance. All Brief Reports are published immediate open access.  
-
-Brief Reports are limited to 3 pages, which is approximately 1,600 words (including the manuscript text, title page, abstract, and figure legends), and 15 references. 
-
-Supporting information (SI) is limited to extended methods, essential supporting datasets, and videos (no additional tables or figures).
-All Brief Reports follow the Direct Submission mode of review and are not eligible as member-contributed submissions
-
-References {#references .unnumbered}
-----------
-
-References should be cited in numerical order as they appear in text;
-this will be done automatically via bibtex, e.g. @belkin2002using and
-@berard1994embedding [@coifman2005geometric]. All references, including
-for the SI, should be included in the main manuscript file. References
-appearing in both sections should not be duplicated. SI references
-included in tables should be included with the main reference section.
-
-Data Archival {#data-archival .unnumbered}
--------------
-
-PNAS must be able to archive the data essential to a published article.
-Where such archiving is not possible, deposition of data in public
-databases, such as GenBank, ArrayExpress, Protein Data Bank, Unidata,
-and others outlined in the Information for Authors, is acceptable.
-
-
-<!-- Language-Editing Services {#language-editing-services .unnumbered} -->
-<!-- ------------------------- -->
-
-<!-- Prior to submission, authors who believe their manuscripts would benefit -->
-<!-- from professional editing are encouraged to use a language-editing -->
-<!-- service (see list at www.pnas.org/site/authors/language-editing.xhtml). -->
-<!-- PNAS does not take responsibility for or endorse these services, and -->
-<!-- their use has no bearing on acceptance of a manuscript for publication. -->
-
-![Placeholder image of a frog with a long example caption to show
-justification setting.<span data-label="fig:frog"></span>](frog.png)
-
-Digital Figures {#sec:figures .unnumbered}
----------------
-
-Only TIFF, EPS, and high-resolution PDF for Mac or PC are allowed for
-figures that will appear in the main text, and images must be final
-size. Authors may submit U3D or PRC files for 3D images; these must be
-accompanied by 2D representations in TIFF, EPS, or high-resolution PDF
-format. Color images must be in RGB (red, green, blue) mode. Include the
-font files for any text.
-
-Figures and Tables should be labelled and referenced in the standard way
-using the `\label{}` and `\ref{}` commands.
-
-Figure \[fig:frog\] shows an example of how to insert a column-wide
-figure. To insert a figure wider than one column, please use the
-`\begin{figure*}...\end{figure*}` environment. Figures wider than one
-column should be sized to 11.4 cm or 17.8 cm wide.
-
-Single column equations {#single-column-equations .unnumbered}
------------------------
-
-Authors may use 1- or 2-column equations in their article, according to
-their preference.
-
-To allow an equation to span both columns, options are to use the
-`\begin{figure*}...\end{figure*}` environment mentioned above for
-figures, or to use the `\begin{widetext}...\end{widetext}` environment
-as shown in equation \[eqn:example\] below.
-
-Please note that this option may run into problems with floats and
-footnotes, as mentioned in the [cuted package
-documentation](http://texdoc.net/pkg/cuted). In the case of problems
-with footnotes, it may be possible to correct the situation using
-commands `\footnotemark` and `\footnotetext`.
-
-$$\begin{aligned}
-(x+y)^3&=(x+y)(x+y)^2\\
-       &=(x+y)(x^2+2xy+y^2) \label{eqn:example} \\
-       &=x^3+3x^2y+3xy^3+x^3. 
-\end{aligned}$$
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+# Introduction
 
 
 
-<!-- pandoc writes all tables using longtable, which fails in 2-column mode
+# Results
 
-  Species                    CBS     CV     G3
-  ----------------------- ------ ------ ------
-  1\. Acetaldehyde           0.0    0.0    0.0
-  2\. Vinyl alcohol          9.1    9.6   13.5
-  3\. Hydroxyethylidene     50.8   51.2   54.0
-
-  : Comparison of the fitted potential energy surfaces and ab initio
-  benchmark electronic energy calculations
-
--->
-
-Supporting Information (SI) {#supporting-information-si .unnumbered}
----------------------------
+# Discussion
 
 
-The main text of the paper must stand on its own without the SI. Refer
-to SI in the manuscript at an appropriate point in the text. Number
-supporting figures and tables starting with S1, S2, etc. Authors are
-limited to no more than 10 SI files, not including movie files. Authors
-who place detailed materials and methods in SI must provide sufficient
-detail in the main text methods to enable a reader to follow the logic
-of the procedures and results and also must reference the online
-methods. If a paper is fundamentally a study of a new method or
-technique, then the methods must be described completely in the main
-text. Because PNAS edits SI and composes it into a single PDF, authors
-must provide the following file formats only.
-
-### SI Text {#si-text .unnumbered}
-
-Supply Word, RTF, or LaTeX files (LaTeX files must be accompanied by a
-PDF with the same file name for visual reference).
-
-### SI Figures {#si-figures .unnumbered}
-
-Provide a brief legend for each supporting figure after the supporting
-text. Provide figure images in TIFF, EPS, high-resolution PDF, JPEG, or
-GIF format; figures may not be embedded in manuscript text. When saving
-TIFF files, use only LZW compression; do not use JPEG compression. Do
-not save figure numbers, legends, or author names as part of the image.
-Composite figures must be pre-assembled.
-
-### 3D Figures {#d-figures .unnumbered}
-
-Supply a composable U3D or PRC file so that it may be edited and
-composed. Authors may submit a PDF file but please note it will be
-published in raw format and will not be edited or composed.
-
-### SI Tables {#si-tables .unnumbered}
-
-Supply Word, RTF, or LaTeX files (LaTeX files must be accompanied by a
-PDF with the same file name for visual reference); include only one
-table per file. Do not use tabs or spaces to separate columns in Word
-tables.
-
-### SI Datasets {#si-datasets .unnumbered}
-
-Supply Excel (.xls), RTF, or PDF files. This file type will be published
-in raw format and will not be edited or composed.
-
-### SI Movies {#si-movies .unnumbered}
-
-Supply Audio Video Interleave (avi), Quicktime (mov), Windows Media
-(wmv), animated GIF (gif), or MPEG files and submit a brief legend for
-each movie in a Word or RTF file. All movies should be submitted at the
-desired reproduction size and length. Movies should be no more than 10
-MB in size.
-
-### Still images {#still-images .unnumbered}
-
-Authors must provide a still image from each video file. Supply TIFF,
-EPS, high-resolution PDF, JPEG, or GIF files.
-
-### Appendices {#appendices .unnumbered}
-
-PNAS prefers that authors submit individual source files to ensure
-readability. If this is not possible, supply a single PDF file that
-contains all of the SI associated with the paper. This file type will be
-published in raw format and will not be edited or composed.
+# Materials and Methods
 
 
-<!-- Leave these lines as they are at the end of your .Rmd file to ensure placement of methods & acknowledgements sections before the references-->
-\showmatmethods
-\showacknow
-\pnasbreak
+# Acknowledgments and funding sources
+
+
+# Publications by US Federal Personnel (Jan 2019 - July 1 2025)
+
+# Immediate Consequences of US Administration Policies on Scientific Productivity by Federal Agencies
+
+\bigskip
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(janitor)
+# library(gghighlight)
+library(kableExtra)
+# library(ggrepel)
+# library(knitr)
+# library(progress)
+# library(fs)
+library(data.table)
+library(here)
+
+knitr::opts_chunk$set(echo = FALSE, message=FALSE,warning=FALSE)
+
+options(scipen=999)
+
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+
+knitr::opts_chunk$set(fig.pos = 'H')
+
+```
+
+
+
+
+
+```{r data, cache=TRUE }
+
+# Read data
+summary_data<-read_csv("./docs/summary_info/summary_data.csv")
+jrnls_overall_first<-read_csv("./docs/summary_info/jrnls_overall_first.csv")
+
+journals_n_perc_annual_first.csv<-read_csv("./docs/summary_info/journals_n_perc_annual_first.csv")
+
+auth_per_pub_means<-read_csv("./docs/summary_info/auth_per_pub_means.csv")
+total_pubs_per_agency_first<-read_csv("./docs/summary_info/total_pubs_per_agency_first.csv")
+
+```
+
+
+<!-- https://www.pnas.org/author-center/submitting-your-manuscript#article-types -->
+_PNAS Brief Reports_ describe observations of immediate impact that may hold potential to initiate new avenues of research, provide compelling new data on controversies of broad interest and long-standing questions, or present a concise conceptual advance.
+
+All Brief Reports are published immediate open access.
+
+- Brief Reports are limited to 3 pages, which is approximately 1,600 words (including the manuscript text, title page, abstract, and figure legends), and 15 references.
+
+- Supporting information (SI) is limited to extended methods, essential supporting datasets, and videos (no additional tables or figures).
+
+- All Brief Reports follow the Direct Submission mode of review and are not eligible as member-contributed submissions
+
+
+
+I searched SCOPUS for all indexed articles, reviews, letters, notes, book chapters, data papers, and editorial material published between 2019-2025 that included at least one author with a United States federal government affiliation as their primary address. The search was conducted using Scopus' Affiliation Codes, the list of codes included both the primary codes for government agencies (i.e., US Department of Defense: 60012471; US Department of Commerce: 60000947) and for individual units within administered by those departments (Naval Dental Center: 60032984, National Oceanic and Atmospheric Administration: 60027716).  
+
+_Note:_ Some USGS scientists are based at US universities via the Cooperative Fish and Wildlife Research Units Program. While these publications are returned by SCOPUS searches of the USGS code, the affiliation given for the USGS authors is that of the host university (e.g., USGS Scientists at the Florida Cooperative Fish and Wildlife Research Unit is "University of Florida"). To correct this I downloaded metadata from USGS [Publications Warehouse](https://pubs.usgs.gov/) for the N = 17,445 articles published between 2019-2025 and used it to identify all USGS authors and correct their affiliation in the SCOPUS records. 
+
+\bigskip
+
+# Summary: Total Publications, Total Authors, and Publications Per Year
+
+\bigskip
+
+## Search (SCOPUS API)
+
+
+- **No. of Federal Affil SCOPUS IDs searched:** N = `r comma(as.numeric(summary_data %>% filter(value=="scopus_id_total") %>% select(n)))`. 
+
+- **No. of Federal Affil SCOPUS IDs returned:** N = `r comma(as.numeric(summary_data %>% filter(value=="no_fed_affils") %>% select(n)))`. 
+
+## Results 
+- **Total No. of Publications:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_pubs") %>% select(n)))`.
+
+- **Total No. of Authors:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_authors") %>% select(n)))`.
+
+
+- **Total No. of Unique Authors:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_unique_authors") %>% select(n)))`.
+
+
+  > Unique authors with federal affiliation (Primary): N = `r comma(as.numeric(summary_data %>% filter(value=="total_federals") %>% select(n)))`.
+
+  > Unique non-federal authors: N = `r comma(as.numeric(summary_data %>% filter(value=="total_NOTfederals") %>% select(n)))`.
+  
+
+- **Author Position **
+
+  > Articles with Federal Author in 1st Author Position:  `r comma(as.numeric(summary_data %>% filter(value=="prop_papers_fed_1st") %>% select(n)))`.
+  
+
+  > Articles with Federal Author in Last Author position:  `r comma(as.numeric(summary_data %>% filter(value=="prop_papers_fed_last") %>% select(n)))`.
+  
+
+- **Authors per Publication**: 
+
+  > Authors Per Publication: Mean = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD)
+
+  > Federal Authors per Publication: Mean  = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Fed") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Fed") %>% select(sd)))` SD)
+
+  > Non-Federal Authors per Publication Mean = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="NonFed") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="NonFed") %>% select(sd)))` SD)
+
+\bigskip
+
+
+### Journals with the most papers with an agency 1st author (2019-2025)
+
+```{r journals }
+
+jrnls_overall_first %>% 
+  slice_head(n=20) %>%
+  mutate(perc=round(perc,3)) %>% 
+  rename(N=n,
+         percent=perc) %>% 
+kable(digits = 2,
+  format = "latex",
+  align = "lcc",
+  escape = FALSE,
+  row.names = FALSE,
+  booktabs = T,
+  linesep = ""
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = c("scale_down","hold_position"),
+    font_size = 12,
+    position = "center"
+  )
+
+```
+
+
+
+\newpage
+
+
+## Agencies producing >1000 1st author publications from January 2019-June 2025)
+
+\bigskip
+
+```{r pubs_year}
+
+
+total_pubs_per_agency_first %>%
+  arrange(agency_primary) %>% 
+  group_by(agency_primary) %>% 
+  mutate(total_a2=sum(n)) %>% 
+  arrange(desc(total_a2)) %>% 
+  mutate(perc2=(total_a2/total*100)) %>% 
+  select(-total) %>% 
+  # select(agency_primary,agency,n,perc,total_a2,perc2) %>% 
+  select(agency_primary,total_a2,perc2,agency,n,perc) %>% 
+  # slice_head(n=20) %>% 
+  # select(-total) %>% 
+  mutate(perc=round(perc,2)) %>% 
+  mutate(perc2=round(perc2,2)) %>% 
+  arrange(desc(total_a2)) %>% 
+  filter(total_a2>2000) %>% 
+  # group_by(agency_primary) %>% 
+  add_count(agency_primary) %>% 
+  mutate(agency=if_else(nn==1," ",agency)) %>% 
+  select(-nn) %>% 
+  # ungroup() %>% 
+  mutate(total_a2=paste(total_a2, " (",perc2,"\\%)",sep="")) %>%
+  mutate(n=paste(n, " (",perc,"\\%)",sep="")) %>%
+  mutate(perc=if_else(perc==perc2,NA,perc)) %>% 
+  mutate(n=if_else(n==total_a2,NA,n)) %>% 
+  mutate(n=as.character(n)) %>% 
+  mutate(perc=as.character(perc)) %>% 
+  replace_na(list(n=" ",perc=" ")) %>% 
+  select(-perc2,-perc) %>%
+  rename(Department=agency_primary,
+         Agency=agency,
+         `N (\\%)`=total_a2,
+         `n (\\%)`=n,
+         ) %>% 
+kable(
+  # digits = 2,
+  format = "latex",
+  align = "llllcc",
+  escape = FALSE,
+  row.names = FALSE,
+  booktabs = T,
+  linesep = ""
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = c("scale_down","hold_position"),
+    font_size = 12,
+    position = "center"
+  ) %>% 
+  collapse_rows(columns = (1:2),valign = "top")
+# collapse_rows(columns = c(1,4),valign = "top")
+
+
+
+
+```
+
+
+```{r agency2}
+
+
+agencies_past_20<-total_pubs_per_agency_first %>%
+  filter(n<1000) %>% 
+  select(agency) %>% 
+  mutate(agency=toupper(agency)) %>%  
+  mutate(agency=if_else((agency=="STATE"|
+                           agency=="EDUCATION"|
+                           agency=="CONGRESS"|
+                           agency=="TREASURY"|
+                           agency=="LABOR"|
+                           agency=="OTHER"),
+                        str_to_title(agency),
+                        agency)
+  )
+
+# agencies_past_20[1,]<-paste("Other agencies: ",agencies_past_20[1,],sep="")
+# agencies_past_20[5,]<-paste(agencies_past_20[5,],"\n",sep="")
+# agencies_past_20[10,]<-paste(agencies_past_20[10,],"\n",sep="")
+# agencies_past_20[15,]<-paste(agencies_past_20[15,],"\n",sep="")
+# agencies_past_20[20,]<-paste(agencies_past_20[20,],"\n",sep="")
+
+agencies_past_20<-agencies_past_20 %>% mutate_all(tolower)
+agencies_over_20_1<-paste(agencies_past_20$agency[1:10],collapse=",") 
+agencies_over_20_2<-paste(agencies_past_20$agency[11:20],collapse=",") 
+agencies_over_20_3<-paste(agencies_past_20$agency[21:30],collapse=",") 
+agencies_over_20_4<-paste(agencies_past_20$agency[31:40],collapse=",") 
+agencies_over_20_5<-paste(agencies_past_20$agency[41:50],collapse=",") 
+agencies_over_20_6<-paste(agencies_past_20$agency[51:54],collapse=",") 
+# agencies_over_20_7<-paste(agencies_past_20$agency[61:nrow(agencies_past_20)],collapse=",") 
+
+agencies_over_20<-paste(
+  agencies_over_20_1,
+  agencies_over_20_2,
+  agencies_over_20_3,
+  agencies_over_20_4,
+  agencies_over_20_5,
+  agencies_over_20_6
+  # agencies_over_20_7
+  )
+  
+```
+\bigskip  
+\bigskip 
+
+
+
+**_Other agencies:_**
+
+`r agencies_over_20_1`  
+`r agencies_over_20_2`   
+`r agencies_over_20_3`  
+`r agencies_over_20_4`   
+`r agencies_over_20_5`
+`r agencies_over_20_6`
+
+
+
+
+
+
+### Publications Indexed Quarterly January 1 - December 31 (2019-2024)
+
+\bigskip
+
+```{r  label = pubs_quarterly, echo = FALSE, fig.cap = "Articles per Quarter (2019-2024).", out.width = '75%'}
+knitr::include_graphics("../docs/images/pubs_per_quarter.png", error=FALSE)
+```
+
+### Publications Indexed Monthly January 1 - December 31 (2019-2024)
+
+\bigskip
+
+```{r  label = pubs_monthly, echo = FALSE, fig.cap = "Articles indexed per mobnth (2019-2024).", out.width = '75%'}
+knitr::include_graphics("../docs/images/pubs_per_month.png", error=FALSE)
+```
+
+
+### Publications Indexed Monthly January 1 - July 31 (2019-2025)
+
+\bigskip
+
+
+```{r  label = monthly_pubs_1, echo = FALSE, fig.cap = "Monthly publications from January 1 to June 30 (2019-2025).", out.width = '75%'}
+
+knitr::include_graphics("images/monthly_pubs_to_date.png", error=FALSE)
+
+```
+
+
+
+
+### Cumulative Total Publications January 1 - June 30 (2019-2025)
+
+\bigskip
+
+```{r  label = cumulative_fig, echo = FALSE, fig.cap = "Cumulative number of articles published by researchers at federal agencies between January 1-June 30, 2019-2025 and the percent change in 2025 productivity relative to the same time period in 2024 (red).", out.width = '75%'}
+knitr::include_graphics("../docs/images/pubs_mo_cum_fig.png", error=FALSE)
+```
+
+
+
+
+
+### Total Publications January 1 - June 30 (2019-2025)
+
+\bigskip
+
+```{r  label = fig_total_to_date_1_fig, echo = FALSE, fig.cap = "Articles published by researchers at federal agencies between January 1-June 30, 2019-2025 and the percent change in 2025 productivity relative to the same time period in 2024 (red). Numbers in blue are the number of articles published in 2024 and 2025.", out.width = '75%'}
+knitr::include_graphics("../docs/images/total_pubs_to_month_x.png", error=FALSE)
+```
+
+
+### Total Publications January - May (Agencies with  more than 10,000 articles only)
+
+
+
+```{r agency_n_decline_first1, fig.align='center',fig.cap="Percent change in publicaitons (Jan-May) relative to same period prvious year. Only agencies producing over 5000 1st author publicaitons between 2019-2025 included.",out.width = '50%'}
+knitr::include_graphics("../docs/images/agency_n_decline_sum.png", error=FALSE)
+
+```
+
+
+
+```{r  label = agency_n_decline_2, echo = FALSE, fig.cap = "Percent change in articles published from previous Jan-May (2019-2024) by the 10 most productive federal agencies or institutions.", out.width = '75%'}
+knitr::include_graphics("images/agency_n_decline_2.png", error=FALSE)
+```
+
+
+
+
+
+```{r  label = pubs_yr_1, echo = FALSE, fig.cap = "Publications per year (2019-2024)", out.width = '75%'}
+knitr::include_graphics("../docs/images/total_pubs_per_yr.png", error=FALSE)
+```
+
+
+
+<!-- Spell out all abbreviations -->
+<!-- Use FundRef to identify the standard name for any funders -->
+<!-- Do not include dedications -->
+
+# Data Availibility
+
+<!-- (for all data, documentation, and code used in analysis) -->
+\newpage
+
+# References
+
+::: {#refs custom-style="Bibliography"}
+:::

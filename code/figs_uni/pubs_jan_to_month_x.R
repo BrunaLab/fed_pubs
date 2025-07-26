@@ -17,25 +17,25 @@ pubs_jan_to_month_x <- function(pubs_mo, PM_max) {
     theme(axis.title.y = element_text(size = 14))+
     theme(axis.title.x =element_text(size = 14))+
     scale_x_continuous( breaks=seq(1,7,by=1))+
-    scale_y_continuous(expand = c(0, 0), breaks = seq(0, max(pubs_mo %>% select(n))+5000,by=2500))+
+    scale_y_continuous(expand = c(0, 0), breaks = seq(0, max(pubs_mo %>% select(n))+1000,by=500),limits = c(0, max(pubs_mo %>% select(n))+1000))+
     # gghighlight(min(n) < 50)
     gghighlight(PY == 2025) 
-  
-  data_ends <- pubs_mo %>% filter(PM == PM_max)
-  
-  # data_ends <- pubs_mo %>% 
-  #   filter(PM<7) %>% 
-  #   group_by(PY) %>% 
-  #   summarize(n=sum(n)) %>% 
-  #   mutate(PM=6)
-  
-  monthly_pubs_1 + 
-    geom_text_repel(
-      aes(label = n), data = data_ends,
-      fontface ="plain", color = "black", size = 3,vjust=-.2
-    )
-  
-  ggsave("./docs/images/monthly_pubs_to_date_uni.png", width = 10, height = 10, units = "in")
+  # 
+  # data_ends <- pubs_mo %>% filter(PM == PM_max)
+  # 
+  # # data_ends <- pubs_mo %>% 
+  # #   filter(PM<7) %>% 
+  # #   group_by(PY) %>% 
+  # #   summarize(n=sum(n)) %>% 
+  # #   mutate(PM=6)
+  # 
+  # monthly_pubs_1 + 
+  #   geom_text_repel(
+  #     aes(label = n), data = data_ends,
+  #     fontface ="plain", color = "black", size = 3,hjust=.05
+  #   )
+  # 
+  ggsave("./docs/images/monthly_pubs_to_date_uni.png", width = 6, height = 4, units = "in", device='png', dpi=700)
   
   return(monthly_pubs_1)
 }

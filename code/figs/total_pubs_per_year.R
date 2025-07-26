@@ -17,7 +17,7 @@ total_pubs_per_year <- function(pubs_yr, PY_max) {
     scale_y_continuous(expand = c(0, 0), breaks=seq(0,max(pubs_yr$n)+2500,by=2500), limits = c(0, max(pubs_yr$n)+2500))
      
   
-  ggsave("./docs/images/total_pubs_per_yr.png", width = 8, height = 8, units = "in")
+  ggsave("./docs/images/total_pubs_per_yr.png", width = 6, height = 4, units = "in", device='png', dpi=700)
   
   return(pubs_yr_fig)
 }

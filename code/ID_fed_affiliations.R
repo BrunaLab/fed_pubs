@@ -40,7 +40,9 @@ ID_fed_affiliations <- function(affils_df) {
                        affil_id==122535121~"office of the assistant secretary for planning and evaluation",
                        affil_id==60000459~"office of management and budget",
                        affil_id==60033081~"office of policy analysis",
-                       
+                       affil_id==112888033~"veterans affairs puget sound",
+                       affil_id==121955104~"atlanta va healthcare system",
+                       affil_id==60012320~"us secret service",
                        .default = as.character(affiliation))) %>% 
     mutate(agency_short=
              case_when(affil_id==60028217~"epa",
@@ -267,18 +269,18 @@ ID_fed_affiliations <- function(affils_df) {
       TRUE ~ agency_short
     ))
 
-
-
-  affils_df <- affils_df %>%
-    mutate(agency_short = case_when(
-      affil_id == 112838889 ~ "doj",
-      affil_id == 128561286 ~ "federal reserve system",
-      affil_id == 128464417 ~ "federal reserve system",
-      affil_id == 100641183 ~ "dot",
-      affil_id == 112591249 ~ "va",
-      affil_id == 124526765 ~ "dot",
-      TRUE ~ agency_short
-    ))
+# 
+# 
+#   affils_df <- affils_df %>%
+#     mutate(agency_short = case_when(
+#       affil_id == 112838889 ~ "doj",
+#       affil_id == 128561286 ~ "federal reserve system",
+#       affil_id == 128464417 ~ "federal reserve system",
+#       affil_id == 100641183 ~ "dot",
+#       affil_id == 112591249 ~ "va",
+#       affil_id == 124526765 ~ "dot",
+#       TRUE ~ agency_short
+#     ))
   
   affils_df <- affils_df %>%
     mutate(
@@ -770,6 +772,20 @@ ID_fed_affiliations <- function(affils_df) {
   # Mode   FALSE    TRUE
   # logical    7069 115885
 
+  
+  
+  
+  affils_df <- affils_df %>%
+    mutate(agency_short = case_when(
+      
+      affil_id == 128561286 ~ "federal reserve system",
+      affil_id == 128464417 ~ "federal reserve system",
+      affil_id == 100641183 ~ "dot",
+      affil_id == 112591249 ~ "va",
+      affil_id == 124526765 ~ "dot",
+      TRUE ~ agency_short
+    ))
+  
 
   fed_status_fix <- fed_status_fix %>%
     mutate(agency_short = case_when(
@@ -782,8 +798,18 @@ ID_fed_affiliations <- function(affils_df) {
         "125763856",
         "125364545"
       ) ~ "usda",
+      affil_id %in% c(
+        "128561286",
+        "128464417"
+        )~ "federal reserve system",
+      
       affil_id == "122988512" ~ "ahrq",
-      affil_id == "60019388" ~ "eop",
+      affil_id %in% c(
+        "60019388",
+        "100345200"
+        )~ "eop",
+      affil_id == "60012320" ~ "dhs",
+      affil_id == "112838889" ~ "doj",
       affil_id == "124336178" ~ "cdc",
       affil_id %in% c(
         "100502481",
@@ -805,7 +831,8 @@ ID_fed_affiliations <- function(affils_df) {
         "129955677",
         "123822264",
         "128757432",
-        "131466439"
+        "131466439",
+        "112456278"
       ) ~ "dod",
       affil_id %in% c(
         "60008492",
@@ -815,6 +842,7 @@ ID_fed_affiliations <- function(affils_df) {
         "109347134",
         "112920600",
         "112922559",
+        "60004328",
         "120168333"
       ) ~ "doe",
       affil_id == "123502999" ~ "epa",
@@ -822,7 +850,8 @@ ID_fed_affiliations <- function(affils_df) {
         "100677110",
         "113820147",
         "125383427",
-        "128533828"
+        "128533828",
+        "122605840"
       ) ~ "hhs",
       affil_id %in% c(
         "101140478",
@@ -975,7 +1004,8 @@ ID_fed_affiliations <- function(affils_df) {
         "108095235",
         "123934640",
         "60073942",
-        "126395319"
+        "126395319",
+        "112888033"
       ) ~ "va",
       TRUE ~ agency_short
     ))
@@ -1075,3 +1105,35 @@ ID_fed_affiliations <- function(affils_df) {
   return(affils_df)
 }
 
+
+
+# 100345200
+# agency_short==eop
+# agency_primary==eop
+
+# 112456278
+# agency_short==dod
+# agency_primary==dod
+
+# 112888033
+# affiliation==veterans affairs puget sound
+# agency_short==va
+# agency_primary==va
+
+# 121955104
+# affiliation==atlanta va healthcare system
+# agency_short==va
+# agency_primary==va
+
+# 122605840
+# agency_short==hhs
+# agency_primary==hhs
+
+# 60004328
+# agency_short==doe
+# agency_primary==doe
+
+# 60012320
+# affiliation==us secret service
+# agency_short==dhs
+# agency_primary==dhs

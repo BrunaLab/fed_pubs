@@ -104,7 +104,7 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     #                  nudge_x = .2,
     #                  na.rm = TRUE)
   
-  ggsave("./docs/images/pubs_mo_cum_fig.png", width = 10, height = 10, units = "in")
+  ggsave("./docs/images/pubs_mo_cum_fig.png", width = 7, height = 10, units = "in", device='png', dpi=700)
   # 
   return(pubs_mo_cum_fig)
 }
