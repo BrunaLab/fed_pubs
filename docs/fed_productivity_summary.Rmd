@@ -90,7 +90,7 @@ knitr::opts_chunk$set(fig.pos = 'H')
 
 
 
-```{r data, cache=TRUE }
+```{r data, cache=FALSE }
 
 # Read data
 summary_data<-read_csv("./docs/summary_info/summary_data.csv")
@@ -98,10 +98,14 @@ jrnls_overall_first<-read_csv("./docs/summary_info/jrnls_overall_first.csv")
 
 journals_n_perc_annual_first.csv<-read_csv("./docs/summary_info/journals_n_perc_annual_first.csv")
 
-auth_per_pub_means<-read_csv("./docs/summary_info/auth_per_pub_means.csv")
+auth_per_pub_means<-read_csv("./docs/summary_info/auth_per_pub_means.csv") 
 total_pubs_per_agency_first<-read_csv("./docs/summary_info/total_pubs_per_agency_first.csv")
 
 ```
+<!-- `r total_pubs_per_agency_first[1,3]` -->
+<!-- as.numeric(total_pubs_per_agency_first %>% filter(agency=="interior") %>% select(n)): `r as.numeric(total_pubs_per_agency_first %>% filter(agency=="interior") %>% select(n))` -->
+
+<!-- r as.numeric(total_pubs_per_agency_first %>% filter(agency=="doe") %>% select(n)): `r as.numeric(total_pubs_per_agency_first %>% filter(agency=="doe") %>% select(n))` -->
 
 
 <!-- https://www.pnas.org/author-center/submitting-your-manuscript#article-types -->
@@ -135,6 +139,7 @@ _Note:_ Some USGS scientists are based at US universities via the Cooperative Fi
 - **No. of Federal Affil SCOPUS IDs returned:** N = `r comma(as.numeric(summary_data %>% filter(value=="no_fed_affils") %>% select(n)))`. 
 
 ## Results 
+
 - **Total No. of Publications:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_pubs") %>% select(n)))`.
 
 - **Total No. of Authors:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_authors") %>% select(n)))`.
@@ -150,10 +155,10 @@ _Note:_ Some USGS scientists are based at US universities via the Cooperative Fi
 
 - **Author Position **
 
-  > Articles with Federal Author in 1st Author Position:  `r comma(as.numeric(summary_data %>% filter(value=="prop_papers_fed_1st") %>% select(n)))`.
+  > Articles with Federal Author in 1st Author Position:  `r comma(as.numeric(summary_data %>% filter(value=="prop_papers_fed_1st") %>% select(n)))`%.
   
 
-  > Articles with Federal Author in Last Author position:  `r comma(as.numeric(summary_data %>% filter(value=="prop_papers_fed_last") %>% select(n)))`.
+  > Articles with Federal Author in Last Author position:  `r comma(as.numeric(summary_data %>% filter(value=="prop_papers_fed_last") %>% select(n)))`%.
   
 
 - **Authors per Publication**: 
@@ -161,7 +166,7 @@ _Note:_ Some USGS scientists are based at US universities via the Cooperative Fi
   > Authors Per Publication: Mean = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD)
 
   > Federal Authors per Publication: Mean  = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Fed") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Fed") %>% select(sd)))` SD)
-
+  
   > Non-Federal Authors per Publication Mean = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="NonFed") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="NonFed") %>% select(sd)))` SD)
 
 \bigskip
@@ -205,8 +210,10 @@ kable(digits = 2,
 
 ```{r pubs_year}
 
-
-total_pubs_per_agency_first %>%
+agency_table<-
+  total_pubs_per_agency_first %>%
+  mutate(agency_primary=if_else(agency=='federal reserve system',"federal reserve system",agency_primary)) %>% 
+  mutate(total=sum(n)) %>% 
   arrange(agency_primary) %>% 
   group_by(agency_primary) %>% 
   mutate(total_a2=sum(n)) %>% 
@@ -220,7 +227,9 @@ total_pubs_per_agency_first %>%
   mutate(perc=round(perc,2)) %>% 
   mutate(perc2=round(perc2,2)) %>% 
   arrange(desc(total_a2)) %>% 
-  filter(total_a2>2000) %>% 
+  # filter(total_a2>2000) %>% 
+  filter(agency_primary!="other") %>% 
+  filter(agency_primary!="state") %>% 
   # group_by(agency_primary) %>% 
   add_count(agency_primary) %>% 
   mutate(agency=if_else(nn==1," ",agency)) %>% 
@@ -238,7 +247,9 @@ total_pubs_per_agency_first %>%
          Agency=agency,
          `N (\\%)`=total_a2,
          `n (\\%)`=n,
-         ) %>% 
+  ) 
+
+agency_table %>% 
 kable(
   # digits = 2,
   format = "latex",
@@ -262,6 +273,10 @@ kable(
 
 
 ```
+<!-- `r total_pubs_per_agency_first` -->
+
+<!-- `r as.numeric(total_pubs_per_agency_first %>% filter(agency=="interior") %>% select(n))` -->
+
 
 
 ```{r agency2}
@@ -378,18 +393,18 @@ knitr::include_graphics("../docs/images/total_pubs_to_month_x.png", error=FALSE)
 ```
 
 
-### Total Publications January - May (Agencies with  more than 10,000 articles only)
+### Total Publications January-July (only agencies with N > 3000 articles)
 
 
 
-```{r agency_n_decline_first1, fig.align='center',fig.cap="Percent change in publicaitons (Jan-May) relative to same period prvious year. Only agencies producing over 5000 1st author publicaitons between 2019-2025 included.",out.width = '50%'}
+```{r agency_n_decline_first1, fig.align='center',fig.cap="Percent change in publicaitons (Jan-May) relative to same period prvious year. Only agencies producing over 3000 1st author publicaitons between 2019-2025 included.",out.width = '50%'}
 knitr::include_graphics("../docs/images/agency_n_decline_sum.png", error=FALSE)
 
 ```
 
 
 
-```{r  label = agency_n_decline_2, echo = FALSE, fig.cap = "Percent change in articles published from previous Jan-May (2019-2024) by the 10 most productive federal agencies or institutions.", out.width = '75%'}
+```{r  label = agency_n_decline_2, echo = FALSE, fig.cap = "Percent change in articles published from previous Jan-May federal agencies or institutions producing N > 3000 articles 2019-2025.", out.width = '75%'}
 knitr::include_graphics("images/agency_n_decline_2.png", error=FALSE)
 ```
 

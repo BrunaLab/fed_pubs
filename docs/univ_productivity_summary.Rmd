@@ -1,5 +1,5 @@
 ---
-title: "Articles Published by US Federal Personnel"
+title: "Articles Published by US focal university Personnel"
 subtitle: "January 2019 - May 2025)"
 author: "Emilio M. Bruna"
 date: "`r format(Sys.time(), '%d %B %Y')`"
@@ -52,7 +52,7 @@ header-includes:
 # https://pubs.usgs.gov/search?q=&startYear=2019&__ncforminfo=Rf6y9tBB_4xn4sDOJ7tdSPmxI5Eu33dcCKy8YpAAAQRE-JJvXyAJAosPJMziEEMnxQE_iCi7dgGWVwrbQe9Gpb9a-7115VxO
 
 ---
-# Publications by the 10 institutions publishing the most papers (between Jan 2019 & May 2025
+# Publications by the 10 institutions publishing the most papers (between Jan 2019 & July 2025
 
 \bigskip
 
@@ -73,127 +73,22 @@ comma <- function(x) format(x, digits = 2, big.mark = ",")
 
 knitr::opts_chunk$set(fig.pos = 'H')
 
+knitr::opts_chunk$set(dpi=300,fig.width=6)
+
 ```
 
 
-```{r data, cache=TRUE, echo=FALSE}
+```{r data, cache=FALSE, echo=FALSE}
 
 # Read data
-#  fed affils -------------------------------------------------------------
-# 
+summary_data<-read_csv("./docs/summary_info/uni_summary_data.csv")
+jrnls_overall_first<-read_csv("./docs/summary_info/uni_jrnls_overall_first.csv")
 
-papers_df  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) 
-papers_df <- papers_df %>% 
-  mutate(PM=
-           case_when(
-             is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
-             .default = as.numeric(PM)
-           )
-  ) %>% 
-  remove_empty(c("rows","cols")) %>% 
-  tibble()
-  
+# journals_n_perc_annual_first<-read_csv("./docs/summary_info/uni_journals_n_perc_annual_first.csv")
 
+auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
 
-
-authors_df <- setDT(readRDS("./data_clean/authors_df_uni_clean.rds")) %>% 
-remove_empty(c("rows","cols")) %>% 
-  mutate(uni = case_when(
-    uni=="minn"~"other",
-    uni=="unc_ch"~"other",
-    uni=="ohio_state"~"other",
-    .default = as.character(uni)
-  ))
-
-# 
-PY_for_authors_df<-papers_df %>%
-   select(refID,PY,PM)
-authors_df <- authors_df %>%
-left_join(PY_for_authors_df)
-rm(PY_for_authors_df)
-```
-
-```{r totals, cache=TRUE, echo=FALSE}
-
-total_pubs<-papers_df %>% 
-  summarize(n=n_distinct(refID))
-
-# Total_authors (focal uni+ non)
-total_authors<-authors_df %>% 
-  select(authorID) %>% 
-  distinct() %>% 
-  tally()
-
-
-total_focal_uni<-authors_df %>% 
-  filter(uni!="other") %>% 
-  select(authorID) %>% 
-  distinct() %>% 
-  tally()
-
-total_NOTfocal<-authors_df %>% 
-  filter(uni=="other") %>% 
-  select(authorID) %>% 
-  distinct() %>% 
-  tally() 
-  
-
-first_authors <- authors_df %>%
-  filter(uni!="other") %>% 
-  filter(author_order == 1) 
-
-
-prop_papers_univ_1st<-nrow(first_authors)/ total_pubs*100
-
-last_authors <- authors_df %>%
-  group_by(refID) %>%
-  slice_tail() %>%
-  filter(author_order != 1) %>%
-  filter(uni!="other")
-
-prop_papers_univ_last<-nrow(last_authors)/ total_pubs*100
-
-
-all_author_positions <- authors_df %>%
-  filter(uni!="other") %>% 
-  distinct(refID,uni,.keep_all=TRUE) %>% 
-  arrange(refID)
-
-```
-
-
-
-```{r authors_per_pub, cache=TRUE, echo=FALSE}
-# Authors per pub
-
-auth_per_pub<-authors_df %>% 
-  group_by(refID) %>% 
-          summarize(FocalUni=sum(uni!="other"),
-          nonFocalUni=sum(uni=="other"),
-          total=sum(FocalUni+nonFocalUni))
-
-auth_per_pub_means<-auth_per_pub %>% 
-  ungroup() %>% 
-  drop_na() %>% 
-  summarize(
-    avg_FocalUni=mean(FocalUni),
-    sd_FocalUni=sd(FocalUni),
-    avg_NonFocalUni=mean(nonFocalUni),
-    sd_NonFocalUni=sd(nonFocalUni),
-    avg_Total=mean(total),
-    sd_Total=sd(total)
-    ) %>%  
- pivot_longer(
-    cols = starts_with("avg_"),
-    names_to = "author_category",
-    names_prefix = "avg_",
-    values_to = "mean_per_pub",
-    values_drop_na = TRUE
-  ) %>% 
-  mutate(sd=if_else(author_category=="Total",sd_Total,NA)) %>% 
-  mutate(sd=if_else(author_category=="NonFocalUni",sd_NonFocalUni,sd)) %>% 
-  mutate(sd=if_else(author_category=="FocalUni",sd_FocalUni,sd)) %>% 
-  select(-sd_FocalUni,-sd_NonFocalUni,-sd_Total) 
+total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv")
 
 
 ```
@@ -201,126 +96,103 @@ auth_per_pub_means<-auth_per_pub %>%
 
 
 
-\bigskip
-
-# Summary: Total Publications, Total Authors, and Publications Per Year
-
-\bigskip
 
 ## Search (SCOPUS API)
 
 
+- **No. of focal university Affil SCOPUS IDs searched:** N = `r comma(as.numeric(summary_data %>% filter(value=="scopus_id") %>% select(n)))`. 
+
+- **No. of focal university Affil SCOPUS IDs returned:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_affils") %>% select(n)))`. 
+
+## Results 
+- **Total No. of Publications:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_pubs") %>% select(n)))`.
+
+- **Total No. of Authors:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_authors") %>% select(n)))`.
 
 
+- **Total No. of Unique Authors:** N = `r comma(as.numeric(summary_data %>% filter(value=="total_unique_authors") %>% select(n)))`.
 
-## Results
 
+  > Unique authors with focal university affiliation (Primary): N = `r comma(as.numeric(summary_data %>% filter(value=="total_focal") %>% select(n)))`.
 
-- **Total No. of Publications:** N = `r comma(total_pubs$n)`
-
-- **Total No. of Authors:** N = `r comma(total_authors$n)`.
-
-  > Authors with Focal University Affiliation (Primary): N = `r comma(total_focal_uni$n)`
-
-  > Non-Focal University Authors: N = `r comma(total_NOTfocal$n)`
+  > Unique non-focal university authors: N = `r comma(as.numeric(summary_data %>% filter(value=="total_NOTfocal") %>% select(n)))`.
+  
 
 - **Author Position **
 
-  > Articles with Focal University Author in 1st Author Position:  `r comma(prop_papers_univ_1st)`%
+  > Articles with focal university Author in 1st Author Position:  `r comma(as.numeric(summary_data %>% filter(value=="prop_papers_focal_1st") %>% select(n)))`.
+  
 
-  > Articles with Focal University Author in Last Author position:  `r comma(prop_papers_univ_last)`%
+  > Articles with focal university Author in Last Author position:  `r comma(as.numeric(summary_data %>% filter(value=="prop_papers_focal_last") %>% select(n)))`.
+  
 
-- **Authors per Publication**:
+- **Authors per Publication**: 
 
   > Authors Per Publication: Mean = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD)
 
-  > Focal University Authors per Publication: Mean  = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="FocalUni") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="FocalUni") %>% select(sd)))` SD)
+  > focal university Authors per Publication: Mean  = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Focal") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="Focal") %>% select(sd)))` SD)
 
-  > Non-Focal University Authors per Publication Mean = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="NonFocalUni") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="NonFocalUni") %>% select(sd)))` SD)
-
-\bigskip
-
-
-I searched SCOPUS for all indexed articles, reviews, letters, notes, book chapters, data papers, and editorial material published between 2019-2025 that included at least one author whose primary address was one of the following institutions:
-
-
-
-### Articles indexed Monthly/Quarterly (2019-2024)
+  > Non-focal university Authors per Publication Mean = `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="NonFocal") %>% select(mean_per_pub)))` (± `r comma(as.numeric(auth_per_pub_means %>% filter(author_category=="NonFocal") %>% select(sd)))` SD)
 
 \bigskip
 
 
-```{r  label = pubs_mo_yr_1_2, echo = FALSE, fig.cap = "Articles per month (2019-2024). Note: the the January-December peaks are likely due to journals journals publishing fewer than 12 issues per year. Smoothed out somewhat by converting to publications per quarter (see below).", out.width = '75%'}
-knitr::include_graphics("./images/pubs_per_month_uni.png")
+### Journals with the most papers with an Focal Uni 1st author (2019-2025)
+
+```{r journals }
+
+jrnls_overall_first %>% 
+  slice_head(n=20) %>%
+  mutate(perc=round(perc,3)) %>% 
+  rename(N=n,
+         percent=perc) %>% 
+kable(digits = 2,
+  format = "latex",
+  align = "lcc",
+  escape = FALSE,
+  row.names = FALSE,
+  booktabs = T,
+  linesep = ""
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = c("scale_down","hold_position"),
+    font_size = 12,
+    position = "center"
+  )
+
 ```
-
-
-\bigskip
-\bigskip
-
-
-### Publications Indexed Monthly January 1 - July 31 (2019-2025)
-
-\bigskip
-
-```{r  label = monthly_pubs_1_1, echo = FALSE, fig.cap = "Monthly publications from January 1 to May 31 (2019-2025).", out.width = '75%'}
-knitr::include_graphics("./images/monthly_pubs_to_date_uni.png")
-```
-
-### Cumulative Total Publications January 1 - June 30 (2019-2025)
-
-\bigskip
-
-```{r  label = cumulative_fig, echo = FALSE, fig.cap = "Cumulative number of articles published by focal universities between January 1-May 31, 2019-2025 and the percent change in 2025 productivity relative to the same time period in 2024 (red).", out.width = '75%'}
-knitr::include_graphics("./images/pubs_mo_cum_fig_uni.png")
-```
-
-
-### Total Publications January 1 - June 30 (2019-2025)
-
-\bigskip
-
-```{r  label = fig_total_to_date_1_fig, echo = FALSE, fig.cap = "Articles published by researchers at 10 focal universities between January 1-May 31, 2019-2025 and the percent change in 2025 productivity relative to the same time period in 2024 (red). Numbers in blue are the number of articles published in 2024 and 2025.", out.width = '75%'}
-knitr::include_graphics("./images/total_pubs_to_month_x_uni.png")
-```
-
-
 
 
 
 \newpage
 
-## Total publications (all author positions) from universities (1 January 2019 to 31 June 2025)
+
+## Total Publications by each university (2019-June 2025) and percent of overall productivity
 
 \bigskip
 
+```{r pubs_year}
 
 
-```{r table_uni_productivity, echo=FALSE, cache=TRUE}
-
-
-total_pubs_per_uni_data <- authors_df %>% 
-  select(refID,uni) %>% 
-  distinct() %>% 
-  drop_na() %>% 
-  group_by(uni) %>% 
-  summarize(n=n_distinct(refID)) %>% 
-  filter(uni!="other") %>% 
+total_pubs_per_uni_first %>%
+  mutate(uni=if_else(uni=="mass_general","mass general",uni)) %>% 
+  arrange(uni) %>% 
   arrange(desc(n)) %>% 
-  mutate(uni=case_when(
-    uni=="mass_general"~"mass general",
-    .default = as.character(uni)
-  )
-  )
-
-
-  total_pubs_per_uni_table<-
-total_pubs_per_uni_data %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  mutate(perc=round(perc,2)) %>% 
+  mutate(n=paste(n, " (",perc,"\\%)",sep="")) %>%
+  mutate(n=as.character(n)) %>% 
+  mutate(perc=as.character(perc)) %>% 
+  replace_na(list(n=" ",perc=" ")) %>% 
+  select(-perc) %>%
   rename(University=uni,
-         N=n) %>% 
-kable(digits = 2,
+         `N (\\%)`=n,
+         ) %>% 
+kable(
+  # digits = 2,
   format = "latex",
-  caption = "Number of publications by focal universities",
   align = "ll",
   escape = FALSE,
   row.names = FALSE,
@@ -333,17 +205,83 @@ kable(digits = 2,
     latex_options = c("scale_down","hold_position"),
     font_size = 12,
     position = "center"
-  ) %>% 
-  column_spec(2, width = "9em")
-total_pubs_per_uni_table
+  ) 
+```
+
+
+
+
+
+### Publications per year (2019-2024)
+
+```{r  label = pubs_yr_1, echo = FALSE, fig.cap = "Publications per year (2019-2024)", out.width = '75%'}
+knitr::include_graphics("../docs/images/total_pubs_per_yr_uni.png", error=FALSE)
+```
+
+
+### Articles indexed Monthly/Quarterly (2019-2024)
+
+\bigskip
+
+
+```{r  label = pubs_mo_yr_1, echo = FALSE, fig.cap = "Articles per month (2019-2024). Note: the the January-December peaks are likely due to journals journals publishing fewer than 12 issues per year. Smoothed out somewhat by converting to publications per quarter (see below).", out.width = '75%'}
+knitr::include_graphics("../docs/images/pubs_per_month_uni.png", error = FALSE)
+
+```
+<!-- \bigskip -->
+<!-- \bigskip -->
+
+```{r  label = pubs_quarterly, echo = FALSE, fig.cap = "Articles per Quarter (2019-2024).", out.width = '75%'}
+knitr::include_graphics("../docs/images/pubs_per_quarter_uni.png", error=FALSE)
+```
+
+### Publications Indexed Monthly January 1 - June 30 (2019-2025)
+
+\bigskip
+
+```{r  label = monthly_pubs_1, echo = FALSE, fig.cap = "Monthly publications from January 1 to June 30 (2019-2025).", out.width = '75%'}
+
+knitr::include_graphics("../docs/images/monthly_pubs_to_date_uni.png", error=FALSE)
+
+```
+
+
+
+### Cumulative Total Publications January 1 - June 30 (2019-2025)
+
+\bigskip
+
+```{r  label = cumulative_fig, echo = FALSE, fig.cap = "Cumulative number of articles published by researchers at focal universities between January 1-June 30, 2019-2025 and the percent change in 2025 productivity relative to the same time period in 2024 (red).", out.width = '100%'}
+knitr::include_graphics("../docs/images/pubs_mo_cum_fig_uni.png", error=FALSE)
 
 ```
 
 
 
 
-\bigskip  
-\bigskip  
+
+### Total Publications January 1 - June 30 (2019-2025)
+
+\bigskip
+
+```{r  label = fig_total_to_date_1_fig, echo = FALSE, fig.cap = "Articles published by researchers at focal universities between January 1-June 30, 2019-2025 and the percent change in 2025 productivity relative to the same time period in 2024 (red). Numbers in blue are the number of articles published in 2024 and 2025.", out.width = '75%'}
+knitr::include_graphics("../docs/images/total_pubs_to_month_x_uni.png", error=FALSE)
+```
+
+
+### Percent change in No. of publications (January-July) relative to same time period prior year.)
+
+
+
+```{r label=agency_n_decline_first1, fig.cap="Percent change in publications (Jan-July) relative to same period previous year.", out.width = '75%'}
+
+knitr::include_graphics("../docs/images/uni_n_decline_2.png", error=FALSE)
+
+```
+
+
+
+
 
 
 <!-- Need to compare with non-government institutions. Note that they are systematically tearing apart the most proiductive institution in the world (by far) and the leading system in the world (no foreign university or system even in top 20, only two in top 30). -->

@@ -13,6 +13,16 @@ papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) %
   ) %>% 
   mutate(PT=if_else(PT=="j","journal",PT))
 
+# papers_df %>% filter(is.na(PM))
+
+authors_df_complete <- setDT(read_rds("./data_clean/authors_df_uni_clean.rds")) %>% 
+  mutate(uni=case_when(
+    uni == "unc_ch"~"other",
+    uni == "ohio_state"~"other",
+    uni == "mass_general"~"harvard",
+    is.na(uni) ~ "other",
+    .default = as.character(uni)
+  )) 
 
 
 # chose any publication types or titles to remove -------------------------
@@ -44,8 +54,8 @@ papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) %
 
 
 # papers_df %>% filter(is.na(PM))
-
-authors_df_complete <- setDT(readRDS("./data_clean/authors_df_uni_clean.rds")) 
+# 
+# authors_df_complete <- setDT(read_rds("./data_clean/authors_df_uni_clean.rds")) 
 
 
 
@@ -90,9 +100,9 @@ unique(authors_df$uni)
 focal_first_authors <- authors_df %>%
   remove_empty(c("rows","cols")) %>% 
   filter(uni != "other") %>%
-  filter(uni != "minn") %>% 
   filter(uni != "unc_ch") %>% 
-  filter(uni != "ohio_state") %>% 
+  filter(uni != "ohio_state") %>%
+  filter(uni != "mass_general") %>%
   # filter(!is.na(uni)) %>%
   filter(author_order == 1) 
   
@@ -148,8 +158,8 @@ focal_first_authors %>%
   arrange(desc(n))
 
 papers_dataset %>% filter(is.na(DI)) %>% tally()
-
-papers_dataset %>% filter(!is.na(DI)) %>% tally()
+# 
+# papers_dataset %>% filter(!is.na(DI)) %>% tally()
 
 unique(papers_dataset$DT)
 
@@ -175,6 +185,10 @@ pubs_uni <- focal_first_authors %>%
   tally() %>% 
   arrange(desc(n))
 pubs_uni
+
+
+write_csv(pubs_uni,"./docs/summary_info/uni_total_pubs_per_uni_first.csv")
+
 
 
 source("code/figs_uni/total_pubs_per_year.R")
@@ -205,7 +219,7 @@ pubs_mo <-
 pubs_mo %>% filter(PM<4) %>% arrange(PM,desc(PY))
 
 source("code/figs_uni/pubs_per_month.R")
-pubs_mo_fig<-pubs_per_month(pubs_mo,2024)
+pubs_mo_fig<-pubs_per_month(pubs_mo,2025)
 
 
 # pubs per month_cumulative -----------------------------------------------
@@ -406,7 +420,7 @@ uni_n_decline_sum_fig<-uni_n_decline_sum %>%
            color="navyblue", size=4)+
   annotate(geom="text", x=2025, y=(max(uni_n_decline_sum$n)-.02*max(uni_n_decline_sum$n)), label=(uni_n_decline_sum %>% filter(PY==2025) %>% select(n)),
            color="navyblue", size=4)+
-  annotate(geom="text", x=2025, y=(max(uni_n_decline_sum$n)-.17*max(uni_n_decline_sum$n)), label=paste("(", round((uni_n_decline_sum %>% filter(PY>2024) %>% select(perc_previous_yr)),2),"%)",sep=""),
+  annotate(geom="text", x=2025, y=(max(uni_n_decline_sum$n)-.1*max(uni_n_decline_sum$n)), label=paste("(", round((uni_n_decline_sum %>% filter(PY>2024) %>% select(perc_previous_yr)),2),"%)",sep=""),
            color="red", size=4)+
   scale_y_continuous(expand = c(0, 0), breaks=seq(0, max(uni_n_decline_sum %>% select(n))+5000,by=2500))+
   scale_x_continuous( breaks=seq(2019,2025,by=1))+
@@ -416,7 +430,7 @@ uni_n_decline_sum_fig<-uni_n_decline_sum %>%
   theme(axis.text.x =element_text(size = 12))+
   gghighlight(PY == 2025)
 
-ggsave("./docs/images/uni_n_decline_sum.png", width = 6, height = 4, units = "in")
+ggsave("./docs/images/uni_n_decline_sum.png", width = 6, height = 4, units = "in", device='png', dpi=700)
 
 
 
@@ -461,7 +475,7 @@ uni_n_decline_2<-
   uni_n_decline %>%
   drop_na() %>%
   # filter(author_position=="any") %>%
-  filter(PY > 2021) %>%
+  filter(PY > 2023) %>%
   ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
   geom_bar(stat = "identity", position = "dodge") +
   scale_x_continuous(expand = c(0, 0), breaks = c(2024, 2025))+
@@ -474,10 +488,208 @@ uni_n_decline_2<-
   theme(axis.title.y = element_text(size = 14))+
   theme(axis.title.x =element_text(size = 14))+
   geom_hline(yintercept = 0) +
-  facet_wrap(vars(uni),ncol = 3)+
+  facet_wrap(vars(uni),ncol = 2)+
   theme(strip.text = element_text(
     size = 10, color = "navy"))+
   gghighlight(PY==2025)
 
-ggsave("./docs/images/uni_n_decline_2.png", width = 6, height = 9, units = "in")
+ggsave("./docs/images/uni_n_decline_2.png", width = 7, height = 10, units = "in", device='png', dpi=700)
 
+
+
+
+
+
+
+
+
+
+# summary calculations ----------------------------------------------------
+
+auth_per_pub<-authors_df %>% 
+  group_by(refID) %>% 
+  summarize(focal=sum(uni!="other"),
+            nonFocal=sum(uni=="other"),
+            total=sum(focal+nonFocal))
+
+auth_per_pub_means<-auth_per_pub %>% 
+  ungroup() %>% 
+  drop_na() %>% 
+  summarize(
+    avg_Focal=mean(focal),
+    sd_Focal=sd(focal),
+    avg_NonFocal=mean(nonFocal),
+    sd_NonFocal=sd(nonFocal),
+    avg_Total=mean(total),
+    sd_Total=sd(total)
+  ) %>%  
+  pivot_longer(
+    cols = starts_with("avg_"),
+    names_to = "author_category",
+    names_prefix = "avg_",
+    values_to = "mean_per_pub",
+    values_drop_na = TRUE
+  ) %>% 
+  mutate(sd=if_else(author_category=="Total",sd_Total,NA)) %>% 
+  mutate(sd=if_else(author_category=="NonFocal",sd_NonFocal,sd)) %>% 
+  mutate(sd=if_else(author_category=="Focal",sd_Focal,sd)) %>% 
+  select(-sd_Focal,-sd_NonFocal,-sd_Total) 
+
+# number of scopus IDs searched 
+
+scopus_id<-read_csv("./data_clean/uni_affils_clean.csv")
+scopus_id<-scopus_id %>% select(affil_id) %>% distinct() %>% summarize(n=n_distinct(affil_id))
+
+total_affils<-authors_df %>% select(affil_id) %>% summarize(n=n_distinct(affil_id))
+
+total_pubs<-authors_df %>% 
+  summarize(n=n_distinct(refID))
+
+# Total_authors (focal+non)
+
+total_authors<-authors_df %>% 
+  select(SID) %>%
+  tally()
+
+total_unique_authors<-authors_df %>% 
+  select(SID) %>% 
+  distinct() %>% 
+  tally()
+
+
+total_focal<-authors_df %>% 
+  filter(uni!="other") %>% 
+  select(SID) %>% 
+  distinct() %>% 
+  tally()
+
+total_NOTfocal<-authors_df %>% 
+  filter(uni=="other") %>% 
+  select(SID) %>% 
+  distinct() %>% 
+  tally() 
+
+
+first_authors <- authors_df %>%
+  filter(uni != "other") %>%
+  filter(author_order == 1) 
+
+
+prop_papers_focal_1st<-nrow(first_authors)/ total_pubs*100
+
+last_authors <- authors_df %>%
+  group_by(refID) %>%
+  slice_tail() %>%
+  filter(author_order != 1) %>%
+  filter(uni !="other") 
+
+prop_papers_focal_last<-nrow(last_authors)/ total_pubs*100
+
+
+all_author_positions <- authors_df %>%
+  filter(uni !="other") %>%
+  distinct(refID,uni,.keep_all=TRUE) %>% 
+  arrange(refID)
+
+
+
+
+
+
+write_csv(auth_per_pub_means,"./docs/summary_info/uni_auth_per_pub_means.csv")
+summary_data<-data.frame(value=c("scopus_id",
+                                 "total_affils",
+                                 "total_pubs",
+                                 "total_authors",
+                                 "total_unique_authors",
+                                 "total_focal",
+                                 "total_NOTfocal",
+                                 "prop_papers_focal_1st",
+                                 "prop_papers_focal_last"),
+                         n=c(scopus_id$n,
+                             total_affils$n,
+                             total_pubs$n,
+                             total_authors$n,
+                             total_unique_authors$n,
+                             total_focal$n,
+                             total_NOTfocal$n,
+                             prop_papers_focal_1st$n,
+                             prop_papers_focal_last$n))
+
+write_csv(summary_data,"./docs/summary_info/uni_summary_data.csv")
+
+
+
+#  journals info ----------------------------------------------------------
+
+
+
+
+journals_first <- papers_with_focaluni_first %>%
+  select(refID,SO, PY) %>%
+  distinct() %>% 
+  mutate_all(tolower) %>% 
+  drop_na() %>% 
+  select(SO) %>% 
+  distinct() %>% 
+  arrange(SO)
+# 
+write_csv(journals_first,"./docs/summary_info/uni_journals_first.csv")
+
+jrnls_overall_first <- 
+  papers_with_focaluni_first %>%
+  select(refID,SO, PY) %>%
+  distinct() %>% 
+  mutate_all(tolower) %>% 
+  drop_na() %>% 
+  group_by(SO) %>%
+  tally() %>%
+  mutate(total=sum(n)) %>% 
+  mutate(perc=n/total*100) %>% 
+  arrange(desc(n))%>%
+  select(-total)
+write_csv(jrnls_overall_first,"./docs/summary_info/uni_jrnls_overall_first.csv")
+
+
+# 
+jrnls_yr_first <- 
+  papers_with_focaluni_first %>%
+  select(refID,SO, PY) %>%
+  distinct() %>% 
+  mutate_all(tolower) %>% 
+  drop_na() %>% 
+  group_by(SO,PY) %>%
+  tally() %>%
+  group_by(PY) %>% 
+  mutate(total=sum(n)) %>% 
+  mutate(perc=n/total*100) %>% 
+  select(-total) %>% 
+  arrange(desc(n)) %>% 
+  mutate(perc=round(perc,3))
+
+# 
+# 
+journals_n_perc_annual_first <- jrnls_yr_first %>% 
+  pivot_wider(names_from=PY,
+              names_prefix = "yr_",
+              values_from = c(n,perc)
+  ) %>% 
+  select(SO,
+         n_yr_2025,
+         perc_yr_2025,
+         n_yr_2024,
+         perc_yr_2024,
+         n_yr_2023,
+         perc_yr_2023,
+         n_yr_2022,
+         perc_yr_2022,
+         n_yr_2021,
+         perc_yr_2021,
+         n_yr_2020,
+         perc_yr_2020,
+         n_yr_2019,
+         perc_yr_2019)     
+
+
+
+write_csv(journals_n_perc_annual_first,"./docs/summary_info/uni_journals_n_perc_annual_first.csv")

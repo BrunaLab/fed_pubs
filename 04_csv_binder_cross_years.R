@@ -11,8 +11,8 @@ library(data.table)
 
 data_dir<-"./data_raw"
 
-# folder_count<-"year_files_fed"
-folder_count<-"year_files_uni"
+folder_count<-"year_files_fed"
+# folder_count<-"year_files_uni"
 
 
 # Define folder paths -----------------------------------------------------
@@ -174,16 +174,16 @@ rm(dt_list)
   # FOR CROSS YEAR BINDING
   
   # FEDS 
-  # write_csv(affils_df,paste("./data_raw/affils/all_affils_df_fed.csv",sep=""))
-  # write_csv(authors_df,paste("./data_raw/authors/all_authors_df_fed.csv",sep=""))
-  # write_csv(papers_df,paste("./data_raw/papers/all_papers_df_fed.csv",sep=""))
+  write_csv(affils_df,paste("./data_raw/affils/all_affils_df_fed.csv",sep=""))
+  write_csv(authors_df,paste("./data_raw/authors/all_authors_df_fed.csv",sep=""))
+  write_csv(papers_df,paste("./data_raw/papers/all_papers_df_fed.csv",sep=""))
   
   
   # UNI
-  write_csv(affils_df,paste("./data_raw/affils/all_affils_df_uni.csv",sep=""))
-  write_csv(authors_df,paste("./data_raw/authors/all_authors_df_uni.csv",sep=""))
-  write_csv(papers_df,paste("./data_raw/papers/all_papers_df_uni.csv",sep=""))
-  
-  
-  
-  
+  # write_csv(affils_df,paste("./data_raw/affils/all_affils_df_uni.csv",sep=""))
+  # write_csv(authors_df,paste("./data_raw/authors/all_authors_df_uni.csv",sep=""))
+  # write_csv(papers_df,paste("./data_raw/papers/all_papers_df_uni.csv",sep=""))
+  # 
+  # 
+  # 
+  # 

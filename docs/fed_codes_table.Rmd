@@ -1,0 +1,1318 @@
+---
+title: "Articles Published by US Federal Personnel"
+subtitle: "January 2019 - May 2025)"
+author: "Emilio M. Bruna"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+# output: html_document
+output: pdf_document
+geometry: margin=0.5in
+fontsize: 11pt
+linkcolor: darkmidnightblue
+urlcolor: darkmidnightblue
+header-includes:
+  - \DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \usepackage[default]{sourcesanspro}
+  - \usepackage{parskip}
+  - \usepackage{geometry}
+  - \usepackage{caption}
+  - \usepackage{xcolor}
+  - \definecolor{darkmidnightblue}{rgb}{0.0, 0.2, 0.4}
+  - \AtBeginDocument{\let\maketitle\relax}
+  - \usepackage[none]{hyphenat}
+  - \usepackage{setspace}
+  - \usepackage[document]{ragged2e}
+  - \usepackage{graphicx}
+  - \usepackage{sectsty}\allsectionsfont{\raggedright}
+  - \usepackage{sectsty}\sectionfont{\centering\color{darkmidnightblue}}
+  - \usepackage{sectsty}\subsectionfont{\centering\color{darkmidnightblue}}
+  - \usepackage{titlesec}
+  - \usepackage[export]{adjustbox}
+  - \titlespacing{\section}{0pt}{24pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \titlespacing{\subsection}{0pt}{12pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \titlespacing{\subsubsection}{0pt}{12pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \usepackage{floatrow}
+  - \DeclareFloatSeparators{mysep}{\hskip-94em}
+  # - \floatsetup[figure]{capposition=beside,capbesidesep=mysep,capbesideposition={right, center}}
+  - \usepackage{float}
+  - \usepackage{wrapfig} 
+  - \newcommand{\blandscape}{\begin{landscape}}
+  # - \usepackage[font=small,labelfont=bf,labelsep=space]{caption}
+  # - \captionsetup{figurename=Fig.,tablename=Table}
+  # - \usepackage[labelfont=bf]{caption}
+  # - \captionsetup{font=footnotesize, textfont=footnotesize}
+  - \fancyfoot{} # cues the use of fancy footer
+  - \fancyhead[L]{Emilio M Bruna} # month & year on header left 
+  - \fancyhead[R]{`r format(Sys.time(), '%d %B %Y')`} # name and page on header right
+#Required for specifying captions t
+  # - \usepackage{indentfirst}
+  # - \setlength\parindent{22pt} # uncomment if you want indented paragraphs
+
+
+# https://pubs.usgs.gov/search?q=&startYear=2019&__ncforminfo=Rf6y9tBB_4xn4sDOJ7tdSPmxI5Eu33dcCKy8YpAAAQRE-JJvXyAJAosPJMziEEMnxQE_iCi7dgGWVwrbQe9Gpb9a-7115VxO
+
+
+
+
+---
+
+
+## Supplementary Materials - Scopus Affiliation Codes for Federal Agencies
+
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(janitor)
+# library(gghighlight)
+library(kableExtra)
+# library(ggrepel)
+# library(knitr)
+# library(progress)
+# library(fs)
+library(textclean)
+library(data.table)
+library(here)
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+options(scipen = 999)
+knitr::asis_output("\0430")
+
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+
+knitr::opts_chunk$set(fig.pos = "H")
+```
+
+<!-- need to confirm 112988162 us usaid -->
+
+<!-- 60004062 -->
+<!-- epa -->
+<!-- arkansas department of energy and environment -->
+
+<!-- 9 -->
+<!-- 60077294 -->
+<!-- NA -->
+<!-- association of the us army -->
+<!-- 129027339 -->
+<!-- NA -->
+<!-- inc under contract to the us geological -->
+
+<!-- 105428030 -->
+<!-- NA -->
+<!-- association of the us army -->
+
+<!-- 118735849 -->
+<!-- NA -->
+<!-- asrc federal inuteq (contractor to the usgs) -->
+
+<!-- 125564413 -->
+<!-- NA -->
+<!-- contracted to the usgs -->
+<!-- contacted -->
+<!-- contractor -->
+<!-- under contract -->
+<!-- biscayne national parknational park serviceus department of the interior -->
+<!-- h -->
+
+
+```{r data, cache=TRUE }
+
+pull <-
+  read_rds('./data_clean/affils_df_clean.rds') %>% 
+  filter(federal==TRUE) %>% 
+  select(affil_id, affiliation,agency,agency_primary) %>% 
+  distinct() %>% 
+  mutate(affil_id = as.character(affil_id)) 
+
+
+  pull$affiliation<-replace_non_ascii(pull$affiliation)
+# 
+# 
+# pull <- pull %>%
+#   mutate(affiliation = gsub("[.]", "", affiliation)) %>%
+#   mutate(affiliation = gsub("[/]", " ", affiliation)) %>%
+#   mutate(affiliation = gsub(",", "", affiliation)) %>%
+#   mutate(affiliation = gsub("- ", "-", affiliation)) %>%
+#   mutate(affiliation = gsub(" -", "-", affiliation)) %>%
+#   mutate(affiliation = gsub("indo-pacific", "indopacific", affiliation)) %>%
+#   mutate(affiliation = gsub("aphisppq", "aphis ppq", affiliation)) %>%
+#   mutate(affiliation = gsub("-", " ", affiliation)) %>%
+#   mutate(affiliation = gsub("united states ", "us ", affiliation)) %>%
+#   mutate(affiliation = gsub("veterans administration", "va", affiliation)) %>%
+#   mutate(affiliation = gsub("us agency for international development", "usaid", affiliation)) %>%
+#   mutate(affiliation = gsub("usaid's", "usaid", affiliation)) %>%
+#   mutate(affiliation = gsub("us department of agriculture", "usda", affiliation))%>%
+# # mutate(affiliation = gsub("US FOREST SERVICE", "US Forest Service", affiliation))%>%
+#   mutate(affiliation = gsub(" servhice", " service", affiliation))%>%
+#   # mutate(affiliation = gsub("Us ", "US ", affiliation))%>%
+#   mutate(affiliation = gsub("usda forest service", "us forest service", affiliation))%>%
+#   mutate(affiliation = gsub("environmental protection agency", "epa", affiliation))%>%
+# mutate(affiliation = gsub("us epa", "epa", affiliation))%>%
+#   mutate(affiliation = gsub("usepa", "epa", affiliation))%>%
+#   mutate(affiliation = gsub("usfws", "us fish and wildlife service", affiliation))%>%
+#   mutate(affiliation = gsub("veteran's ", "veterans ", affiliation))%>%
+#   mutate(affiliation = gsub("epa's ", "epa ", affiliation))%>%
+#   mutate(affiliation = gsub("nasa's ", "nasa ", affiliation))%>%
+#   mutate(affiliation = gsub("usda's ", "usda ", affiliation))%>%
+#   mutate(affiliation = gsub("cdc's ", "cdc ", affiliation))%>%
+#   mutate(affiliation = gsub("energy's ", "energy ", affiliation))%>%
+#   mutate(affiliation = gsub("guard's ", "guard ", affiliation))%>%
+#   mutate(affiliation = gsub("institute's ", "institute ", affiliation))%>%
+#   mutate(affiliation = gsub("smithsonian's ", "smithsonian ", affiliation))%>%
+#   mutate(affiliation = gsub("army's ", "army ", affiliation))%>%
+#   mutate(affiliation = gsub("college's ", "college ", affiliation))%>%
+#   mutate(affiliation = gsub("engineer's ", "engineer ", affiliation))%>%
+#   mutate(affiliation = gsub("us geological survey", "usgs", affiliation))%>%
+#   mutate(affiliation = gsub("us dep of ", "department of ", affiliation))%>%
+#   mutate(affiliation = gsub("us department of ", "department of ", affiliation))%>%
+#   mutate(affiliation = gsub("us forest service (usda)", "us forest service", affiliation))%>%
+#   mutate(affiliation = gsub("us forest service (usfs)", "us forest service", affiliation))%>%
+#   mutate(affiliation = gsub("noaa's", "noaa", affiliation))%>%
+#   mutate(affiliation = gsub("national oceanic and atmospheric administration", "noaa", affiliation))%>%
+#   mutate(affiliation = gsub("[(]retired)", "retired", affiliation))%>%
+#   mutate(affiliation = gsub("national weather service", "nws", affiliation)) %>% 
+#   mutate(affiliation = gsub("agency for international development (aid)", "usaid", affiliation)) %>% 
+#   mutate(affiliation = gsub("united agency for international development (usaid)", "usaid", affiliation)) %>% 
+#   mutate(affiliation = gsub("agency for international development", "usaid", affiliation)) %>% 
+#   mutate(affiliation = gsub("us of america agency for international development (usaid)", "usaid", affiliation)) %>% 
+#   mutate(affiliation = str_replace(affiliation, "^the ", "")) 
+# 
+# pull<-pull %>% 
+#   
+# mutate(affiliation = 
+#          case_when(
+#            affiliation == "animal and plant health inspection service usda"~"usda animal and plant health inspection service",
+# affiliation == "european biological control laboratory (usda-ars)"~"usda-ars european biological control laboratory",
+# affiliation == "retired us forest service"~"us forest service retired",
+# affiliation == "retired usda-ars"~"usda-ars retired",
+# affiliation == "us forest service (retired)"~"us forest service retired",
+# affiliation == "us forest service (usda)"~"us forest service",
+# affiliation == "usda animal and plant health inspection service"~"usda animal and plant health inspection service",
+# affiliation == "usda us forest service"~"us forest service",
+# affiliation == "usda-ars (retired)"~"usda-ars retired",
+# affiliation == "usda-ars european biological control laboratory"~"usda-ars european biological control laboratory",
+# affiliation == "affiliate noaa"~"noaa affiliate",
+# affiliation == "atlantic oceanographic and meteorological laboratory (noaa)"~"noaa atlantic oceanographic and meteorological laboratory",
+# affiliation == "climate program office (noaa)"~"noaa climate program office",
+# affiliation == "earth system research laboratory (noaa)"~"noaa earth system research laboratory",
+# affiliation == "national environmental satellite data and information service (noaa)"~"noaa national environmental satellite data and information service",
+# affiliation == "nmfs noaa"~"noaa nmfs",
+# affiliation == "noaa (noaa) restoration center"~"noaa restoration center",
+# affiliation == "noaa affiliate"~"noaa affiliate",
+# affiliation == "noaa atlantic oceanographic and meteorological laboratory"~"noaa atlantic oceanographic and meteorological laboratory",
+# affiliation == "noaa climate program office"~"noaa climate program office",
+# affiliation == "noaa earth system research laboratory"~"noaa earth system research laboratory",
+# affiliation == "noaa national environmental satellite data and information service"~"noaa national environmental satellite data and information service",
+# affiliation == "noaa nmfs"~"noaa nmfs",
+# affiliation == "noaa pacific islands fisheries science center"~"noaa pacific islands fisheries science center",
+# affiliation == "noaa restoration center"~"noaa restoration center",
+# affiliation == "northeast fisheries science center (noaa)"~"noaa northeast fisheries science center",
+# affiliation == "northwest fisheries science center (noaa)"~"noaa northwest fisheries science center",
+# affiliation == "nws (nws)"~"nws",
+# affiliation == "pacific islands fisheries science center (noaa)"~"noaa pacific islands fisheries science center",
+# affiliation == "southwest fisheries science center (noaa)"~"noaa southwest fisheries science center",
+# affiliation == "albuquerque va medical center"~"albuquerque va medical center",
+# affiliation == "army ccdc army research laboratory"~"us army ccdc research laboratory",
+# affiliation == "ccdc army research laboratory"~"us army ccdc research laboratory",
+# affiliation == "ccdc us army research laboratory"~"us army ccdc research laboratory",
+# affiliation == "center for combat and battlefield (combat) research"~"center for combat and battlefield research",
+# affiliation == "center for combat and battlefield research"~"center for combat and battlefield research",
+# affiliation == "medical corps us air force"~"us air force medical corps",
+# affiliation == "medical department activity-korea 65th medical brigade"~"medical department activity-korea  65th medical brigade",
+# affiliation == "naval medical training and readiness command"~"naval medical readiness and training command",
+# affiliation == "navy medicine readiness and training command"~"navy medicine and readiness training command",
+# affiliation == "office of the assistant secretary of defense (health affairs"~"office of the assistant secretary of defense health affairs",
+# affiliation == "office of the assistant secretary of defense (health affairs)"~"office of the assistant secretary of defense health affairs",
+# affiliation == "san antonio military medical center;"~"san antonio military medical center",
+# affiliation == "us air force medical corps"~"us air force medical corps",
+# affiliation == "us army (retired)"~"us army retired",
+# affiliation == "us army ccdc army research laboratory"~"us army ccdc research laboratory",
+# affiliation == "us army devcom army research laboratory"~"us army devcom research laboratory",
+# affiliation == "us army institute of surgical re-search"~"us army institute of surgical research",
+# affiliation == "us army institute of surgical research"~"us army institute of surgical research",
+# affiliation == "us army intelligence threat and analysis center"~"us army intelligence and threat analysis center",
+# affiliation == "us army retired"~"us army retired",
+# affiliation == "us bureau of navy medicine and surgery"~"us navy bureau of medicine and surgery",
+# affiliation == "us devcom army research laboratory"~"us army devcom research laboratory",
+# affiliation == "us navy bureau of medicine and surgery"~"us navy bureau of medicine and surgery",
+# affiliation == "us veterans' health administration"~"us veterans health administration",
+# affiliation == "veterans affairs boston healthcare system"~"boston va healthcare system",
+# affiliation == "walter reed national military med-ical center"~"walter reed national military medical center",
+# affiliation == "walter reed national military medical center"~"walter reed national military medical center",
+# affiliation == "womack army med-ical center"~"womack army medical center",
+# affiliation == "womack army medical center"~"womack army medical center",
+# affiliation == "los alamos national laboratory (retired)"~"los alamos national laboratory retired",
+# affiliation == "national energy technology laboratory (netl) support contractor"~"national energy technology laboratory support contractor",
+# affiliation == "national energy technology laboratory netl support contractor"~"national energy technology laboratory support contractor",
+# affiliation == "retired los alamos national laboratory"~"los alamos national laboratory retired",
+# affiliation == "national institute of diabetes and digestive and kidney diseases"~"national institute of diabetes digestive and kidney diseases",
+# affiliation == "national institute of diabetes digestive and kidney diseases"~"national institute of diabetes digestive and kidney diseases",
+# affiliation == "national institute on alcoholism and alcohol abuse"~"national institute on alcohol abuse and alcoholism",
+# affiliation == "nibib nih center for engineering complex tissues"~"nih nibib center for engineering complex tissues",
+# affiliation == "nih nibib center for engineering complex tissues"~"nih nibib center for engineering complex tissues",
+# affiliation == "usaid (usaid)"~"usaid",
+# affiliation == "boston va health care system"~"boston va healthcare system",
+# affiliation == "boston veterans affairs healthcare system"~"boston va healthcare system",
+# affiliation == "military and veteran microbiome consortium for research and education (mvm-core)"~"military and veteran microbiome consortium for research and education",
+# affiliation == "military and veteran microbiome: consortium for research and education"~"military and veteran microbiome consortium for research and education",
+# affiliation == "military and veteran microbiome: consortium for research and education (mvm-core)"~"military and veteran microbiome consortium for research and education",
+# affiliation == "va albuquerque medical center"~"albuquerque va medical center",
+# affiliation == "va ann arbor health system"~"ann arbor va health system",
+# affiliation == "va boston cooperative studies program"~"boston va cooperative studies program",
+# affiliation == "va boston health care system"~"boston va healthcare system",
+# affiliation == "va boston healthcare system"~"boston va healthcare system",
+# affiliation == "va butler healthcare"~"butler va healthcare",
+# affiliation == "va center for healthcare organization and implementation research (choir"~"va center for healthcare organization and implementation research",
+# affiliation == "va center for healthcare organization and implementation research (choir)"~"va center for healthcare organization and implementation research",
+# affiliation == "va finger lakes healthcare system"~"finger lakes va healthcare system",
+# affiliation == "va hsr&d"~"va hsrd",
+# affiliation == "va long beach healthcare system"~"long beach va healthcare system",
+# affiliation == "va manchester medical center"~"manchester va medical center",
+# affiliation == "va medical center new orleans"~"new orleans va medical center",
+# affiliation == "va montana health care system"~"montana va health care system",
+# affiliation == "va northwest network (visn 20)"~"va northwest network 20",
+# affiliation == "va palo alto health system"~"palo alto va health system",
+# affiliation == "va portland health care system"~"portland va health care system",
+# affiliation == "va puget sound health care system"~"puget sound va health care system",
+# affiliation == "va va hospital"~"va hospital",
+# affiliation == "va visn 20 northwest network"~"va northwest network 20",
+# affiliation == "va washington dc health care system"~"va washington dc health care system",
+# affiliation == "veterans ' integrated service network (visn) 7"~"veterans ' integrated service network 7",
+# affiliation == "veterans affairs nebraska-western iowa health care system"~"nebraska-western iowa veterans affairs health care system",
+# affiliation == "veterans integrated service network visn 7"~"veterans ' integrated service network 7",
+# affiliation == "veterans' integrated service network (visn) 7"~"veterans ' integrated service network 7",
+# affiliation == "washington dc va health care system"~"va washington dc health care system",
+# affiliation == "department of the interior bureau land management"~"bureau land management",
+# affiliation == "department of the interior bureau of land management"~"bureau land management",
+# affiliation == "kaua'i national wildlife refuge complex"~"kauai national wildlife refuge complex",
+# affiliation == "kauai national wildlife refuge complex"~"kauai national wildlife refuge complex",
+# affiliation == "retired us fish and wildlife service"~"us fish and wildlife service retired",
+# affiliation == "retired usgs"~"usgs retired",
+# affiliation == "us fish and wildlife service (retired)"~"us fish and wildlife service retired",
+# affiliation == "usgs (emeritus)"~"usgs emeritus",
+# affiliation == "usgs (retired)"~"usgs retired",
+# affiliation == "usgs (usgs)"~"usgs",
+# affiliation == "usgs emeritus"~"usgs emeritus",
+# affiliation == "usgs retired"~"usgs retired",
+# affiliation == "epa (epa)"~"epa",
+# affiliation == "epa (orise)"~"epa orise",
+# affiliation == "epa (retired"~"epa retired",
+# affiliation == "epa (retired)"~"epa retired",
+# affiliation == "orise epa"~"epa orise",
+# affiliation == "goddard institute for space studies (nasa)"~"nasa goddard institute for space studies",
+# affiliation == "nasa goddard institute for space studies"~"nasa goddard institute for space studies",
+# affiliation == "american museum of national history"~"national museum of american history",
+# affiliation == "national museum of american history"~"national museum of american history",
+# affiliation == "smithsonian center for folklife and cultural heritage"~"smithsonian center for folklife and cultural heritage",
+# affiliation == "smithsonian center for folklife cultural heritage and folklife center"~"smithsonian center for folklife and cultural heritage",
+# affiliation == "cibola national forest & national grasslands"~"cibola national forest",
+# affiliation == "daniel boone national forest redbird ranger district 91"~"daniel boone national forest",
+# affiliation == "department of agricultural agricultural research service"~"usda ars",
+# affiliation == "department of agricultural research service"~"usda ars",
+# affiliation == "european biological control laboratory (usda ars)"~"usda ars european biological control laboratory",
+# affiliation == "formerly usda ars nlae"~"formerly usda ars",
+# affiliation == "nez perce clearwater national forests"~"nez perce clearwater national forest",
+# affiliation == "retired usda ars"~"usda ars retired",
+# affiliation == "usad ars"~"usda ars",
+# affiliation == "usda ars (retired)"~"usda ars retired",
+# affiliation == "usda ars aquatic animal health research center (aahrc)"~"usda ars aquatic animal health research center",
+# affiliation == "usda ars aquatic animal health research laboratory"~"usda ars aquatic animal health research center",
+# affiliation == "usda ars coastal plains soil"~"usda ars coastal plains soil water and plant research center",
+# affiliation == "usda ars genetics and sustainable agriculture research unit"~"usda ars genetics and precision agriculture research unit",
+# affiliation == "usda ars swcrl"~"usda ars screwworm research laboratory",
+# affiliation == "usda veterinary services"~"usda veterinary sciences",
+# affiliation == "va caribbean health care system"~"caribbean va health care system",
+# affiliation == "1national institute of standards and technology"~"national institute of standards and technology",
+# affiliation == "connecticut sea grant (noaa)"~"connecticut sea grant",
+# affiliation == "connecticut sea grant college program"~"connecticut sea grant",
+# affiliation == "illinois indiana sea grant college program"~"illinois indiana sea grant",
+# affiliation == "maryland sea grant college"~"maryland sea grant",
+# affiliation == "maryland sea grant extension"~"maryland sea grant",
+# affiliation == "michigan sea grant extension"~"michigan sea grant",
+# affiliation == "national oceanic and atmopsheric administration (noaa)"~"national oceanic and atmospheric association",
+# affiliation == "national oceanographic and atmospheric administration"~"noaa fisheries",
+# affiliation == "national oceanographic and atmospheric administration (noaa) fisheries"~"noaa fisheries",
+# affiliation == "noaa epp earth system sciences and remote sensing scholar"~"noaa epp earth system science and remote sensing technologies scholar",
+# affiliation == "noaa jpss program science office"~"noaa jpss program office",
+# affiliation == "noaa national environmental satellite"~"noaa national environmental satellite data and information service",
+# affiliation == "noaa national severe storms laboratory"~"noaa national severe storm laboratory",
+# affiliation == "noaa nesdis center for satellite applications and research (star)"~"noaa nesdis center for satellite applications and research",
+# affiliation == "noaa office of marine and aviation operations (omao)"~"noaa office of marine and aviation operations",
+# affiliation == "noaa office of ocean exploration and research"~"noaa office of ocean exploration",
+# affiliation == "noaa office of ocean exploration and research (oer)"~"noaa office of ocean exploration",
+# affiliation == "noaa pacific islands fisheries center"~"noaa pacific islands fisheries science center",
+# affiliation == "75th ranger regiment headquarters"~"75th ranger regiment",
+# affiliation == "air force institution of technology"~"air force institute of technology",
+# affiliation == "air force life cycle management center"~"air force lifecycle management center",
+# affiliation == "air force technical applications center aftac"~"air force technical applications center",
+# affiliation == "ann arbor va health system"~"ann arbor va healthcare system",
+# affiliation == "army public health center (provisional)"~"army public health center",
+# affiliation == "atlanta veterans affairs health care system"~"atlanta va affairs healthcare system",
+# affiliation == "bay pines veterans affairs healthcare system"~"bay pines va healthcare system",
+# affiliation == "birmingham va health care services"~"birmingham va healthcare system",
+# affiliation == "boston veterans health administration"~"boston va healthcare system",
+# affiliation == "brook army medical center"~"brooke army medical center",
+# affiliation == "brooke armymedical center"~"brooke army medical center",
+# affiliation == "carl r darnall medical center"~"carl r darnall army medical center",
+# affiliation == "carl r darnall military treatment facility"~"carl r darnall army medical center",
+# affiliation == "carl r darnell army medical center"~"carl r darnall army medical center",
+# affiliation == "central virginia veterans affairs health care system"~"central virginia va health care system",
+# affiliation == "cold regions research engineering laboratory"~"cold regions research and engineering laboratory",
+# affiliation == "combat trauma research group"~"us navy combat trauma research group",
+# affiliation == "combat trauma research group us navy"~"us navy combat trauma research group",
+# affiliation == "combating terrorism center"~"combating terrorism center at west point",
+# affiliation == "combating terrorism center at west po"~"combating terrorism center at west point",
+# affiliation == "defence health agency"~"defense health agency",
+# affiliation == "defense health agency (j3)"~"defense health agency",
+# affiliation == "defense health agency research and development (j 9)"~"defense health agency research and development",
+# affiliation == "el erdc"~"erdc el",
+# affiliation == "engineer research and development center (erdc)"~"engineer research and development center",
+# affiliation == "iowa city veterans affairs healthcare system"~"iowa city veterans affairs health center",
+# affiliation == "james a haley veterans affairs"~"james a hale va healthcare system",
+# affiliation == "james a haley veterans affairs healthcare system"~"james a hale va healthcare system",
+# affiliation == "james a haley veterans' hospital"~"james a hale va healthcare system",
+# affiliation == "james j peters veterans affairs medical center"~"james j peters va",
+# affiliation == "keller army hospital military academy west point"~"keller army hospital",
+# affiliation == "lexington va medical center"~"lexington va healthcare system",
+# affiliation == "marine corps system command"~"marine corps systems command",
+# affiliation == "mcdonald army health center fort eustis"~"mcdonald army health center",
+# affiliation == "medical department activity korea  65th medical brigade"~"medical department activity korea 65th medical brigade",
+# affiliation == "medical research and materiel command"~"medical research and development command",
+# affiliation == "mike o'callaghan federal hospital"~"mike o'callaghan federal medical center",
+# affiliation == "minneapolis va health care system"~"minneapolis va healthcare system",
+# affiliation == "minneapolis veterans affairs"~"minneapolis va healthcare system",
+# affiliation == "minneapolis veterans affairs health care system"~"minneapolis va healthcare system",
+# affiliation == "national defence university"~"national defense university",
+# affiliation == "naval aerospace medicine institute"~"naval aerospace medical research laboratory",
+# affiliation == "naval center for combat and operational stress control"~"naval center for combat & operational stress control",
+# affiliation == "naval nedical center portsmouth"~"naval medical center portsmouth",
+# affiliation == "naval surface forces pacific"~"naval surface force pacific fleet",
+# affiliation == "navy experimental diving unit"~"navy experimental dive unit",
+# affiliation == "new mexico veterans affairs health care system"~"new mexico va affairs healthcare system",
+# affiliation == "noaa office of ocean exploration and research engagement division"~"noaa office of ocean exploration",
+# affiliation == "northport veterans affairs medical center"~"northport va medical center",
+# affiliation == "oklahoma city department of veterans affairs medical center"~"oklahoma city va healthcare system",
+# affiliation == "phoenix va health care system"~"phoenix va healthcare system",
+# affiliation == "rocky mountain regional veterans affairs medical center"~"rocky mountain regional va healthcare system",
+# affiliation == "salem veterans affairs health care system"~"salem va healthcare system",
+# affiliation == "san antonio military medical center texas"~"san antonio military medical center",
+# affiliation == "san francisco veterans affairs health care system"~"san francisco va healthcare system",
+# affiliation == "u s army natural resources program on o'ahu"~"us army natural resources program oahu",
+# affiliation == "u s naval hospital"~"us naval hospital",
+# affiliation == "uniformed services university of the health science"~"uniformed services university of the health sciences",
+# affiliation == "us army aeromedical research laboratory"~"us army aeromedical activity",
+# affiliation == "us army aeromedical research laboratory (usaarl)"~"us army aeromedical activity",
+# affiliation == "us army armaments research development and engineering center"~"us army armament research and development center",
+# affiliation == "us army ccdc army research laboratory (arl)"~"us army ccdc research laboratory",
+# affiliation == "us army ccdc sc"~"us army ccdc center",
+# affiliation == "us army ccdc soldier center"~"us army ccdc center",
+# affiliation == "us army combat capabilities development com "~"us army combat capabilities development com",
+# affiliation == "us army combat capabilities development command army research laboratory"~"us army ccdc research laboratory",
+# affiliation == "us army combat capabilities development command chemical biological center"~"us army ccdc chemical biological center",
+# affiliation == "us army criminal investigation laboratory"~"us army criminal investigation command",
+# affiliation == "us army criminal investigation laboratorydefense forensic science center"~"us army criminal investigation command",
+# affiliation == "us army institute of surgical re search"~"us army institute of surgical research",
+# affiliation == "us army maneuver center of excellence (mcoe)"~"us army maneuver center of excellence",
+# affiliation == "us army medical materiel development activity"~"us army medical material development activity",
+# affiliation == "us army natick research"~"us army natick rd&e cent",
+# affiliation == "us army natick research and development command"~"us army natick rd&e cent",
+# affiliation == "us army natural resources program on o'ahu"~"us army natural resources program oahu",
+# affiliation == "us army rdecom ardec"~"us army rde command",
+# affiliation == "us army reserve"~"us army reserves",
+# affiliation == "us baylor military graduate program in nutrition"~"us military baylor graduate program in nutrition",
+# affiliation == "us combat capabilities development command army research laboratory"~"us army ccdc research laboratory",
+# affiliation == "us naval academy (md)"~"us naval academy",
+# affiliation == "us navy bureau of medicine and surgery (bumed)"~"us navy bureau of medicine and surgery",
+# affiliation == "usaf dental evaluation and consultation service (decs)"~"usaf dental evaluation and consultation service",
+# affiliation == "usaf reserve"~"usaf reserves",
+# affiliation == "usaf school of aerospace medicine (sme)"~"usaf school of aerospace medicine",
+# affiliation == "usarmy combat capabilities development command chemical biological center"~"us army ccdc chemical biological center",
+# affiliation == "va caribbean healthcare system"~"caribbean va health care system",
+# affiliation == "va connecticut healthcare system"~"connecticut va healthcare system",
+# affiliation == "va health care system"~"va healthcare system",
+# affiliation == "va north texas healthcare system"~"north texas va healthcare system",
+# affiliation == "veterans affairs northern california healthcare system"~"northern california va healthcare system",
+# affiliation == "veterans affairs tennessee valley health care system"~"tennessee valley va healthcare system",
+# affiliation == "vha office of veterans access to care"~"va office of veterans access to care",
+# affiliation == "walter reed national military med ical center"~"walter reed national military medical center",
+# affiliation == "white river junction veterans affairs medical center"~"white river junction va medical center",
+# affiliation == "womack army med ical center"~"womack army medical center",
+# affiliation == "argonne national laboratory"~"argonne national accelerator laboratory",
+# affiliation == "argonne national labpratory"~"argonne national accelerator laboratory",
+# affiliation == "jet propulsion laboratory's"~"jet propulsion laboratory",
+# affiliation == "lawrencelivermore national laboratory"~"lawrence livermore national laboratory",
+# affiliation == "lawrnece livermore national laboratory"~"lawrence livermore national laboratory",
+# affiliation == "national energy research scientific computing center (nersc)"~"national energy research scientific computing center",
+# affiliation == "nevada national security sites"~"nevada national security site",
+# affiliation == "nevada national security sites (nnss)"~"nevada national security site",
+# affiliation == "oak ridge national laboratoy"~"oak ridge national laboratory",
+# affiliation == "agency for healthcare research and quality"~"agency for health care research & quality",
+# affiliation == "agency for healthcare research and quality (ahrq)"~"agency for health care research & quality",
+# affiliation == "agency for healthcare research and quality evidence based practice centers program"~"agency for health care research & quality",
+# affiliation == "agency for toxic substances and disease registry (atsdr)"~"agency for toxic substances and disease registry",
+# affiliation == "cdc covid 19 emergency response team"~"cdc covid 19 emergency response",
+# affiliation == "epidemic intelligence service cdc"~"epidemic intelligence service",
+# affiliation == "epidemic intelligence service officer"~"epidemic intelligence service",
+# affiliation == "national human genome research institute (nhgri)"~"national human genome research institute",
+# affiliation == "national human genomic research institute"~"national human genome research institute",
+# affiliation == "national institute on alcohol abuse and alcoholism (niaaa)"~"national institute on alcohol abuse and alcoholism",
+# affiliation == "network of the national library of medicine region 4"~"network of the national library of medicine",
+# affiliation == "pacific cancer research consortium national cancer institute community oncology research program (ncorp)"~"pacific cancer research consortium nci community oncology research program",
+# affiliation == "public health service commissioned corps"~"public health service",
+# affiliation == "us public health service (usphs)"~"us public health service",
+# affiliation == "us public health service commissioned corps"~"us public health service",
+# affiliation == "usa national library of medicine"~"us national library of medicine",
+# affiliation == "office of the us global aids coordinator and health diplomacy"~"office of the us global aids coordinator",
+# affiliation == "sauti program|usaid grantee"~"sauti program usaid grantee",
+# affiliation == "usaid regional development mission for asia"~"usaid regional development mission asia",
+# affiliation == "1va salt lake city health care system"~"salt lake city va healthcare system",
+# affiliation == "ann arbor va healthcare"~"ann arbor va healthcare system",
+# affiliation == "atlanta va geriatric research education and clinical center (grecc)"~"atlanta va geriatric research education and clinical center",
+# affiliation == "atlanta va health care system"~"atlanta va healthcare system",
+# affiliation == "atlanta veterans affairs healthcare system"~"atlanta va affairs healthcare system",
+# affiliation == "baltimore veterans affairs hospital"~"baltimore va hospital",
+# affiliation == "baltimore veterans affairs medical center"~"baltimore va hospital",
+# affiliation == "bay pines veterans health system"~"bay pines va healthcare system",
+# affiliation == "birmingham va health care system"~"birmingham va healthcare system",
+# affiliation == "birmingham veterans affairs healthcare system (bvahs)"~"birmingham veterans affairs health care system",
+# affiliation == "birmingham veterans affairs medical center"~"birmingham veterans affairs health care system",
+# affiliation == "boston veteran administration healthcare system"~"boston va healthcare system",
+# affiliation == "boston veterans administration healthcare"~"boston va healthcare system",
+# affiliation == "butler va health care system"~"butler va healthcare system",
+# affiliation == "butler va healthcare"~"butler va healthcare system",
+# affiliation == "center for veterans research and education"~"center for veterans research & education",
+# affiliation == "central arkansas va health care system"~"central arkansas va healthcare system",
+# affiliation == "central texas va health care system"~"central texas va healthcare system",
+# affiliation == "central texas veterans health care system"~"central texas va healthcare system",
+# affiliation == "central texas veterans health system"~"central texas va healthcare system",
+# affiliation == "central texas veterans healthcare system"~"central texas va healthcare system",
+# affiliation == "central virginia veterans healthcare system"~"central virginia va health care system",
+# affiliation == "columbia va health care system"~"columbia va healthcare system",
+# affiliation == "connecticut veteran health system"~"connecticut va healthcare system",
+# affiliation == "connecticut veteran healthcare system"~"connecticut va healthcare system",
+# affiliation == "connecticut veterans legal center"~"connecticut va healthcare system",
+# affiliation == "corporal michael crescenz vha medical center"~"corporal michael crescenz va medical center",
+# affiliation == "corporal michael j crescenz va medical center"~"corporal michael crescenz va medical center",
+# affiliation == "corporal michael j crescenz vamc"~"corporal michael crescenz va medical center",
+# affiliation == "corporal michael j crescenz veterans affairs medical center"~"corporal michael crescenz va medical center",
+# affiliation == "dod va extremity trauma and amputation center of excellence"~"dod va extremity trauma & amputation center of excellence",
+# affiliation == "durham va health care system"~"durham va healthcare system",
+# affiliation == "durham va healthcare system duram"~"durham va healthcare system",
+# affiliation == "eastern kansas veteran affair healthcare system"~"eastern kansas va healthcare system",
+# affiliation == "eastern kansas veteran healthcare system"~"eastern kansas va healthcare system",
+# affiliation == "edward hines jr veterans affairs medical center"~"edward hines jr va hospital",
+# affiliation == "edward hines jr veterans hospital"~"edward hines jr va hospital",
+# affiliation == "finger lakes va health care system"~"finger lakes va healthcare system",
+# affiliation == "greater los angeles va health system"~"greater los angeles va healthcare system",
+# affiliation == "greater los angeles veterans healthcare system"~"greater los angeles va healthcare system",
+# affiliation == "greenville va health care center"~"greenville va healthcare center",
+# affiliation == "gulf coast veterans health care system"~"gulf coast va healthcare system",
+# affiliation == "gulf coast veterans healthcare system in biloxi"~"gulf coast va healthcare system",
+# affiliation == "hwashington dc veterans affairs medical center"~"washington dc va healthcare system",
+# affiliation == "iowa city va health care system"~"iowa city va healthcare system",
+# affiliation == "iowa city veterans health care system"~"iowa city veterans affairs health center",
+# affiliation == "james a hale veterans f hospital"~"james a hale va healthcare system",
+# affiliation == "james a haley va hospital and clinics"~"james a haley va hospital",
+# affiliation == "james a haley veterans administration"~"james a hale va healthcare system",
+# affiliation == "james j peters va medical research center"~"james j peters va",
+# affiliation == "kansas city veterans affair medical center"~"kansas city va healthcare system",
+# affiliation == "kansas city veterans affairs healthcare system"~"kansas city va healthcare system",
+# affiliation == "lexington va health care system"~"lexington va healthcare system",
+# affiliation == "lexington va healthcare"~"lexington va healthcare system",
+# affiliation == "lexington veterans affairs healthcare system"~"lexington va healthcare system",
+# affiliation == "louis stokes cleveland va medical centers"~"louis stokes cleveland va medical center",
+# affiliation == "louis stokes cleveland va medical centre"~"louis stokes cleveland va medical center",
+# affiliation == "manhattan veterans affairs"~"montana va healthcare system",
+# affiliation == "massachusetts veterans epidemiology and information center"~"massachusetts veterans epidemiological research and information center",
+# affiliation == "massachusetts veterans epidemiology research and information center"~"massachusetts veterans epidemiological research and information center",
+# affiliation == "massachusetts veterans epidemiology research and information center (maveric)"~"massachusetts veterans epidemiological research and information center",
+# affiliation == "memphis veteran administration hospital"~"memphis va hospital",
+# affiliation == "memphis veterans affairs center"~"memphis va hospital",
+# affiliation == "michael e debakey va medican center"~"michael e debakey va medical center",
+# affiliation == "michael e debakey veterans affairs medical center"~"michael e debakey veterans affairs hospital",
+# affiliation == "military and veteran microbiome consortium for research and education (mvm core)"~"military and veteran microbiome consortium for research and education",
+# affiliation == "military and veteran microbiome: consortium for research and education (mvm core)"~"military and veteran microbiome consortium for research and education",
+# affiliation == "minneapolis va health care center"~"minneapolis va healthcare system",
+# affiliation == "montana va health care system"~"montana va healthcare system",
+# affiliation == "montana veteran affairs health care system"~"montana va healthcare system",
+# affiliation == "nebraska western iowa veterans affairs health care system"~"nebraska western iowa va health care system",
+# affiliation == "new mexico va health care services"~"new mexico va healthcare system",
+# affiliation == "new mexico veterans affairs healthcare system"~"new mexico va affairs healthcare system",
+# affiliation == "new york harbor veterans health affairs"~"new york harbour va healthcare system",
+# affiliation == "new york harbour veterans affairs healthcare system new york city"~"new york harbour va healthcare system",
+# affiliation == "northport veterans affairs hospital"~"northport va medical center",
+# affiliation == "oklahoma city department of veterans health care system"~"oklahoma city va healthcare system",
+# affiliation == "oklahoma city va health care system"~"oklahoma city va healthcare system",
+# affiliation == "oklahoma city veterans affairs health care system"~"oklahoma city va healthcare system",
+# affiliation == "oklahoma city veterans affairs medical centercity veterans affairs medical center"~"oklahoma city va healthcare system",
+# affiliation == "patton veterans project"~"patton veterans film project",
+# affiliation == "phoenix va health care center"~"phoenix va healthcare system",
+# affiliation == "portland va health care system"~"portland va healthcare system",
+# affiliation == "ralph h johnson va medical center"~"ralph h johnson va health care system",
+# affiliation == "robley rex veterans medical center"~"robley rex veterans affairs medical center",
+# affiliation == "rocky mountain regional va medical system va"~"rocky mountain regional va healthcare system",
+# affiliation == "salem va health care system"~"salem va healthcare system",
+# affiliation == "salem veterans affair medical center"~"salem va healthcare system",
+# affiliation == "salisbury va healthcare system in salisbury"~"salisbury va health care system",
+# affiliation == "salt lake city va health care system"~"salt lake city va healthcare system",
+# affiliation == "san francisco va health care system"~"san francisco va healthcare system",
+# affiliation == "san francisco veterans affairs healthcare system"~"san francisco va healthcare system",
+# affiliation == "south texas veterans hcs"~"south texas veterans healthcare system",
+# affiliation == "south texas veterans health care system"~"south texas veterans healthcare system",
+# affiliation == "south texas veterans health san antonio"~"south texas veterans healthcare system",
+# affiliation == "south texas veterans healthcare administration"~"south texas veterans healthcare system",
+# affiliation == "southeast louisiana veterans affairs healthcare system"~"southeast louisiana va healthcare system",
+# affiliation == "southeast louisiana veterans health care"~"southeast louisiana va healthcare system",
+# affiliation == "southeast louisiana veterans health care system"~"southeast louisiana va healthcare system",
+# affiliation == "southern arizona va health care system"~"southern arizona va healthcare system",
+# affiliation == "southern arizona va health system"~"southern arizona va healthcare system",
+# affiliation == "tennessee valley veterans affairs geriatric research education clinical center"~"tennessee valley va geriatric research education clinical center",
+# affiliation == "tennessee valley veterans affairs geriatric research education clinical center (grecc)"~"tennessee valley va geriatric research education clinical center",
+# affiliation == "texas valley coastal bend veterans health care system"~"texas valley coastal bend va healthcare system",
+# affiliation == "texas valley costal bend veterans affairs (va)"~"texas valley coastal bend va healthcare system",
+# affiliation == "va ann arbor center for clinical management research health services research and development center of innovation"~"va ann arbor center for clinical management research",
+# affiliation == "va ann arbor health care system"~"ann arbor va healthcare system",
+# affiliation == "va ann arbor healthcare system"~"ann arbor va healthcare system",
+# affiliation == "va capitol health care network"~"capitol va healthcare network",
+# affiliation == "va capitol health care system"~"capitol va healthcare network",
+# affiliation == "va capitol healthcare network mental illness research education and clinical center"~"capitol va healthcare network",
+# affiliation == "va collaborative evaluation center (vace)"~"va collaborative evaluation center",
+# affiliation == "va connecticut health system"~"connecticut va healthcare system",
+# affiliation == "va connicticut healthcare system"~"connecticut va healthcare system",
+# affiliation == "va eastern colorado health care system"~"eastern colorado va healthcare system",
+# affiliation == "va eastern colorado healthcare system"~"eastern colorado va healthcare system",
+# affiliation == "va eastern kansas healthcare system"~"eastern kansas va healthcare system",
+# affiliation == "va greater los angeles healthcare system"~"greater los angeles va healthcare system",
+# affiliation == "va loma linda health care system"~"loma linda va healthcare system",
+# affiliation == "va loma linda healthcare system"~"loma linda va healthcare system",
+# affiliation == "va montana healthcare system"~"montana va healthcare system",
+# affiliation == "va national teleoncology program"~"va national teleoncology",
+# affiliation == "va nebraska western iowa health care system"~"nebraska western iowa va health care system",
+# affiliation == "va nebraska western iowa health care system omaha division"~"nebraska western iowa va health care system",
+# affiliation == "va nebraska western iowa healthcare system"~"nebraska western iowa va health care system",
+# affiliation == "va new england health care system"~"new england va healthcare system",
+# affiliation == "va new england healthcare system"~"new england va healthcare system",
+# affiliation == "va new england mental illness research and education center"~"va new england mental illness",
+# affiliation == "va new england mirecc"~"va new england mental illness",
+# affiliation == "va new york harbor healthcare"~"va new york harbor health care system",
+# affiliation == "va nj health care system"~"nj va healthcare system",
+# affiliation == "va nj healthcare system"~"nj va healthcare system",
+# affiliation == "va north texas health care system"~"north texas va healthcare system",
+# affiliation == "va northeast ohio health care"~"northeast ohio va healthcare system",
+# affiliation == "va northeast ohio healthcare system"~"northeast ohio va healthcare system",
+# affiliation == "va northern ca health care system"~"northern ca va healthcare system",
+# affiliation == "va northern california"~"northern ca va healthcare system",
+# affiliation == "va northern california health care system"~"northern california va healthcare system",
+# affiliation == "va northern california healthcare system"~"northern california va healthcare system",
+# affiliation == "va office of analytics and business intelligence"~"va office of analytics and business informatics (oabi)",
+# affiliation == "va office of patient care"~"vha office of patient centered care & cultural transformation",
+# affiliation == "va office of patient care services"~"vha office of patient centered care & cultural transformation",
+# affiliation == "va office of patient centered care and cultural transformation"~"vha office of patient centered care & cultural transformation",
+# affiliation == "va office of research & development (ord)"~"va office of research and development",
+# affiliation == "va office of specialty care services (scs)"~"va office of specialty care services",
+# affiliation == "va pacific islands health care services community living center"~"pacific islands va healthcare system",
+# affiliation == "va pacific islands healthcare system"~"pacific islands va healthcare system",
+# affiliation == "va palo alto health care system"~"palo alto va healthcare system",
+# affiliation == "va palo alto healthcare system"~"palo alto va healthcare system",
+# affiliation == "va pittsburgh health care system"~"va pittsburg healthcare system",
+# affiliation == "va pittsburgh health services"~"va pittsburg healthcare system",
+# affiliation == "va pittsburgh healthcare center"~"va pittsburg healthcare system",
+# affiliation == "va providence health care system"~"providence va healthcare system",
+# affiliation == "va providence healthcare"~"providence va healthcare system",
+# affiliation == "va puget sound health care system and visn 20 clinical resource hub"~"va puget sound health care center",
+# affiliation == "va puget sound health services research and development"~"va puget sound health care center",
+# affiliation == "va puget sound health system"~"va puget sound health care center",
+# affiliation == "va puget sound healthcare system"~"va puget sound health care center",
+# affiliation == "va salt lake city healthcare system"~"salt lake city va healthcare system",
+# affiliation == "va san diego healthcare system"~"san diego va healthcare system",
+# affiliation == "va sand diego healthcare system"~"san diego va healthcare system",
+# affiliation == "va serious mental illness treatment resource and evaluation center (smitrec)"~"va serious mental illness treatment resource and evaluation center",
+# affiliation == "va south central mental illness research education and clinic center"~"va south central mental illness research",
+# affiliation == "va south central mental illness research education and clinical center"~"va south central mental illness research",
+# affiliation == "va st louis health care system"~"st louis va healthcare system",
+# affiliation == "va st louis healthcare system"~"st louis va healthcare system",
+# affiliation == "va tennessee valley healthcare"~"va tennessee valley health system",
+# affiliation == "va tennessee valley healthcare system"~"tennessee valley va healthcare system",
+# affiliation == "va texas valley coastal bend health care system"~"texas valley coastal bend va healthcare system",
+# affiliation == "va texas valley coastal bend healthcare system"~"texas valley coastal bend va healthcare system",
+# affiliation == "va washington dc health care system"~"washington dc va healthcare system",
+# affiliation == "va washington dc healthcare system"~"washington dc va healthcare system",
+# affiliation == "va western new york health care system"~"western new york va healthcare system",
+# affiliation == "va western new york healthcare system"~"western new york va healthcare system",
+# affiliation == "veteran affairs ann arbor health care system"~"ann arbor va healthcare system",
+# affiliation == "veteran affairs ann arbor healthcare system"~"ann arbor va healthcare system",
+# affiliation == "veteran consulting and research"~"veteran consulting and research corp",
+# affiliation == "veterans afairs medical center"~"veterans affairs medical center",
+# affiliation == "veterans affairs center for integrated health care"~"veterans affairs center for integrated healthcare",
+# affiliation == "veterans affairs nebraska western iowa health care system"~"nebraska western iowa va health care system",
+# affiliation == "veterans affairs northern california health care system"~"northern california va healthcare system",
+# affiliation == "veterans affairs palo alto health care system"~"palo alto va healthcare system",
+# affiliation == "veterans affairs palo alto healthcare system"~"palo alto va healthcare system",
+# affiliation == "veterans affairs quality scholarship program"~"veterans affairs quality scholars program",
+# affiliation == "veterans affairs tennessee valley healthcare system"~"tennessee valley va healthcare system",
+# affiliation == "veterans emergency management evaluation center (vemec)"~"veterans emergency management evaluation center",
+# affiliation == "veterans engineering resource center (verc)"~"veterans engineering resource center",
+# affiliation == "vha"~"va",
+# affiliation == "vha health services research and development"~"va health services research and development",
+# affiliation == "vha national center for ethics in health care"~"va national center for ethics in health care",
+# affiliation == "vha national center for health promotion and disease prevention"~"va national center for health promotion and disease prevention",
+# affiliation == "vha national center for patient safety"~"va national center for patient safety",
+# affiliation == "vha national surgery office"~"va national surgery office",
+# affiliation == "vha office of health equity"~"va office of health equity",
+# affiliation == "vha office of mental health and suicide prevention"~"va office of mental health and suicide prevention",
+# affiliation == "vha pharmacy benefits management services"~"va pharmacy benefits management services",
+# affiliation == "visn 17 center for research on returning veterans"~"visn 17 center of excellence for research on returning war veterans",
+# affiliation == "washington d c veterans affairs medical center and heart center"~"washington dc va healthcare system",
+# affiliation == "washington dc va medical center"~"washington dc va healthcare system",
+# affiliation == "washington dc veterans medical center"~"washington dc va healthcare system",
+# affiliation == "west palm beach veterans affairs health care system"~"west palm beach va healthcare system",
+# affiliation == "william s middleton memorial veterans hospital"~"william s middleton va hospital",
+# affiliation == "william s middleton veterans health administration hospital"~"william s middleton va hospital",
+# affiliation == "biscayne national parknational park servicedepartment of the interior"~"biscayne national park",
+# affiliation == "national invasive species council (nisc) staff"~"national invasive species council",
+# affiliation == "national park of american samoa (npsa)"~"national park of american samoa",
+# affiliation == "national parks service"~"national park service",
+# affiliation == "north cascades national park service complex"~"north cascades national park",
+# affiliation == "office of assistant secretary indian affairs"~"office of assistant secretary for indian affairs",
+# affiliation == "sacramento national wildlife refuge complex"~"sacramento national wildlife refuge",
+# affiliation == "u s fish and wildlife service"~"us fish and wildlife service",
+# affiliation == "us geologic survey (usgs) geology"~"us geologic survey",
+# affiliation == "us geologico survey"~"us geologic survey",
+# affiliation == "usdi national park service"~"national park service",
+# affiliation == "usdoi national park service"~"national park service",
+# affiliation == "usgs wyoming montana water science center in helena"~"usgs wyoming montana water science center",
+# affiliation == "national health and environmental effects research lab (nheerl)"~"national health and environmental effects research laboratory",
+# affiliation == "nasa godard space flight center"~"nasa goddard spaceflight center",
+# affiliation == "nasa goddard space flight center"~"nasa goddard spaceflight center",
+# affiliation == "nasa goddard space flight center (gsfc"~"nasa goddard spaceflight center",
+# affiliation == "nasa hubble fellowship program sagan fellow"~"nasa hubble fellowship program",
+# affiliation == "nasa interdisciplinary consortia for astrobiology research (icar)"~"nasa interdisciplinary consortia for astrobiology research",
+# affiliation == "nasa nexus for exoplanet system science (nexss)"~"nasa nexus for exoplanet system science",
+# affiliation == "nasa nexus for exoplanetary system science: earths in other solar systems team"~"nasa nexus for exoplanet system science",
+# affiliation == "nasa postdoctoral program"~"nasa postdoctoral fellow",
+# affiliation == "nasa postdoctoral program (npp) fellow"~"nasa postdoctoral fellow",
+# affiliation == "nasa postdoctoral program fellow"~"nasa postdoctoral fellow",
+# affiliation == "nasa virtual planetary laboratory lead team"~"nasa virtual planetary laboratory",
+# affiliation == "nsf nasa center of chemical evolution"~"nsf nasa center for chemical evolution",
+# affiliation == "geminiobservatory nsf'snoirlab"~"gemini observatory",
+# affiliation == "national ecological observation network (neon)"~"national ecological observatory network",
+# affiliation == "national radio astronomy observatory"~"national radio astronomy laboratory",
+# affiliation == "national radio astronomy observatory socorro"~"national radio astronomy laboratory",
+# affiliation == "national solar observatory (nso)"~"national solar observatory",
+# affiliation == "national solar observatory sacramento peak"~"national solar observatory",
+# affiliation == "nsf nanosystems engineering research center for nanotechnology enabled water treatment (newt)"~"nsf nanosystems engineering research center on nanotechnology enabled water treatment",
+# affiliation == "federal emergency management agency's (fema)"~"federal emergency management agency",
+# affiliation == "federal housing finance agency (fhfa)"~"federal housing finance agency",
+# affiliation == "national invasive species council staff"~"national invasive species council",
+# affiliation == "national snow and ice data center (nsidc)"~"national snow and ice data center",
+# affiliation == "us general services administration (gsa)"~"us general services administration",
+# affiliation == "national museum of the american indian (nmai)"~"national museum of the american indian",
+# affiliation == "smithsonian conservation biology institute center for conservation education & sustainability (cces)"~"smithsonian conservation biology institute",
+# affiliation == "smithsonian conservation biology unit"~"smithsonian conservation biology institute",
+# affiliation == "smithsonian environmental research center (si)"~"smithsonian environmental research center",
+# affiliation == "smithsonian environmental research station"~"smithsonian environmental research center",
+# affiliation == "smithsonian tropical institute"~"smithsonian tropical research institute",
+# .default = as.character(affiliation)
+# ))
+# 
+
+# pull<-pull %>% 
+#   mutate(agency_primary = case_when(
+#     affil_id == "112988162" ~ "state",
+#     .default = as.character(agency_primary)
+#   )) %>%
+# mutate(agency = case_when(
+#     affil_id == "112988162" ~ "usaid",
+#     .default = as.character(agency)
+#   )) 
+
+# pull$affiliation
+# # Extract strings with parentheses
+# matches <- str_extract_all(pull$affiliation, "\\([^()]+\\)")
+# 
+# # Flatten the list and remove NULLs
+# matches <- unlist(matches)
+# matches <- matches[matches != ""]
+# 
+
+
+# parentheses <- pull %>%
+#   mutate(parentheses_text = str_extract(affiliation, "\\([^()]+\\)")) %>% 
+#   filter(!is.na(parentheses_text))
+# 
+# parentheses$parentheses_text
+# pull2<-pull %>% 
+#   mutate(str_remove(affiliation,"[(]jrs[)]"))
+# pull<-pull %>% 
+# mutate(affiliation = gsub("[(]nhlbi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nih[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]airborne[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]wrrc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]niaid[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]niehs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nlm[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]ret[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]aphis[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]retired[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]grecc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nia[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nadp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nidcd[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nci[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncep[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nichd[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]national zoo[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]erdc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nida[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cindrr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]hsr and d[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nimhd[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usda ars[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]noaa[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncep[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ctp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nmfs[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]va desert pacific healthcare network[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]socom[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]sesync[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]niddk[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncats[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]r[)]","(retired)",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]mu ncorp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]aid[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]c stars[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]contractor to the usgs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usda ars[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncorp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]star[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]grecc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nswc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cc[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]retired[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]onr science and technology 101unit[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]mcsp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]west point[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ret)","(retired)",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]hpw[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nih[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]formerly the institute for transfusion medicine[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nmaahc[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]army futures command[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ussouthcom[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]fmc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]erdc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]netl[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usphs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nzp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nifs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]apf[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]sonny[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nei[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncbi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nidcr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]rrc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cnpp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ntp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]niams[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nibib[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ninr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cit[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nigms[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nccih[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]warun[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]od[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]csr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]coeci[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]afosi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]niimbl[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ussocom[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]hs&rd[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ideas[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]quirc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]grecc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]va[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]va[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn 6[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]installations and logistics[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]airborne[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]namru 2[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ma mirecc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]atlanta[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nam[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]adapt[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]perc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]roc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]erdc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usaid[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]niceatm[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncei[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]afmoa[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]r[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]government contractor for noaa ncei[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncei[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vha[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ccdc sc[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]ret[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]retired[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]r[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]erdc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]niwc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ibfm cnr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]mirecc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]rdrl hrs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]contractor[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]posthumous[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]r[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nserl ars usda[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]mtaps[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]badc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usuhs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usu[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]pmi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]oes[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]va[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]oabi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]pris m[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]airborne[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]deployment support[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]va[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nf[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nsrdec[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]navfac syscom midlant[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]grecc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]mtaps[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]renuwit[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]retired[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]bill[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nia nih[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]a[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usfs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nci[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vrhrc slc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vrhrc ic[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]as 40[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]devcom[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nia[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]arl[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]hab[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]airborne[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]queri[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]the center for environmental sustainability through insect farming nsf i ucrc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]boem[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cmat[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]airborne[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]dcmt[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]dmea[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]irac[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]orwh[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]deployment support[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]tasc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]oabi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]grecc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cg oes 3[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ret[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn 1[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]neptune[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cesamh[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usda ars[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nih cc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]pacific cancer research consortium national cancer institute community oncology research program[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn 19[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cabbi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]afmra[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]dac[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]gecdac[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nwr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncats[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]afrl rwwi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vha[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]idds[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]retired[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nwr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]star[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]us army retired[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncis[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]kelly services[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncorp[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nihs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]aifs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cms[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]va echo[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]climb[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]pacdet[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]tradoc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]troop support[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]116b 3[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]eros[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]climb[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usamrd g[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]idds[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]idds[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]t ah 19[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nmrtc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vrhrc gnv[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ssc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usfs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ret[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cimt[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]doe[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]apac[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]wwetac[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]afsec[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usamrd a[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nam[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]dod[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]11spec[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]jgcri pnnl[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]idds[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usvl[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]idds[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]wabiled[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]supporting noaa  nesdis star[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nrel[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]bha[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]reserve[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vha[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cmat[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]r6[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ncrr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]star[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]va[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]dchv[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]hsr&d[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]osires[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cares[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nccam[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nichq[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cna[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]quirc[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]under contract with noaa southwest fisheries science center[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]eric[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]11g[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]veterans integrated service network 16[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vha[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vaqs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nccos[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nia[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]thrive coin[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]gao[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]noaa[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usawc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]opm[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]socom[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vha[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usda[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nccih[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]usamrd a[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nlm[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]gdit[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]wrair dod[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]retired[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]founding[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]2300 1810d[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]jal jangal[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]erc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]wpo[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]frfs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]afsoc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cesamh[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]wrair[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nci[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]pact karamoja[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]doe's[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]nrel[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]sfm[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]integrated resilience directorate[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]afosi[)]","",affiliation)) %>% 
+# # mutate(affiliation = gsub("[(]noaa nesdis[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]gdvs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]jal jangal[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cber[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]discovvr[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]va[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]finvet[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn 1[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]quail[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]netl[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]dha[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]atp bio[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]sea[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ret[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]skai[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]drs trikhacheva and dengler[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]noaa glerl[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]eoard[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]jrs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]doi[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]ccld[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]retired[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]lcluc[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vha[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]edward p boland[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]vetwise lhs[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]cmk[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]aetc psse[)]","",affiliation)) %>% 
+# mutate(affiliation = gsub("[(]visn 1)","",affiliation)) %>% 
+# mutate(affiliation = gsub("health care","healthcare",affiliation)) %>% 
+# mutate(affiliation = gsub("u s ","us ",affiliation)) 
+# 
+# pull<-pull %>% 
+#   mutate_all(trimws) %>% 
+#   mutate(affiliation = gsub("  ","",affiliation)) 
+# 
+# 
+# 
+# 
+# 
+# pull<-pull %>% 
+# select(agency_primary, affil_id, affiliation) %>%
+#   distinct(affil_id, .keep_all = TRUE) %>%
+#   mutate(agency_primary = case_when(
+#     agency_primary == "usda" ~ "Department of Agriculture",
+#     agency_primary == "dod" ~ "Department of Defense",
+#     agency_primary == "interior" ~ "Department of the Interior",
+#     agency_primary == "hhs" ~ "Department of Health and Human Services",
+#     agency_primary == "commerce" ~ "Department of Commerce",
+#     agency_primary == "other" ~ "Other Agencies, Commissions, or Institutions",
+#     agency_primary == "nsf" ~ "National Science Foundation",
+#     agency_primary == "state" ~ "Department of State",
+#     agency_primary == "doe" ~ "Department of Energy",
+#     agency_primary == "va" ~ "Department of Veteran's Affairs",
+#     agency_primary == "epa" ~ "Environmental Protection Agency",
+#     agency_primary == "smithsonian" ~ "Smithsonian Institution",
+#     agency_primary == "nasa" ~ "National Aeronautics and Space Administration",
+#     .default = as.character(agency_primary)
+#   )) %>%
+#   distinct()
+
+pull<-pull %>%
+  arrange(agency_primary, affiliation, affil_id) %>%
+  group_by(agency_primary, affiliation) %>%
+  mutate(affil_id=paste(affil_id,collapse=", ")) %>%
+  distinct(affiliation, .keep_all = TRUE) %>%
+  ungroup() %>%
+  mutate(row = row_number()) 
+
+# %>%
+#   # mutate(affils=paste(affiliation,collapse=", ")) %>%
+#   select(row,`Scopus ID`=affil_id,Affiliation=affiliation)
+  
+  
+
+
+
+
+
+
+
+# Read data search data
+# 
+# pull <- setDT(readRDS("./data_clean/affils_df_clean.rds")) %>%
+#   mutate(federal = if_else(is.na(federal), FALSE, federal)) %>%
+#   filter(federal != FALSE) %>%
+#   select(affil_id, agency, agency_primary) %>%
+#   mutate(affil_id = as.character(affil_id)) %>% 
+#   distinct() 
+
+
+# 
+# 
+# 
+# fed_affils1 <- read_csv("./data_raw/agencies/agency_redux.csv") %>%
+#   rename(affil_id = scopus_code) %>%
+#   distinct() %>%
+#   mutate(df = "redux")
+# fed_affils2 <- read_csv("./data_raw/agencies/agencies_redux_clean.csv") %>%
+#   distinct() %>%
+#   mutate(df = "redux")
+# fed_affils3 <- read_csv("./data_raw/agencies/agencies_orig_clean.csv") %>%
+#   distinct()
+# fed_affils_search <- fed_affils1 %>%
+#   full_join(fed_affils2) %>%
+#   full_join(fed_affils3, by = c("affil_id", "affiliation"))
+# 
+# fed_affils_search$affiliation <- replace_non_ascii(fed_affils_search$affiliation)
+# fed_affils_search<-fed_affils_search %>%
+#   mutate(city.x = if_else(is.na(city.x), city.y, city.x)) %>%
+#   mutate(city.y = if_else(city.x == city.y, NA, city.y)) %>%
+#   mutate(df.y = if_else(is.na(df.y), df.x, df.y)) %>%
+#   select(
+#     -pub_count.x,
+#     -pub_count.y,
+#     -country.x,
+#     -country.y,
+#     -df.x,
+#     -city.y
+#   ) %>%
+#   mutate(agency = if_else(affil_id == 60138915, "doe", agency)) %>%
+#   distinct(affil_id, agency, affiliation, city.x, df.y) %>%
+#   rename(
+#     city = `city.x`,
+#     search = `df.y`
+#   ) %>%
+#   mutate(affil_id = as.factor(affil_id)) %>% 
+#   mutate(cat="search")
+# # 
+# # 
+# # fed_affils_search$affil_id <- as.character(fed_affils_search$affil_id)
+# fed_affils_search <- fed_affils_search %>%
+#   full_join(pull, by = "affil_id") %>%
+#   distinct() %>% 
+#   filter(cat=="search") %>% 
+#   distinct(affil_id,.keep_all = TRUE) %>% 
+#   mutate_all(tolower)
+# # 
+# # # rm(pull)
+# # 
+# # fed_affils_search <- fed_affils_search %>%
+# #   filter(federal != FALSE)
+# # unique(fed_affils_search$agency_primary)
+# fed_affils_search <- fed_affils_search %>%
+#   mutate(affiliation.x = gsub("[.]", "", affiliation.x)) %>%
+#   mutate(affiliation.x = gsub(",", "", affiliation.x)) %>%
+#   mutate(affiliation.x = gsub("- ", "-", affiliation.x)) %>%
+#   mutate(affiliation.x = gsub(" -", "-", affiliation.x)) %>%
+#   mutate(affiliation.x = gsub("united states ", "us ", affiliation.x)) %>%
+#   mutate(affiliation.x = gsub("veterans administration", "va", affiliation.x)) %>%
+#   mutate(affiliation.x = gsub("us agency for international development", "usaid", affiliation.x)) %>%
+#   mutate(affiliation.x = gsub("usaid's", "usaid", affiliation.x)) %>%
+# 
+#   mutate(affiliation.x = gsub("us department of agriculture", "usda", affiliation.x))%>%
+# 
+# # mutate(affiliation.x = gsub("US FOREST SERVICE", "US Forest Service", affiliation.x))%>%
+#   mutate(affiliation.x = gsub(" servhice", " service", affiliation.x))%>%
+#   # mutate(affiliation.x = gsub("Us ", "US ", affiliation.x))%>%
+#   mutate(affiliation.x = gsub("usda forest service", "us forest service", affiliation.x))%>%
+#   mutate(affiliation.x = gsub("environmental protection agency", "epa", affiliation.x))%>%
+# mutate(affiliation.x = gsub("us epa", "epa", affiliation.x))%>%
+#   mutate(affiliation.x = gsub("usepa", "epa", affiliation.x))%>%
+#   mutate(affiliation.x = gsub("usfws", "us fish and wildlife service", affiliation.x))%>%
+# 
+#   mutate(affiliation.x = gsub("us geological survey", "usgs", affiliation.x))%>%
+#   mutate(affiliation.x = gsub("us dep of ", "department of ", affiliation.x))%>%
+#   mutate(affiliation.x = gsub("us department of ", "department of ", affiliation.x))%>%
+#   
+#   
+#   
+#   mutate(affiliation.x = gsub("us forest service (usda)", "us forest service", affiliation.x))%>%
+#   mutate(affiliation.x = gsub("us forest service (usfs)", "us forest service", affiliation.x))%>%
+#   mutate(affiliation.x = gsub("noaa’s", "noaa", affiliation.x))%>%
+# 
+#   mutate(affiliation.x = gsub("national weather service", "nws", affiliation.x)) 
+# 
+# # %>%
+# fed_affils_search <- fed_affils_search %>%
+#   # mutate(affiliation = gsub("−", "-", affiliation)) %>%
+#   # mutate(affiliation = gsub("─", "-", affiliation)) %>%
+#   # mutate(affiliation = gsub("ʻ", "'", affiliation)) %>%
+#   select(agency_primary, affil_id, affiliation) %>%
+#   distinct(affil_id, .keep_all = TRUE) %>%
+#   mutate(agency_primary = case_when(
+#     agency_primary == "usda" ~ "Department of Agriculture",
+#     agency_primary == "dod" ~ "Department of Defense",
+#     agency_primary == "interior" ~ "Department of the Interior",
+#     agency_primary == "hhs" ~ "Department of Health and Human Services",
+#     agency_primary == "commerce" ~ "Department of Commerce",
+#     agency_primary == "other" ~ "Other Agencies, Commissions, or Institutions",
+#     agency_primary == "nsf" ~ "National Science Foundation",
+#     agency_primary == "state" ~ "Department of State",
+#     agency_primary == "doe" ~ "Department of Energy",
+#     agency_primary == "va" ~ "Department of Veteran's Affairs",
+#     agency_primary == "epa" ~ "Environmental Protection Agency",
+#     agency_primary == "smithsonian" ~ "Smithsonian Institution",
+#     agency_primary == "nasa" ~ "National Aeronautics and Space Administration",
+#     .default = as.character(agency_primary)
+#   )) %>%
+#   distinct() %>%
+#   arrange(agency_primary, affiliation, affil_id) %>%
+#   group_by(affiliation) %>%
+#   mutate(affil_id=paste(affil_id,collapse=", ")) %>%
+#   distinct(affiliation, .keep_all = TRUE) %>%
+#   ungroup() %>%
+#   mutate(row = row_number()) %>%
+#   # mutate(affils=paste(affiliation,collapse=", ")) %>%
+#   select(row,`Scopus ID`=affil_id,Affiliation=affiliation)
+
+#
+
+# group_by(agency_primary) %>%
+# mutate(ids=paste(affil_id,collapse=", ")) %>%
+# mutate(affils=paste(affiliation,collapse=", ")) %>%
+# fed_affils_search %>%
+# write_csv(pull,"./data_intermediate/affils_for_or.csv")
+
+# # 
+# refined<-read_csv("./data_intermediate/affils-for-or-csv_OPEN_REFINED3.csv") %>%
+#   mutate(cat="refined") %>% 
+#   select(-affiliation)
+# 
+# refine_both<-left_join(pull,refined,by=c("agency_primary","affil_id","row")) %>%
+#   mutate(match=(affiliation==affiliation_mod)) %>%
+#   filter(match==FALSE)
+#   write_csv(refine_both,"./data_intermediate/refined_for_correcting.csv")
+# 
+#   
+  
+
+first<-pull %>% group_by(agency_primary) %>% slice_head(n=1) %>% select(agency_primary,first=row)
+last<-pull %>% group_by(agency_primary) %>% slice_tail(n=1) %>% select(agency_primary,last=row)
+first_last<-left_join(first,last) 
+rm(first,last)
+pull %>%
+  select(affiliation,affil_id) %>% 
+  # slice(1:750) %>% 
+  kable(
+    format = "latex",
+    longtable = T,
+    booktabs = T,
+    linesep = "",
+    caption = "Scopus affiliation IDs used in the search of research productivity by federal agencies and departments. These affiliations are nested under a department or agency's institution code.",
+    align = "ll",
+  ) %>%
+  # kable(digits = 2,
+  #   format = "latex",
+  #   align = "lll",
+  #   escape = FALSE,
+  #   row.names = FALSE,
+  #   booktabs = T,
+  #   linesep = ""
+  # ) %>%
+  kable_styling(
+    # longtable = T,
+    bootstrap_options = c("hover"),
+    full_width = T,
+    latex_options = c("hold_position", "repeat_header"),
+    repeat_header_continued = "\\textit{(Continued on next page...)}",
+    position = "center",
+    font_size = 8
+  ) %>%
+  row_spec(0, bold = T) %>%
+  column_spec(1, width = "40em") %>%
+  column_spec(2, width = "20em") %>%
+  # column_spec(1, width = "2em") %>% 
+  pack_rows("Department of Agriculture", as.numeric(first_last[1,2]), as.numeric(first_last[1,3])) %>%
+pack_rows("Department of Commerce", as.numeric(first_last[2,2]), as.numeric(first_last[2,3])) %>%
+pack_rows("Department of Defense", as.numeric(first_last[3,2]), as.numeric(first_last[3,3])) %>%
+pack_rows("Department of Energy", as.numeric(first_last[4,2]), as.numeric(first_last[4,3])) %>%
+  pack_rows("Department of Health and Human Services", as.numeric(first_last[5,2]), as.numeric(first_last[5,3])) %>%
+  pack_rows("Department of State", as.numeric(first_last[6,2]), as.numeric(first_last[6,3])) %>%
+  pack_rows("Department of Veteran's Affairs", as.numeric(first_last[7,2]), as.numeric(first_last[7,3])) %>%
+  pack_rows("Department of the Interior", as.numeric(first_last[8,2]), as.numeric(first_last[8,3])) %>%
+  pack_rows("Environmental Protection Agency", as.numeric(first_last[9,2]), as.numeric(first_last[9,3])) %>%
+  pack_rows("National Aeronautics and Space Administration", as.numeric(first_last[10,2]), as.numeric(first_last[10,3])) %>%
+  pack_rows("National Science Foundation", as.numeric(first_last[11,2]), as.numeric(first_last[11,3])) %>%
+  pack_rows("Other Agencies, Commissions, or Institutions", as.numeric(first_last[12,2]), as.numeric(first_last[12,3])) %>%
+  pack_rows("Smithsonian Institution", as.numeric(first_last[13,2]), as.numeric(first_last[13,3]))
+
+
+```
+
+
+

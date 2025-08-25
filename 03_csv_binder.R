@@ -15,8 +15,10 @@ library(data.table)
 # 
 
 
-data_dir<-"./data_raw/scopus_api/unis_files"
-# data_dir<-"./data_raw/scopus_api/fed_files/redux"
+# data_dir<-"./data_raw/scopus_api/unis_files"
+data_dir<-"./data_raw/scopus_api/fed_files/redux"
+# data_dir<-"./data_raw/scopus_api/2025-2"
+# folder<-c("2025-2") # 8
 
 folder<-c(
   "2019", # 1
@@ -25,7 +27,8 @@ folder<-c(
   "2022", # 4
   "2023", # 5
   "2024", # 6
-  "2025") # 7
+  "2025")# 7
+  
 
 
 
@@ -350,23 +353,23 @@ authors_df<-authors_df %>%
 # save --------------------------------------------------------------------
 
   # # FOR WITHIN YEAR BINDING - FEDS
-  # 
-  # write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
-  # write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
-  # write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
-  # 
-  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
-  
+
+  write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
+  write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
+  write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
+
+  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
+
   
   # # FOR WITHIN YEAR BINDING - UNIS
   # 
-  write_csv(affils_df,paste("./data_raw/affils/year_files_uni/affils_df_",folder[k],".csv",sep=""))
-  write_csv(authors_df,paste("./data_raw/authors/year_files_uni/authors_df_",folder[k],".csv",sep=""))
-  write_csv(papers_df,paste("./data_raw/papers/year_files_uni/papers_df_",folder[k],".csv",sep=""))
+  # write_csv(affils_df,paste("./data_raw/affils/year_files_uni/affils_df_",folder[k],".csv",sep=""))
+  # write_csv(authors_df,paste("./data_raw/authors/year_files_uni/authors_df_",folder[k],".csv",sep=""))
+  # write_csv(papers_df,paste("./data_raw/papers/year_files_uni/papers_df_",folder[k],".csv",sep=""))
+  # 
+  # 
+  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder[k],".csv",sep=""))
 
-  
-  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder[k],".csv",sep=""))
-  
   
     }
   

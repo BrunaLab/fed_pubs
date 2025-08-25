@@ -1,7 +1,7 @@
 
 
 library(tidyverse)
-
+library(rscopus)
 # Define the folder path
 folder_path <- "data_raw/uni_affils"
 
@@ -25,6 +25,7 @@ uni_affils <- file_list %>%
 
 
 search_term <- uni_affils$affil_id
+search_term <- "109556305"
 term <- seq_along(search_term)
 all_affils<-data.frame()
 for (h in term){

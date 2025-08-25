@@ -11,7 +11,7 @@ pubs_per_month <- function(pubs_mo, PY_max) {
     expand_limits(y = 0)+
     theme_classic()+
     # scale_x_continuous( breaks=seq(1,12,by=1))+
-    scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo %>% select(n))+5000),by=2500))+
+    # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo %>% select(n))+5000),by=2500))+
     theme(axis.text.y = element_text(size = 12))+
     theme(axis.text.x =element_text(size = 12))+
     theme(axis.title.y = element_text(size = 14))+

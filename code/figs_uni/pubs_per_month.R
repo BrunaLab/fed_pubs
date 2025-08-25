@@ -18,8 +18,10 @@ pubs_per_month <- function(pubs_mo, PY_max) {
     theme(axis.text.x =element_text(size = 12))+
     theme(axis.title.y = element_text(size = 14))+
     theme(axis.title.x =element_text(size = 14))+
-    scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_mo %>% select(n))+500))+
+    
     scale_x_discrete(labels=c(month))+
+    scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_mo %>% select(n))+500))+
+    # gghighlight(min(n) < 50)
     gghighlight(PY == 2024)
     # geom_label(aes(label = label, nudge_x = 0.25, size = 3))
   # +
