@@ -1,20 +1,32 @@
 
-# 60138915: CURENT, Center for Ultra-Wide-Area Resilient Electric Energy Transmission Networks, is a graduated National Science Foundation (NSF) Engineering Research Center that was jointly supported by NSF and the Department of Energy (DoE) for a period of 10 years before becoming self-sustaining. A collaboration between academia, industry, and national laboratories, CURENT is led by the University of Tennessee, Knoxville. Partner institutions include:
-# DO WE KEEP? 
+
+# load libraries ----------------------------------------------------------
+
 library(tidyverse)
 library(janitor)
 library(gghighlight)
 library(kableExtra)
 library(ggrepel)
-# library(knitr)
 library(progress)
 library(fs)
 library(data.table)
 
 
+
+# select max month to analyze & plot --------------------------------------
+
+# PM_max<-6 # june
+# PM_max<-7 # july
+PM_max<-8 # aug
+
+# load data  --------------------------------------------------------------
+
+# Affiliations
 affils_df_complete  <- setDT(read_rds("./data_clean/affils_df_clean.rds"))
 
+# unique(affils_df_complete$agency_primary)
 
+# Publications
 papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) %>% 
   mutate(PM=
            case_when(
@@ -25,44 +37,35 @@ papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) %>%
   mutate(PT=if_else(PT=="j","journal",PT))
   
   
-# make rds of papers with fed 1st author ----------------------------------
+# Authors
 
-  
-
-# papers_df %>% filter(is.na(PM))
-
-authors_df_complete <- setDT(readRDS("./data_clean/authors_df_clean.rds")) %>% 
+authors_df_complete <- setDT(read_rds("./data_clean/authors_df_clean.rds")) %>% 
   mutate(federal=if_else(is.na(federal),FALSE,federal))
 
 
 
-# chose any publication types or titles to remove -------------------------
-# TITLE WORDS
-# editor's
-# preface
-# foreward
-#  - reply
+# chose publication types or titles to remove -----------------------------
 
-# ARTICLE TYPE
+# remove with these TITLE WORDS
+# "editor's"
+# "preface"
+# "foreward"
+#  "- reply"
+
+
 # unique(papers_df$DT)
+# ARTICLE TYPES - KEEP
 # "book chapter"
 # "article"
 # "review"
 # "note"
 # "data paper"
-
+# ARTICLE TYPES - REMOVE
 # "letter" # excluded below
 # "editorial" # excluded below" 
 
 # papers_df %>% filter(DT=="editorial") %>% select(TI)
-
 # authors_df %>% filter(is.na(agency)) %>% group_by(federal) %>% tally()
-
-papers_df_complete %>% 
-  group_by(DT) %>% 
-  tally() %>% 
-  mutate(perc=n/sum(n)*100) %>% 
-  arrange(n)
 
 papers_cat<-c("article","book chapter","data paper","note","review")
 
@@ -72,37 +75,19 @@ papers_df <- papers_df_complete %>%
 authors_df<-authors_df_complete %>% 
   filter(refID%in%papers_df$refID)
 
-# 
-# 
-# foo<-
-#   authors_df %>% 
-#   
-#   filter(federal==TRUE) %>% 
-#   filter(author_order==1) %>%  
-#   group_by(federal,agency,agency_primary) %>% 
-#   tally() %>% 
-#   arrange(desc(n)) %>% 
-#   head(20)
-	
-# 60277579_2024-3
+rm(papers_cat)
+# data summaries ----------------------------------------------------------
 
+# N and % of articles in each category after cleanup
+pub_cat_summary<-papers_df %>% 
+  group_by(DT) %>% 
+  tally() %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(n)
 
-# 
-# x <- data.frame(refID = c("100312437_2019-1", "usgs_ti_79-1"))
-# 
-# x %>%
-#   mutate(
-#     is_usgs = str_detect(refID, "^usgs"),
-#     refID_clean = if_else(is_usgs, refID, NA_character_),
-#     temp = if_else(!is_usgs, refID, NA_character_)
-#   ) %>%
-#   extract(temp, into = c("refID", "xtra"), regex = "^([0-9]+)_20(.*)", remove = TRUE) %>%
-#   mutate(refID = coalesce(refID, refID_clean)) %>%
-#   select(-refID_clean, -is_usgs)
-
-
-# summary calculations ----------------------------------------------------
-
+# authors (fed, non, total) per publication
+# removes any with no fed authors that might have 
+# managed to sneak through 
 auth_per_pub <-authors_df %>% 
   group_by(refID) %>% 
   summarize(fed=sum(federal==TRUE),
@@ -110,19 +95,9 @@ auth_per_pub <-authors_df %>%
             total=sum(fed+nonFed)) %>% 
 filter(fed!=0) 
 
-# %>% 
-#   # extract(refID, into = c("refID", "xtra"), regex = "^([0-9]+)_20(.*)", remove = FALSE) %>% 
-#   mutate(
-#     is_usgs = str_detect(refID, "^usgs"),
-#     refID_clean = if_else(is_usgs, refID, NA_character_),
-#     temp = if_else(!is_usgs, refID, NA_character_)
-#   ) %>%
-#   extract(temp, into = c("refID", "xtra"), regex = "^([0-9]+)_20(.*)", remove = TRUE) %>%
-#   mutate(refID = coalesce(refID, refID_clean)) %>%
-#   select(-refID_clean, -is_usgs) %>% 
-#   mutate(refID=gsub('<span class="searchMatch">',"",refID)) %>% 
-#   mutate(refID=gsub("</span>","",refID)) 
- 
+
+
+ # mean and SD of authors per publication (fed, nonfed, total)
 auth_per_pub_means<-auth_per_pub %>% 
   ungroup() %>% 
   drop_na() %>% 
@@ -146,95 +121,88 @@ auth_per_pub_means<-auth_per_pub %>%
   mutate(sd=if_else(author_category=="Fed",sd_Fed,sd)) %>% 
   select(-sd_Fed,-sd_NonFed,-sd_Total) 
 
-
 auth_per_pub_means
 
-# number of scopus IDs searched 
 
-scopus_id_1<-read_csv("./data_raw/agencies/agencies_redux_clean.csv")
-scopus_id_2<-read_csv("./data_raw/agencies/agencies_orig_clean.csv")
-scopus_id_total<-bind_rows(scopus_id_2,scopus_id_1) %>% select(affil_id) %>% distinct() %>% summarize(n=n_distinct(affil_id))
-rm(scopus_id_1,scopus_id_2)
-# 
-# no_fed_affils_srch<-authors_df %>% select(source) %>% mutate(source=gsub("affil_","",source)) %>% mutate(source=gsub(".csv","",source)) %>% mutate(source=gsub("_2019","",source)) %>% 
-# mutate(source=gsub("_2020","",source)) %>% 
-# mutate(source=gsub("_2021","",source)) %>% 
-# mutate(source=gsub("_2022","",source)) %>% 
-# mutate(source=gsub("_2023","",source)) %>% 
-# mutate(source=gsub("_2024","",source)) %>% 
-# mutate(source=gsub("_2025","",source)) %>% 
-# distinct() %>% 
-# summarize(n=n_distinct(source))
+# remove any papers with no feds that snuck through -----------------------
 
-# Number of federal affiliations returned
-authors_df$refID
-auth_per_pub$refID
+
 authors_df<-authors_df %>% 
   filter(refID%in%auth_per_pub$refID)
 papers_df<-papers_df %>% 
   filter(refID%in%auth_per_pub$refID)
+affils_df<-affils_df_complete %>% 
+  filter(refID%in%auth_per_pub$refID)
 
-no_fed_affils<-authors_df %>% filter(federal==TRUE) %>% summarize(n=n_distinct(affil_id))
-no_fed_affils
-
-# %>% 
-#   rename(SD=sd,
-#          `Mean per Paper`=mean_per_pub,
-#          `Author Category`=author_category)
-
-# 
-# auth_per_pub_means %>%
-# kable(digits = 2,
-#   format = "latex",
-#   align = "lcc",
-#   caption = "Avg No of Federal and NonFederal Authors Per Publication",
-#   escape = FALSE,
-#   row.names = FALSE,
-#   booktabs = T,
-#   linesep = ""
-# ) %>%
-#   kable_styling(
-#     bootstrap_options = c("hover"),
-#     # full_width = F,
-#     latex_options = c("scale_down","hold_position"),
-#     font_size = 12,
-#     position = "center"
-#   )
+# total number of scopus IDs in the initial search
+scopus_id_1<-read_csv("./data_raw/affiliations_to_search/fed_affils/agencies_redux_clean.csv")
+scopus_id_2<-read_csv("./data_raw/affiliations_to_search/fed_affils/agencies_orig_clean.csv")
+scopus_id_initial<-bind_rows(scopus_id_2,scopus_id_1) %>% select(affil_id) %>% distinct() %>% summarize(n=n_distinct(affil_id))
+rm(scopus_id_1,scopus_id_2)
+scopus_id_initial
+# total number of scopus IDs in the follow-up search
+scopus_id_followup<-read_csv("./data_clean/api_affils_searched_2025-09-01.csv") %>% 
+select(affil_id) %>% 
+  distinct() %>% 
+  summarize(n=n_distinct(affil_id))
+scopus_id_followup
 
 
+# Total number of federal affiliations in the final data set 
+# no_fed_affils<-authors_df %>% 
+#   filter(federal==TRUE) %>% 
+#   summarize(n=n_distinct(affil_id))
+# no_fed_affils
 
-
-
-# total_pubs<-papers_df %>% 
+no_fed_affils<-affils_df %>%
+  filter(federal==TRUE) %>% 
+  summarize(n=n_distinct(affil_id))
+# Total number of publications in the final data set 
+# # internal check to see if same when using different df to calclulate
+# total_pubs_au<-authors_df %>% 
 #   summarize(n=n_distinct(refID))
+# 
+# total_pubs_pa<-papers_df %>% 
+#   summarize(n=n_distinct(refID))
+# total_pubs_au==total_pubs_pa
 
-
-total_pubs<-authors_df %>% 
+total_pubs<-papers_df %>% 
   summarize(n=n_distinct(refID))
 
-# Total_authors (fed+non)
 
+# Total_authors (fed+non)
 total_authors<-authors_df %>% 
   select(SID) %>%
   tally()
+# 
+# there might be some errors, a few where 
+# authors_df[1:1000,] %>% 
+#   group_by(SID,agency_primary) %>% 
+#   tally(n_distinct(surname)) %>% 
+#   filter(n>1)
+  
 
+# total unique authors (fed+non)
 total_unique_authors<-authors_df %>% 
   select(SID) %>% 
   distinct() %>% 
   tally()
+total_unique_authors
 
-
+# total unique federal authors
 total_federals<-authors_df %>% 
   filter(federal==TRUE) %>% 
   select(SID) %>% 
   distinct() %>% 
   tally()
+total_federals
 
 total_NOTfederals<-authors_df %>% 
   filter(federal==FALSE) %>% 
   select(SID) %>% 
   distinct() %>% 
   tally() 
+total_NOTfederals
 
 
 first_authors <- authors_df %>%
@@ -265,7 +233,8 @@ all_author_positions <- authors_df %>%
 
 write_csv(auth_per_pub_means,"./docs/summary_info/auth_per_pub_means.csv")
 
-summary_data<-data.frame(value=c("scopus_id_total",
+summary_data<-data.frame(value=c("scopus_id_initial",
+                                 "scopus_id_followup",
                                  "no_fed_affils",
                                  "total_pubs",
                                  "total_authors",
@@ -274,7 +243,8 @@ summary_data<-data.frame(value=c("scopus_id_total",
                                  "total_NOTfederals",
                                  "prop_papers_fed_1st",
                                  "prop_papers_fed_last"),
-                         n=c(scopus_id_total$n,
+                         n=c(scopus_id_initial$n,
+                             scopus_id_followup$n,
                              no_fed_affils$n,
                              total_pubs$n,
                              total_authors$n,
@@ -287,11 +257,14 @@ summary_data<-data.frame(value=c("scopus_id_total",
 write_csv(summary_data,"./docs/summary_info/summary_data.csv")
 summary_data
 
+
+
 rm(summary_data, 
+   scopus_id_initial,
+   scopus_id_followup,
    auth_per_pub_means,
    all_author_positions,
    auth_per_pub,
-   scopus_id_total,
    no_fed_affils,
    prop_papers_fed_1st,
    prop_papers_fed_last,
@@ -325,19 +298,19 @@ papers_with_fed_first<-papers_df %>%
   distinct(scopus_article_id,.keep_all=TRUE) 
 
 
-
-last_authors <- authors_df %>%
-  group_by(refID) %>%
-  slice_tail() %>%
-  filter(author_order != 1) %>%
-  filter(federal == TRUE) 
-
-
-
-
-papers_with_fed_last<-papers_df %>% 
-  filter(refID%in%last_authors$refID) %>% 
-  distinct(scopus_article_id,.keep_all=TRUE) 
+# 
+# last_authors <- authors_df %>%
+#   group_by(refID) %>%
+#   slice_tail() %>%
+#   filter(author_order != 1) %>%
+#   filter(federal == TRUE) 
+# 
+# 
+# 
+# 
+# papers_with_fed_last<-papers_df %>% 
+#   filter(refID%in%last_authors$refID) %>% 
+#   distinct(scopus_article_id,.keep_all=TRUE) 
 
 
 
@@ -361,9 +334,9 @@ agencies<-authors_df %>%
 
 all_authors_df_for_fed_1st_papers<-authors_df %>% 
   filter(refID%in%first_authors$refID) 
-
-all_authors_df_for_fed_last_papers<-authors_df %>% 
-  filter(refID%in%last_authors$refID) 
+# 
+# all_authors_df_for_fed_last_papers<-authors_df %>% 
+#   filter(refID%in%last_authors$refID) 
 
 
 
@@ -373,12 +346,12 @@ PY_for_authors_df<-papers_with_fed_first %>%
   select(refID,PY,PM) 
 first_authors <- first_authors %>% 
   left_join(PY_for_authors_df)
-
-
-PY_for_last_authors_df<-papers_with_fed_last %>% 
-  select(refID,PY,PM) 
-last_authors <- last_authors %>% 
-  left_join(PY_for_last_authors_df)
+# 
+# 
+# PY_for_last_authors_df<-papers_with_fed_last %>% 
+#   select(refID,PY,PM) 
+# last_authors <- last_authors %>% 
+#   left_join(PY_for_last_authors_df)
 
 
 
@@ -386,17 +359,17 @@ all_authors_df_for_fed_1st_papers<-authors_df %>%
   filter(refID%in%first_authors$refID) %>% 
   left_join(PY_for_authors_df)
 
+# 
+# 
+# all_authors_df_for_fed_last_papers<-authors_df %>% 
+#   filter(refID%in%last_authors$refID) %>% 
+#   left_join(PY_for_last_authors_df)
 
-
-all_authors_df_for_fed_last_papers<-authors_df %>% 
-  filter(refID%in%last_authors$refID) %>% 
-  left_join(PY_for_last_authors_df)
-
-rm(PY_for_authors_df,PY_for_last_authors_df)
-
+# rm(PY_for_authors_df,PY_for_last_authors_df)
+rm(PY_for_authors_df)
 # first and last authors
-papers_first_last<-bind_rows(papers_with_fed_first,papers_with_fed_last)
-fed_first_last_authors<-bind_rows(first_authors,last_authors)
+# papers_first_last<-bind_rows(papers_with_fed_first,papers_with_fed_last)
+# fed_first_last_authors<-bind_rows(first_authors,last_authors)
 
 # all authors
 
@@ -512,63 +485,17 @@ total_pubs_per_agency_first <- first_authors %>%
 write_csv(total_pubs_per_agency_first,"./docs/summary_info/total_pubs_per_agency_first.csv")
 
 
+# choose focal datasets ---------------------------------------------------
 
-
-
-# affils_df %>% 
-# filter(federal==TRUE) %>% 
-# group_by(agency,PY) %>% 
-# tally() %>% 
-# ungroup() %>% 
-# group_by(agency) %>% 
-# tally() %>% 
-# arrange(n)
-
-
-# set focal datasets ------------------------------------------------------
-
+# fed first authors 
 papers_dataset<-papers_with_fed_first
 authors_data_set<-first_authors
-# 
-# 
-# foo<-first_authors %>% 
-#   group_by(affil_id,PY) %>%
-#   tally() %>% 
-#   arrange((desc(n)),PY)
 
-
-# first and last
-# 
-# papers_dataset<-papers_first_last
-# authors_data_set<-fed_first_last_authors
-
-# any author position
+# fed authors anywhere on author list
 # papers_dataset<-papers_df
 # authors_data_set<-all_authors_df
 
-
 # publications per year ---------------------------------------------------
-
-# 
-# 
-# papers_dataset$SO
-# papers_dataset$PY
-
-
-
-papers_dataset %>% filter(is.na(DI)) %>% tally()
-
-papers_dataset %>% filter(!is.na(DI)) %>% tally()
-
-unique(papers_dataset$DT)
-
-papers_dataset %>% filter(is.na(DT)) %>% tally()
-
-papers_dataset %>%
-  group_by(SO,PY,DI,TI) %>% 
-  tally() %>% 
-  filter(n>1) %>% 
-  arrange(desc(n))
 
 
 pubs_yr <- papers_dataset %>% 
@@ -590,8 +517,6 @@ library(forcats)
 month<-data.frame(month_name=month.abb,PM=seq(1:12)) %>% 
   mutate(month_name=as.factor(month_name)) 
 
-
-
 pubs_mo <-
   papers_dataset %>%
   group_by(PM, PY) %>%
@@ -605,7 +530,7 @@ pubs_mo <-
   mutate(month_name=reorder(month_name,PM))
 
 
-pubs_mo %>% filter(PM<8) %>% arrange(PM,desc(PY))
+pubs_mo %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
 source("code/figs/pubs_per_month.R")
 pubs_mo_fig<-pubs_per_month(pubs_mo,2024)
@@ -629,10 +554,10 @@ pubs_mo_cumulative <-
 # last number is max month of focal year (ie 2025)
 
 
-pubs_mo_cumulative %>% filter(PM<8) %>% arrange(PM,desc(PY))
+pubs_mo_cumulative %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
 source("code/figs/pubs_per_month_cumulative.R")
-pubs_mo_fig_cumulative<-pubs_per_month_cumulative(pubs_mo,2025,7)
+pubs_mo_fig_cumulative<-pubs_per_month_cumulative(pubs_mo,2025,PM_max)
 
 
 
@@ -651,7 +576,7 @@ source("code/figs/pubs_jan_to_month_x.R")
 # number is max month you want to visualize (i.e., 6 = june, 7 = july)
 # pubs_per_quarter(pubs_mo,8)
 
-monthly_pubs_1<-pubs_jan_to_month_x(pubs_mo, 7)
+monthly_pubs_1<-pubs_jan_to_month_x(pubs_mo, PM_max)
 
 
 
@@ -663,135 +588,57 @@ source("code/figs/total_pubs_to_month_x.R")
 # number is max month you want to visualize (i.e., 6 = june, 7 = july)
 # pubs_per_quarter(pubs_mo,8)
 
-total_pubs_to_month_x_fig<-total_pubs_to_month_x(pubs_mo, 7)
+total_pubs_to_month_x_fig<-total_pubs_to_month_x(pubs_mo, PM_max)
 
 
 # total pubs per agency ---------------------------------------------------
-# 
-# foo<-
-# authors_data_set %>% 
-#   
-#   filter(federal==TRUE) %>% 
-#   filter(author_order==1) %>%  
-#   group_by(federal,agency,agency_primary) %>% 
-#   tally() %>% 
-#   arrange(desc(n)) %>% 
-#   head(20)
 
 
-
-names(authors_data_set)
+# names(authors_data_set)
 total_pubs_per_agency <- authors_data_set %>% 
   filter(federal==TRUE) %>% 
   mutate(agency=if_else(agency=="us department of the interior", "interior",agency)) %>% 
   mutate(agency=if_else(agency=="federal reserve system", "frs",agency)) %>% 
   mutate(agency=if_else(agency=="us department of defense", "dod",agency)) %>% 
-  select(refID,agency) %>% 
+  select(refID,agency_primary) %>% 
   distinct() %>% 
   drop_na() %>% 
-  group_by(agency) %>% 
+  group_by(agency_primary) %>% 
   summarize(n=n_distinct(refID)) %>% 
   arrange(desc(n))
 
-agencies_past_20<-total_pubs_per_agency %>% 
-  select(agency) %>% slice(21:nrow(total_pubs_per_agency)) %>% 
-  mutate(agency=toupper(agency)) %>%  
-  mutate(agency=if_else((agency=="STATE"|
-                           agency=="EDUCATION"|
-                           agency=="CONGRESS"|
-                           agency=="TREASURY"|
-                           agency=="LABOR"|
-                           agency=="OTHER"),
-                        str_to_title(agency),
-                        agency)
-  )
+threshold<-4000
 
-# agencies_past_20[1,]<-paste("Other agencies: ",agencies_past_20[1,],sep="")
-# agencies_past_20[5,]<-paste(agencies_past_20[5,],"\n",sep="")
-# agencies_past_20[10,]<-paste(agencies_past_20[10,],"\n",sep="")
-# agencies_past_20[15,]<-paste(agencies_past_20[15,],"\n",sep="")
-# agencies_past_20[20,]<-paste(agencies_past_20[20,],"\n",sep="")
+agencies_over_thresh<-total_pubs_per_agency %>% 
+  filter(n>=threshold) %>% 
+  mutate(agency_primary=toupper(agency_primary)) 
 
-agencies_past_20<-agencies_past_20 %>% mutate_all(tolower)
-agencies_over_20_1<-paste(agencies_past_20$agency[1:10],collapse=",") 
-agencies_over_20_2<-paste(agencies_past_20$agency[11:20],collapse=",") 
-agencies_over_20_3<-paste(agencies_past_20$agency[21:30],collapse=",") 
-agencies_over_20_4<-paste(agencies_past_20$agency[31:40],collapse=",") 
-agencies_over_20_5<-paste(agencies_past_20$agency[41:50],collapse=",") 
-# agencies_over_20_6<-paste(agencies_past_20$agency[51:nrow(agencies_past_20)],collapse=",") 
+agencies_under_thresh<-total_pubs_per_agency %>% 
+  filter(n<threshold) %>% 
+  mutate(agency_primary=toupper(agency_primary)) 
 
-agencies_over_20<-paste(
-  agencies_over_20_1,
-  agencies_over_20_2,
-  agencies_over_20_3,
-  agencies_over_20_4,
-  agencies_over_20_5
-)
+# N and % change - agency level -------------------------------------------------------
 
-
-
-# agency change fig -------------------------------------------------------
-
-
-
-
-
-agency_subset_over <- total_pubs_per_agency %>%
-  # filter(n > 10000) %>%
-  filter(n > 1999) %>%
-  select(agency,n) %>%
-  arrange(desc(n))
-
-agency_subset_under <- total_pubs_per_agency %>%
-  # filter(n < 10000) %>%
-  filter(n < 2000) %>%
-  select(agency,n) %>%
-  arrange(desc(n))
-
-agency_subset<-agency_subset_over$agency
-# 
-# agency_subset<-agency_subset_less10K$agency
+agency_subset<-agencies_over_thresh$agency_primary
 
 
 agency_n_decline_first <-
   authors_data_set %>%
-  filter(agency %in% agency_subset) %>%
+  filter(agency_primary %in% tolower(agency_subset)) %>%
   # mutate(PM=if_else(PY==2025,5,PM)) %>%
-  filter(PM<8) %>%
+  filter(PM<(PM_max+1)) %>%
   group_by(agency_primary, PY) %>%
   tally() %>%
   group_by(agency_primary) %>%
   mutate(decline_n = (n - lag(n))) %>%
   mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>%
   mutate(author_position="first")
-# 
-# agency_n_decline_last <-
-#   last_authors %>%
-#   filter(agency %in% agency_subset) %>%
-#   # mutate(PM=if_else(PY==2025,5,PM)) %>%
-#   filter(PM<7) %>%
-#   group_by(agency, PY) %>%
-#   tally() %>%
-#   group_by(agency) %>%
-#   mutate(decline_n = (n - lag(n))) %>%
-#   mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>%
-#   mutate(author_position="last")
 
-# 
-# agency_n_decline_any <-
-#   all_author_positions %>%
-#   filter(agency %in% agency_subset) %>%
-#   # mutate(PM=if_else(PY==2025,5,PM)) %>%
-#   filter(PM<7) %>%
-#   group_by(agency, PY) %>%
-#   tally() %>%
-#   group_by(agency) %>%
-#   mutate(decline_n = (n - lag(n))) %>%
-#   mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>%
-#   mutate(author_position="any")
 
-# agency_n_decline<-bind_rows(agency_n_decline_first,agency_n_decline_last,agency_n_decline_any) %>% mutate(PY=as.numeric(PY))
-agency_n_decline<-agency_n_decline_first %>% mutate(PY=as.numeric(PY))
+
+
+agency_n_decline<-agency_n_decline_first %>% 
+  mutate(PY=as.numeric(PY))
 
 
 agency_n_decline_sum<- agency_n_decline %>%
@@ -813,43 +660,80 @@ agency_n_decline_bar_fig <- agency_n_decline_bar(agency_n_decline_sum, PY_max)
 
 # per agency comparison to previous year ----------------------------------
 
-  
-agency_n_decline %>%
-  # filter(author_position=="any") %>%
-  filter(PY>2022) %>%
-  drop_na() %>%
-  ggplot(aes(x = PY, y = n, group = agency_primary, color = agency_primary)) +
-  # ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) +
-  # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
-  geom_point() +
-  geom_line() +
-  theme_classic() +
-  facet_wrap(vars(agency_primary), scales = "free")
-# +
-# scale_y_continuous(expand = c(0, 0), breaks = c(2019, 2025))
-
-
 compare_agency_2425 <-
 agency_n_decline %>%
 drop_na() %>%
 filter(PY > 2023)
-#  -->
-# agency_n_decline %>% 
-#   drop_na() %>% 
-#   filter(PY > 2023) %>% 
-#   ggplot(aes(x = PY, y = perc_previous, group = agency, color = agency)) + 
-#   # ggplot(aes(x=PY,y=n, group=agency, color=agency)) +
-#   geom_point() + 
-#   geom_line() + 
-#   theme_classic() + 
-#   facet_wrap(vars(author_position))+ 
-#   scale_y_continuous(expand = c(0, 0), breaks = c(2019, 2025))  
-# + 
-# scale_y_continuous(expand = c(0, 0), limits = c(0, 2000))+ 
-# gghighlight((perc_previous < -.5)) 
 
+# source("code/figs/agency_n_decline_2.R")
+# agency_n_decline_2_fig <- agency_n_decline_2(agency_n_decline)
 
-source("code/figs/agency_n_decline_2.R")
-agency_n_decline_2_fig <- agency_n_decline_2(agency_n_decline) 
+source("code/figs/pubs_per_month_cumulative_agency.R")
+pubs_per_month_cumulative_agency<-pubs_per_month_cumulative_agency(papers_dataset,authors_dataset,2025,PM_max)
   
+
+
+# non_feds<-affils_df_complete %>% 
+#   filter(federal==FALSE) %>% 
+#   distinct(affil_id,.keep_all=TRUE) %>% 
+#   filter(country=="usa"|is.na(country))
+#   
+
+
+# table for ms ------------------------------------------------------------
+
+
+agency_n_decline_first <-
+  authors_data_set %>%
+  # filter(agency_primary %in% tolower(agency_subset)) %>%
+  # mutate(PM=if_else(PY==2025,5,PM)) %>%
+  filter(PM<(PM_max+1)) %>%
+  group_by(agency_primary, PY) %>%
+  tally() %>%
+  group_by(agency_primary) %>%
+  mutate(decline_n = (n - lag(n))) %>%
+  mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>%
+  mutate(author_position="first")
+write_csv(agency_n_decline_first,"./docs/summary_info/agency_n_decline_first.csv")
+
+
+total_pubs_per_agency_first<-read_csv("./docs/summary_info/total_pubs_per_agency_first.csv") %>% 
+  mutate(agency_primary=if_else(agency=='federal reserve system',"federal reserve system",agency_primary)) %>% 
+  group_by(agency_primary) %>%
+  mutate(total=sum(n)) %>%
+  select(agency_primary,total) %>% 
+  group_by(agency_primary) %>%
+  slice_head(n=1) %>% 
+  ungroup() %>% 
+  mutate(perc=total/sum(total)*100) %>% 
+  arrange(desc(total)) %>% 
+  mutate(perc=round(perc,2))
+
+perc_data<-read_csv("./docs/summary_info/agency_n_decline_first.csv") %>% 
+  filter(PY==2025) %>% select(agency_primary,n,perc_decline=perc_previous)
+
+agency_table<-  total_pubs_per_agency_first %>%
+  left_join(perc_data,by="agency_primary") %>% 
+  mutate(agency_primary=if_else(nchar(agency_primary)<5,str_to_upper(agency_primary),str_to_title(agency_primary))) %>%
+  # filter(agency_primary!="other") %>%
+  # filter(agency_primary!="state") %>%
+  mutate(perc=as.character(perc)) %>% 
+  mutate(total=as.character(total)) %>% 
+  mutate(n=as.character(n)) %>% 
+  mutate(perc_decline=round(perc_decline,2)) %>%
+  mutate(perc_decline=as.character(perc_decline)) %>%
+  mutate(total=paste(total," (",perc,")",sep="")) %>% 
+  select(-perc) %>% 
+  replace_na(list(n = "-", perc_decline="-")) 
+
+write_csv(agency_table,"./docs/summary_info/agency_table.csv") 
+
+other_affils<-authors_data_set %>% filter(federal==TRUE) %>%
+  filter(agency_primary=="other") %>% 
+  select(agency) %>% 
+  distinct() %>% 
+  arrange(agency) %>% 
+  mutate(agency=if_else(nchar(agency)<6,str_to_upper(agency),str_to_title(agency))) 
+  
+write_csv(other_affils,"./docs/summary_info/other_affils.csv") 
   

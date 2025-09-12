@@ -7,13 +7,15 @@ agency_n_decline_2 <- function(agency_n_decline) {
       mutate(PY=as.factor(PY)) %>% 
       drop_na() %>%
       # filter(author_position=="any") %>%
-      filter(PY == "2023"|PY == "2024"| PY == "2025") %>%
+      # filter(PY == "2023"|PY == "2024"| PY == "2025") %>%
+      filter(PY == "2024"| PY == "2025") %>%
       ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
       geom_bar(stat = "identity", position = "dodge") +
-      scale_y_continuous(limits=c(-30,20),breaks = seq(-30,20,by=5))+
+      # scale_y_continuous(limits=c(-30,20),breaks = seq(-30,20,by=5))+
       labs(x = "Year", size=5)+
       labs(y = "Percent Change in Productivity from Previous Year", size=5)+
-      scale_fill_manual("legend",  values = c("#36648B","#36648B","#8B0000"))+
+    scale_fill_manual("legend",  values = c("#8B0000","#36648B","#36648B","#36648B","#36648B","#8B0000"))+  
+    # scale_fill_manual("legend",  values = c("#36648B","#36648B","#8B0000"))+
       theme_classic() +
       theme(legend.position="none")+
       theme(axis.text.y = element_text(size = 12))+

@@ -1,0 +1,242 @@
+---
+title             : "Declining contribution of the United States federal government to global research corpus "
+shorttitle        : "Federal research productivity"
+# Publications by US Federal Personnel (Jan 2019 - July 1 2025)
+
+# 
+
+author: 
+  - name          : "Emilio M. Bruna"
+    affiliation   : "1,2"
+    corresponding : yes    # Define only one corresponding author
+    address       : "University of Florida"
+    email         : "embruna@ufl.edu"
+    role: # Contributorship roles (e.g., CRediT, https://credit.niso.org/)
+      - Conceptualization
+      - Methodology
+      - Investigation
+      - Formal analysis
+      - Data curation
+      - Visualization
+      - Writing - Original Draft Preparation
+      - Writing - Review & Editing
+      - Project administration
+      - Supervision   
+# 
+#   - name          : " ---- "
+#     affiliation   : "2"
+#     
+#     role:
+#   
+ 
+affiliation:
+  - id            : "1"
+    institution   : "Center for Latin American Studies, University of Florida, PO Box 110530, Gainesville, Florida, 32611-0530 USA"
+  - id            : "2"
+    institution   : "Department of Wildlife Ecology & Conservation, University of Florida, PO Box 110530, Gainesville, Florida, 32611-0430 USA"
+    # - id            : "3"
+    # institution   : "University of Colorado, Boulder"
+
+note:       | 
+  A preprint of this article has been posted at ----- Preprints (link).
+
+
+
+  ORCID:
+  
+    EB: 0000-0003-3381-8477 
+    <!-- | -->
+    <!-- JR: ----- | -->
+    
+
+  
+    \newpage
+
+
+authornote: |
+  <!-- EB: Department of Wildlife Ecology & Conservation, University of Florida, PO Box 110530, Gainesville, Florida, 32611-0430 USA and Center for Latin American Studies, University of Florida, PO Box 110530, Gainesville, Florida, 32611-0530 USA -->
+
+
+abstract: |
+  
+  
+  
+  <!-- https://tinyurl.com/ybremelq -->
+  
+keywords          : "keywords"
+wordcount         : "762"
+
+bibliography      : "fed_pubs.bib"
+csl               : "pnas.csl"
+floatsintext      : no
+linenumbers       : yes
+draft             : no
+mask              : no
+
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+
+classoption       : "man, donotrepeattitle"
+output            : 
+  papaja::apa6_pdf:
+    extra_dependencies: ["float"]
+
+header-includes:
+  - \usepackage{setspace}
+  - \usepackage{parskip}
+  - \usepackage{threeparttable} #for the long footnote in table
+  - \usepackage{threeparttablex}
+  - \setlength{\parskip}{0.0\baselineskip}
+  - \usepackage{pdflscape}
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
+  - \usepackage{longtable,tabu}
+
+---
+
+```{r setup, include = FALSE}
+library("papaja")
+r_refs("fed_pubs.bib")
+
+library(tidyverse)
+library(janitor)
+library(kableExtra)
+library(gridExtra)
+library(png)
+library(data.table)
+library(here)
+library(textclean)
+
+knitr::opts_chunk$set(echo = FALSE, message=FALSE,warning=FALSE)
+
+options(scipen=999)
+
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
+
+knitr::asis_output("\0430")
+```
+
+
+
+# Supplementary Information
+
+
+### Downloading data
+
+
+\bigskip
+
+### Validating USGS publications and author affiliations
+The list of publications by USGS authors was downloaded in `.csv` format from the USGS Publications Warehouse [USGS Download Link](https://pubs.usgs.gov/search?q=&__ncforminfo=QlYggikRS-BXoBZnKRyLp_RdoV7Dw8RCmr2MzQMevktrqQxDtIgOnT-H17W2qWdL_pZetw-0HTd7qfTpdOVFIE3W0S5oyopp). This file includes a list of all publications and their metadata including the names of authors and - in the case of USGS affiliates - their email addresses. This allowed us to identify each publication's USGS authors and assign them the Scopus affiliation code for the USGS (60011347). 
+
+We then used the DOI of articles in the USGS file to determine (1) if any publications in the USGS file were missing from the Scopus data set and (2) validate the federal affiliation of authors for articles that were found in both the USGS and Scopus data sets (over XX% of the articles in the USGS were represented in the Scopus downloads). After correcting these federal affiliations, we used the Scopus Author ID numbers of these USGS authors to search for and correct any name variants that might be present in the data set (e.g., A Powell, Abigail Powell, Abby Powell). 
+
+\bigskip
+
+### Validation federal affiliations
+
+
+
+
+
+
+```{r unidata, cache=FALSE, echo=FALSE}
+
+# Read data
+uni_summary_data<-read_csv("./docs/summary_info/uni_summary_data.csv")
+# jrnls_overall_first<-read_csv("./docs/summary_info/uni_jrnls_overall_first.csv")
+
+# journals_n_perc_annual_first<-read_csv("./docs/summary_info/uni_journals_n_perc_annual_first.csv")
+
+uni_auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
+
+total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv")
+
+
+```
+\bigskip
+### Productivity at focal universities 
+
+<!-- returned N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_affils") %>% select(n)))`.  -->
+The search of university productivity was conducted using N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id") %>% select(n)))` Scopus affiliation IDs. It resulted in N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_pubs") %>% select(n)))` publications with N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_authors") %>% select(n)))` authors. There were N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_unique_authors") %>% select(n)))` unique authors in the data set, of which N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_focal") %>% select(n)))` had one of the focal universities as their primary affiliation. Each article had an average of N = `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD authors, of which `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Focal") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Focal") %>% select(sd)))` SD were affiliated with the focal universities. 
+
+
+
+
+
+<!-- ```{r  label = cumulative_fig, echo = FALSE, fig.cap = "Cumulative number of articles published by researchers at focal universities from Jan 2019 through Aug 2025 and the percent change in 2025 productivity relative to the same time period in 2024 (red).", out.width = '100%'} -->
+<!-- knitr::include_graphics("../docs/images/pubs_mo_cum_fig_uni.png", error=FALSE) -->
+
+<!-- ``` -->
+
+
+
+```{r tab:pubs_year}
+
+total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv")
+
+total_pubs_per_uni_first %>%
+    # mutate(uni=if_else(nchar(uni)<5,str_to_upper(uni),str_to_title(uni))) %>% 
+    mutate(uni=case_when(
+      uni == "unc_ch"~"UNC Chapel Hill",
+      uni == "ohio_state"~"The Ohio State University",
+    uni == "florida"~"University of Florida",
+    uni == "harvard"~"Harvard University",
+    uni == "mass_general"~"Massachusetts General Hospital",
+    uni == "michigan"~"University of Michigan",
+    uni == "penn"~"University of Pennsylvania",
+    uni == "stanford"~"Stanford University",
+    uni == "ucla"~"University of California, Los Angeles",
+    uni == "minn"~"University of Minnesota",
+    uni == "ucsd"~"University of California, San Diego",
+    uni == "ucsf"~"University of California, San Francisco",
+    uni == "washington"~"University of Washington",
+    # uni == "PENN"~"Penn",
+    #   uni == "MINN"~"Minnesota",
+    #   .default = as.character(uni)
+    .default = as.character(uni)
+  )) %>% 
+  arrange(uni) %>% 
+  arrange(desc(n)) %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  mutate(perc=round(perc,2)) %>% 
+  mutate(n=paste(comma(n), " (",perc,"\\%)",sep="")) %>%
+  mutate(n=as.character(n)) %>% 
+  mutate(perc=as.character(perc)) %>% 
+  replace_na(list(n=" ",perc=" ")) %>% 
+  select(-perc) %>%
+  rename(University=uni,
+         `N - 1st Author (\\%)`=n,
+         ) %>% 
+kable(
+  # digits = 2,
+  format = "latex",
+  align = "ll",
+  escape = FALSE,
+  row.names = FALSE,
+  booktabs = T,
+  longtable = T,
+  linesep = ""
+) %>%
+  kable_styling(
+    bootstrap_options = c("hover"),
+    # full_width = F,
+    latex_options = c("scale_down","hold_position"),
+    font_size = 12,
+    position = "center"
+  ) 
+```
+
+
+
+
+
+
+
+<!-- # References -->
+
+<!-- ::: {#refs custom-style="Bibliography"} -->
+<!-- ::: -->
+

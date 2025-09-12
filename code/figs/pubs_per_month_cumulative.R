@@ -67,6 +67,8 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     mutate(change_n = (cumul_pubs - lag(cumul_pubs))) %>%
     mutate(perc_previous = ((change_n) / lag(cumul_pubs)) * 100) %>% 
     mutate(perc_previous=round(perc_previous,2))
+  
+  write_csv(perc_change,"./docs/summary_info/perc_change_fed.csv")
   # data_cumulative<-pubs_mo_cum %>% left_join(perc_change,by=c("PY","PM","month"))
   library(ggrepel)
   # label<-plot_data %>% group_by(PY) %>% filter(PM==max(PM)) %>% select(PM)
@@ -74,10 +76,10 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
   
   pubs_mo_cum_fig<-
     plot_data %>% 
-    filter(PM<=PM_max) %>% 
+    # filter(PM<=PM_max) %>% 
     mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
     mutate(label = if_else(PY == "Avg. (all yrs)", NA, as.character(label))) %>% 
-    mutate(label = if_else((PY == "2019"|PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
+    # mutate(label = if_else((PY == "2019"|PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
     ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY)) +
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
@@ -86,12 +88,12 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     scale_color_manual(values=c(rep("gray",6),"#8B0000","#36648B"))+
     # expand_limits(y = 0)+
     # expand_limits(x= c(0,length(levels(plot_data$month_name)) + 1.25))+
-    expand_limits(x= c(1,length(levels(plot_data %>% filter(PM<=PM_max) %>% select(month_name))) + 2.5))+
+    expand_limits(x= c(1,length(levels(plot_data %>% filter(PM<=PM_max) %>% select(month_name))) + 5))+
     theme_classic()+
     # scale_x_continuous( breaks=seq(1,12,by=1))+
     # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_cumulative %>% filter(PM<=PM_max) %>% select(cumul_pubs))+2000),by=2500))+
-    theme(axis.text.y = element_text(size = 12))+
-    theme(axis.text.x =element_text(size = 12))+
+    theme(axis.text.y = element_text(size = 10))+
+    theme(axis.text.x =element_text(size = 10))+
     theme(axis.title.y = element_text(size = 14))+
     theme(axis.title.x =element_text(size = 14))+
     theme(legend.position="none")+
@@ -102,8 +104,8 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     #          # label=(round(perc_change %>% filter(PY==2025 & PM==6) %>% select(perc_previous))),
     #          color="black",
     #          size=6)+
-    annotate(geom="text", x=PM_max+0.25,
-             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))+1400),
+    annotate(geom="text", x=PM_max+0.32,
+             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))-2000),
              # label=paste("(", round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,")",sep=""),
              # label=paste(round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,sep=""),
              label=paste(round(perc_change %>% filter(PY==PY_max) %>% select(perc_previous)),"%",sep=""),
@@ -116,27 +118,29 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     #          # label=(round(perc_change %>% filter(PY==2025 & PM==6) %>% select(perc_previous))),
     #          color="black",
     #          size=5)+
-    scale_y_continuous(expand = c(0, 0), n.breaks = 24, limits = c(0, max(pubs_mo_cumulative %>% filter(PM<=PM_max) %>% select(cumul_pubs))+1500))+
-    geom_segment(aes(xend=PM_max+.02, 
-                     yend = (max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))),
-                     x = PM_max+.02, 
-                     y = (max(perc_change %>% filter(PY==2024) %>% select(cumul_pubs)))),
-                     linetype="dotted",
-                 colour = "black",
-                 arrow = arrow(angle = 20, length = unit(0.1, "inches"),
-                                     ends = "last", type = "closed")
-                 )+
+    # scale_y_continuous(expand = c(0, 0), n.breaks = 24, limits = c(0, max(pubs_mo_cumulative %>% filter(PM<=PM_max) %>% select(cumul_pubs))+1500))+
+    scale_y_continuous(expand = c(0, 0), n.breaks = 24, limits = c(0, max(pubs_mo_cumulative %>% select(cumul_pubs))+1500))+
+    # geom_segment(aes(xend=PM_max+.05, 
+    #                  yend = (max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))),
+    #                  x = PM_max+.05, 
+    #                  y = (max(perc_change %>% filter(PY==2024) %>% select(cumul_pubs)))),
+    #                  linetype="dotted",
+    #              colour = "darkgray",
+    #              arrow = arrow(angle = 20, length = unit(0.1, "inches"),
+    #                                  ends = "last", type = "closed")
+    #              )+
     geom_label(aes(label = label), 
                # position="jitter",
-               nudge_y = 0.18, 
-               nudge_x = 0.18, 
+               nudge_y = 1.3, 
+               nudge_x = .3, 
                size =3,
+               fill=NA,
                label.size = unit(0,"mm")
                ) +
     theme(plot.background = element_rect(color = 1,
                                          size = 0),
           plot.margin = margin(t = 20,  # Top margin
-                         r = 20,  # Right margin
+                         r = 25,  # Right margin
                          b = 20,  # Bottom margin
                          l = 20)  # Left margin
           )
@@ -155,7 +159,7 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     #                  nudge_x = .2,
     #                  na.rm = TRUE)
   
-  ggsave("./docs/images/pubs_mo_cum_fig.png", width = 7, height = 7, units = "in", device='png', dpi=700)
+  ggsave("./docs/images/pubs_mo_cum_fig.png", width = 8, height = 8, units = "in", device='png', dpi=700)
   # 
   return(pubs_mo_cum_fig)
 }

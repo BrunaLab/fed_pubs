@@ -4,6 +4,18 @@ library(janitor)
 library(data.table)
 
 
+
+
+# max month to plot -------------------------------------------------------
+
+# PM_max<-6 # june
+# PM_max<-7 # july
+PM_max<-8 # aug
+
+PY_max<-2025
+# load data  --------------------------------------------------------------
+
+
 papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) %>% 
   mutate(PM=
            case_when(
@@ -17,8 +29,8 @@ papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) %
 
 authors_df_complete <- setDT(read_rds("./data_clean/authors_df_uni_clean.rds")) %>% 
   mutate(uni=case_when(
-    uni == "unc_ch"~"other",
-    uni == "ohio_state"~"other",
+    # uni == "unc_ch"~"other",
+    # uni == "ohio_state"~"other",
     uni == "mass_general"~"harvard",
     is.na(uni) ~ "other",
     .default = as.character(uni)
@@ -100,9 +112,9 @@ unique(authors_df$uni)
 focal_first_authors <- authors_df %>%
   remove_empty(c("rows","cols")) %>% 
   filter(uni != "other") %>%
-  filter(uni != "unc_ch") %>% 
-  filter(uni != "ohio_state") %>%
-  filter(uni != "mass_general") %>%
+  # # filter(uni != "unc_ch") %>%  
+  # # filter(uni != "ohio_state") %>%
+  # filter(uni != "mass_general") %>%
   # filter(!is.na(uni)) %>%
   filter(author_order == 1) 
   
@@ -146,30 +158,30 @@ authors_data_set<-focal_first_authors
 
 # publications per year ---------------------------------------------------
 
-
-papers_dataset %>% group_by(SO) %>% tally() %>% arrange(desc(n)) %>% slice_head(n=20)
-
-papers_dataset %>% group_by(PY) %>% tally() 
-
-focal_first_authors %>% 
-  distinct(refID,.keep_all=TRUE) %>% 
-  group_by(uni) %>% 
-  tally() %>% 
-  arrange(desc(n))
-
-papers_dataset %>% filter(is.na(DI)) %>% tally()
+# 
+# papers_dataset %>% group_by(SO) %>% tally() %>% arrange(desc(n)) %>% slice_head(n=20)
+# 
+# papers_dataset %>% group_by(PY) %>% tally() 
+# 
+# focal_first_authors %>% 
+#   distinct(refID,.keep_all=TRUE) %>% 
+#   group_by(uni) %>% 
+#   tally() %>% 
+#   arrange(desc(n))
+# 
+# papers_dataset %>% filter(is.na(DI)) %>% tally()
 # 
 # papers_dataset %>% filter(!is.na(DI)) %>% tally()
 
-unique(papers_dataset$DT)
-
-papers_dataset %>% filter(is.na(DT)) %>% tally()
-
-papers_dataset %>%
-  group_by(SO,PY,DI,TI) %>% 
-  tally() %>% 
-  filter(n>1) %>% 
-  arrange(desc(n))
+# unique(papers_dataset$DT)
+# 
+# papers_dataset %>% filter(is.na(DT)) %>% tally()
+# 
+# papers_dataset %>%
+#   group_by(SO,PY,DI,TI) %>% 
+#   tally() %>% 
+#   filter(n>1) %>% 
+#   arrange(desc(n))
 
 
 pubs_yr <- papers_dataset %>% 
@@ -216,7 +228,7 @@ pubs_mo <-
   mutate(month_name=reorder(month_name,PM))
 
 
-pubs_mo %>% filter(PM<4) %>% arrange(PM,desc(PY))
+pubs_mo %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
 source("code/figs_uni/pubs_per_month.R")
 pubs_mo_fig<-pubs_per_month(pubs_mo,2025)
@@ -243,11 +255,16 @@ pubs_mo_cumulative <-
 # last number is max month of focal year (ie 2025)
 
 
-pubs_mo_cumulative %>% filter(PM<4) %>% arrange(PM,desc(PY))
+pubs_mo_cumulative %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
 source("code/figs_uni/pubs_per_month_cumulative.R")
-pubs_mo_fig_cumulative<-pubs_per_month_cumulative(pubs_mo,2025,6)
+pubs_mo_fig_cumulative_all_uni<-pubs_per_month_cumulative(pubs_mo,PY_max,PM_max)
 
+
+
+
+source("code/figs_uni/pubs_per_month_cumulative_by_uni.R")
+pubs_mo_fig_cumulative_by_uni<-pubs_per_month_cumulative_by_uni(papers_dataset,authors_data_set,2025,PM_max)
 
 
 # publications per quarter ------------------------------------------------
@@ -265,7 +282,7 @@ source("code/figs_uni/pubs_jan_to_month_x.R")
 # number is max month you want to visualize (i.e., 6 = june, 7 = july)
 # pubs_per_quarter(pubs_mo,8)
 
-monthly_pubs_1<-pubs_jan_to_month_x(pubs_mo, 6)
+monthly_pubs_1<-pubs_jan_to_month_x(pubs_mo, PM_max)
 
 
 
@@ -277,7 +294,7 @@ source("code/figs_uni/total_pubs_to_month_x.R")
 # number is max month you want to visualize (i.e., 6 = june, 7 = july)
 # pubs_per_quarter(pubs_mo,8)
 
-total_pubs_to_month_x_fig<-total_pubs_to_month_x(pubs_mo, 6)
+total_pubs_to_month_x_fig<-total_pubs_to_month_x(pubs_mo, PM_max)
 
 
 # total pubs per uni ---------------------------------------------------
@@ -295,72 +312,17 @@ total_pubs_per_uni <- authors_data_set %>%
   group_by(uni) %>% 
   summarize(n=n_distinct(refID)) %>% 
   arrange(desc(n))
-# 
-# agencies_past_20<-total_pubs_per_uni %>% 
-#   select(uni) %>% slice(21:nrow(total_pubs_per_uni)) %>% 
-#   mutate(uni=toupper(uni)) %>%  
-#   mutate(uni=if_else((uni=="STATE"|
-#                            uni=="EDUCATION"|
-#                            uni=="CONGRESS"|
-#                            uni=="TREASURY"|
-#                            uni=="LABOR"|
-#                            uni=="OTHER"),
-#                         str_to_title(uni),
-#                         uni)
-#   )
-
-# agencies_past_20[1,]<-paste("Other agencies: ",agencies_past_20[1,],sep="")
-# agencies_past_20[5,]<-paste(agencies_past_20[5,],"\n",sep="")
-# agencies_past_20[10,]<-paste(agencies_past_20[10,],"\n",sep="")
-# agencies_past_20[15,]<-paste(agencies_past_20[15,],"\n",sep="")
-# agencies_past_20[20,]<-paste(agencies_past_20[20,],"\n",sep="")
-# 
-# agencies_past_20<-agencies_past_20 %>% mutate_all(tolower)
-# agencies_over_20_1<-paste(agencies_past_20$uni[1:10],collapse=",") 
-# agencies_over_20_2<-paste(agencies_past_20$uni[11:20],collapse=",") 
-# agencies_over_20_3<-paste(agencies_past_20$uni[21:30],collapse=",") 
-# agencies_over_20_4<-paste(agencies_past_20$uni[31:40],collapse=",") 
-# agencies_over_20_5<-paste(agencies_past_20$uni[41:50],collapse=",") 
-# # agencies_over_20_6<-paste(agencies_past_20$uni[51:nrow(agencies_past_20)],collapse=",") 
-# 
-# agencies_over_20<-paste(
-#   agencies_over_20_1,
-#   agencies_over_20_2,
-#   agencies_over_20_3,
-#   agencies_over_20_4,
-#   agencies_over_20_5
-# )
-# 
 
 
 # uni change fig -------------------------------------------------------
 
 
 
-
-
-# uni_subset_over <- total_pubs_per_uni %>%
-#   # filter(n > 10000) %>%
-#   filter(n > 5000) %>%
-#   select(uni,n) %>%
-#   arrange(desc(n))
-# 
-# uni_subset_under <- total_pubs_per_uni %>%
-#   # filter(n < 10000) %>%
-#   filter(n < 5000) %>%
-#   select(uni,n) %>%
-#   arrange(desc(n))
-# 
-# uni_subset<-uni_subset_over$uni
-# # 
-# # uni_subset<-uni_subset_less10K$uni
-
-
 uni_n_decline_first <-
   authors_data_set %>%
   # filter(uni %in% uni_subset) %>%
   # mutate(PM=if_else(PY==2025,5,PM)) %>%
-  filter(PM<7) %>%
+  filter(PM<(PM_max+1)) %>%
   group_by(uni, PY) %>%
   tally() %>%
   group_by(uni) %>%
@@ -372,7 +334,7 @@ uni_n_decline_first <-
 #   last_authors %>%
 #   filter(uni %in% uni_subset) %>%
 #   # mutate(PM=if_else(PY==2025,5,PM)) %>%
-#   filter(PM<7) %>%
+#   filter(PM<PM_max+1)) %>%
 #   group_by(uni, PY) %>%
 #   tally() %>%
 #   group_by(uni) %>%
@@ -385,7 +347,7 @@ uni_n_decline_first <-
 #   all_author_positions %>%
 #   filter(uni %in% uni_subset) %>%
 #   # mutate(PM=if_else(PY==2025,5,PM)) %>%
-#   filter(PM<7) %>%
+#   filter(PM<PM_max+1)) %>%
 #   group_by(uni, PY) %>%
 #   tally() %>%
 #   group_by(uni) %>%
@@ -408,46 +370,28 @@ uni_n_decline_sum<- uni_n_decline %>%
 # 
 # ggsave("./docs/images/uni_n_decline_sum.png", width = 4, height = 6, units = "in")
 
-uni_n_decline_sum_fig<-uni_n_decline_sum %>%
-  ggplot(aes(x=PY, y=n)) +
-  labs(x = "Year", size=5)+
-  labs(y = "No. of Publications  (Jan-May)", size=5)+
-  geom_bar(stat="identity")+
-  expand_limits(y = 0)+
-  theme_classic()+
-  geom_hline(yintercept = 0)+
-  annotate(geom="text", x=2024, y=(max(uni_n_decline_sum$n)-.02*max(uni_n_decline_sum$n)), label=(uni_n_decline_sum %>% filter(PY==2024) %>% select(n)),
-           color="navyblue", size=4)+
-  annotate(geom="text", x=2025, y=(max(uni_n_decline_sum$n)-.02*max(uni_n_decline_sum$n)), label=(uni_n_decline_sum %>% filter(PY==2025) %>% select(n)),
-           color="navyblue", size=4)+
-  annotate(geom="text", x=2025, y=(max(uni_n_decline_sum$n)-.1*max(uni_n_decline_sum$n)), label=paste("(", round((uni_n_decline_sum %>% filter(PY>2024) %>% select(perc_previous_yr)),2),"%)",sep=""),
-           color="red", size=4)+
-  scale_y_continuous(expand = c(0, 0), breaks=seq(0, max(uni_n_decline_sum %>% select(n))+5000,by=2500))+
-  scale_x_continuous( breaks=seq(2019,2025,by=1))+
-  theme(axis.title.x = element_text(size = 14))+
-  theme(axis.title.y = element_text(size = 14))+
-  theme(axis.text.y = element_text(size = 12))+
-  theme(axis.text.x =element_text(size = 12))+
-  gghighlight(PY == 2025)
 
-ggsave("./docs/images/uni_n_decline_sum.png", width = 6, height = 4, units = "in", device='png', dpi=700)
+
+# bar chart of decline for top unis -----------------------------------
+source("code/figs/uni_n_decline_bar.R")
+uni_n_decline_bar_fig <- uni_n_decline_bar(uni_n_decline_sum, PY_max) 
 
 
 
 # per uni comparison to previous year ----------------------------------
 
   
-uni_n_decline %>%
-  # filter(author_position=="any") %>%
-  filter(PY>2022) %>%
-  drop_na() %>%
-  ggplot(aes(x = PY, y = n, group = uni, color = uni)) +
-  # ggplot(aes(x = PY, y = perc_previous, group = uni, color = uni)) +
-  # ggplot(aes(x=PY,y=n, group=uni, color=uni)) +
-  geom_point() +
-  geom_line() +
-  theme_classic() +
-  facet_wrap(vars(uni), scales = "free")
+# uni_n_decline %>%
+#   # filter(author_position=="any") %>%
+#   filter(PY>2022) %>%
+#   drop_na() %>%
+#   ggplot(aes(x = PY, y = n, group = uni, color = uni)) +
+#   # ggplot(aes(x = PY, y = perc_previous, group = uni, color = uni)) +
+#   # ggplot(aes(x=PY,y=n, group=uni, color=uni)) +
+#   geom_point() +
+#   geom_line() +
+#   theme_classic() +
+#   facet_wrap(vars(uni), scales = "free")
 # +
 # scale_y_continuous(expand = c(0, 0), breaks = c(2019, 2025))
 
@@ -456,167 +400,10 @@ compare_uni_2425 <-
 uni_n_decline %>%
 drop_na() %>%
 filter(PY > 2023)
-#  -->
-# uni_n_decline %>% 
-#   drop_na() %>% 
-#   filter(PY > 2023) %>% 
-#   ggplot(aes(x = PY, y = perc_previous, group = uni, color = uni)) + 
-#   # ggplot(aes(x=PY,y=n, group=uni, color=uni)) +
-#   geom_point() + 
-#   geom_line() + 
-#   theme_classic() + 
-#   facet_wrap(vars(author_position))+ 
-#   scale_y_continuous(expand = c(0, 0), breaks = c(2019, 2025))  
-# + 
-# scale_y_continuous(expand = c(0, 0), limits = c(0, 2000))+ 
-# gghighlight((perc_previous < -.5)) 
-
-uni_n_decline_2<-
-  uni_n_decline %>%
-  drop_na() %>%
-  # filter(author_position=="any") %>%
-  filter(PY > 2023) %>%
-  ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_x_continuous(expand = c(0, 0), breaks = c(2024, 2025))+
-  labs(x = "Year", size=5)+
-  labs(y = "Relative Change in Productivity (%)", size=5)+
-  theme_classic() +
-  theme(legend.position="none")+
-  theme(axis.text.y = element_text(size = 12))+
-  theme(axis.text.x =element_text(size = 12))+
-  theme(axis.title.y = element_text(size = 14))+
-  theme(axis.title.x =element_text(size = 14))+
-  geom_hline(yintercept = 0) +
-  facet_wrap(vars(uni),ncol = 2)+
-  theme(strip.text = element_text(
-    size = 10, color = "navy"))+
-  gghighlight(PY==2025)
-
-ggsave("./docs/images/uni_n_decline_2.png", width = 7, height = 10, units = "in", device='png', dpi=700)
 
 
-
-
-
-
-
-
-
-
-# summary calculations ----------------------------------------------------
-
-auth_per_pub<-authors_df %>% 
-  group_by(refID) %>% 
-  summarize(focal=sum(uni!="other"),
-            nonFocal=sum(uni=="other"),
-            total=sum(focal+nonFocal))
-
-auth_per_pub_means<-auth_per_pub %>% 
-  ungroup() %>% 
-  drop_na() %>% 
-  summarize(
-    avg_Focal=mean(focal),
-    sd_Focal=sd(focal),
-    avg_NonFocal=mean(nonFocal),
-    sd_NonFocal=sd(nonFocal),
-    avg_Total=mean(total),
-    sd_Total=sd(total)
-  ) %>%  
-  pivot_longer(
-    cols = starts_with("avg_"),
-    names_to = "author_category",
-    names_prefix = "avg_",
-    values_to = "mean_per_pub",
-    values_drop_na = TRUE
-  ) %>% 
-  mutate(sd=if_else(author_category=="Total",sd_Total,NA)) %>% 
-  mutate(sd=if_else(author_category=="NonFocal",sd_NonFocal,sd)) %>% 
-  mutate(sd=if_else(author_category=="Focal",sd_Focal,sd)) %>% 
-  select(-sd_Focal,-sd_NonFocal,-sd_Total) 
-
-# number of scopus IDs searched 
-
-scopus_id<-read_csv("./data_clean/uni_affils_clean.csv")
-scopus_id<-scopus_id %>% select(affil_id) %>% distinct() %>% summarize(n=n_distinct(affil_id))
-
-total_affils<-authors_df %>% select(affil_id) %>% summarize(n=n_distinct(affil_id))
-
-total_pubs<-authors_df %>% 
-  summarize(n=n_distinct(refID))
-
-# Total_authors (focal+non)
-
-total_authors<-authors_df %>% 
-  select(SID) %>%
-  tally()
-
-total_unique_authors<-authors_df %>% 
-  select(SID) %>% 
-  distinct() %>% 
-  tally()
-
-
-total_focal<-authors_df %>% 
-  filter(uni!="other") %>% 
-  select(SID) %>% 
-  distinct() %>% 
-  tally()
-
-total_NOTfocal<-authors_df %>% 
-  filter(uni=="other") %>% 
-  select(SID) %>% 
-  distinct() %>% 
-  tally() 
-
-
-first_authors <- authors_df %>%
-  filter(uni != "other") %>%
-  filter(author_order == 1) 
-
-
-prop_papers_focal_1st<-nrow(first_authors)/ total_pubs*100
-
-last_authors <- authors_df %>%
-  group_by(refID) %>%
-  slice_tail() %>%
-  filter(author_order != 1) %>%
-  filter(uni !="other") 
-
-prop_papers_focal_last<-nrow(last_authors)/ total_pubs*100
-
-
-all_author_positions <- authors_df %>%
-  filter(uni !="other") %>%
-  distinct(refID,uni,.keep_all=TRUE) %>% 
-  arrange(refID)
-
-
-
-
-
-
-write_csv(auth_per_pub_means,"./docs/summary_info/uni_auth_per_pub_means.csv")
-summary_data<-data.frame(value=c("scopus_id",
-                                 "total_affils",
-                                 "total_pubs",
-                                 "total_authors",
-                                 "total_unique_authors",
-                                 "total_focal",
-                                 "total_NOTfocal",
-                                 "prop_papers_focal_1st",
-                                 "prop_papers_focal_last"),
-                         n=c(scopus_id$n,
-                             total_affils$n,
-                             total_pubs$n,
-                             total_authors$n,
-                             total_unique_authors$n,
-                             total_focal$n,
-                             total_NOTfocal$n,
-                             prop_papers_focal_1st$n,
-                             prop_papers_focal_last$n))
-
-write_csv(summary_data,"./docs/summary_info/uni_summary_data.csv")
+source("code/figs/uni_n_decline_2.R")
+uni_n_decline_2_fig <- uni_n_decline_2(uni_n_decline)
 
 
 

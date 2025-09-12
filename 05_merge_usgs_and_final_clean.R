@@ -1,3 +1,6 @@
+# 60138915: CURENT, Center for Ultra-Wide-Area Resilient Electric Energy Transmission Networks, is a graduated National Science Foundation (NSF) Engineering Research Center that was jointly supported by NSF and the Department of Energy (DoE) for a period of 10 years before becoming self-sustaining. A collaboration between academia, industry, and national laboratories, CURENT is led by the University of Tennessee, Knoxville. Partner institutions include:
+# DO WE KEEP? 
+
 # into --------------------------------------------------------------------
 # 
 # This will take the super-file of all years together, 
@@ -13,189 +16,34 @@ library(data.table)
 
 
 
-# LOAD FILES -----------------------------------------------------------
 
-# Define folder paths
-# folder_path_affils <- "./data_raw/affils/year_files_uni"
-# folder_path_papers <- "./data_raw/papers/year_files_uni"
-# folder_path_authors <- "./data_raw/authors/year_files_uni"
-# 
-# folder_path_affils <- "./data_raw/affils/year_files_fed"
-# folder_path_papers <- "./data_raw/papers/year_files_fed"
-# folder_path_authors <- "./data_raw/authors/year_files_fed"
-
-
-# 
-# 
-# # affil binder -----------------------------------------------------------
-# 
-# data_dir_affils<-folder_path_affils
-# csv_files_affils_all <- fs::dir_ls(data_dir_affils, regexp = "\\.csv$")
-# 
-# 
-# 
-# dataDir <- data_dir_affils  # Update this path
-# dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
-# 
-# # Read and tag each file
-# dt_list <- lapply(dataFls, function(file) {
-#   dt <- fread(file, fill = TRUE)
-#   dt[, source_file_combined := basename(file)]  # Add column with filename
-#   return(dt)
-# })
-# 
-# # Combine all tagged data tables
-# affils_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
-# rm(dt_list)
-# 
-# 
-# # author binder -----------------------------------------------------------
-# # data_dir_authors<-"./data_raw/scopus_api/unis_files/authors"
-# data_dir_authors<-folder_path_authors
-# csv_files_authors_all <- fs::dir_ls(data_dir_authors, regexp = "\\.csv$")
-# 
-# 
-# dataDir <- data_dir_authors  # Update this path
-# dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
-# 
-# # Read and tag each file
-# dt_list <- lapply(dataFls, function(file) {
-#   dt <- fread(file, fill = TRUE)
-#   dt[, source_file_combined := basename(file)]  # Add column with filename
-#   return(dt)
-# })
-# 
-# # Combine all tagged data tables
-# authors_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
-# rm(dt_list)
-# 
-# 
-# 
-# # papers binder -----------------------------------------------------------
-# # data_dir_papers<-"./data_raw/scopus_api/unis_files/papers"
-# data_dir_papers<-folder_path_papers
-# csv_files_papers_all <- fs::dir_ls(data_dir_papers, regexp = "\\.csv$")
-# 
-# 
-# dataDir <- data_dir_papers  # Update this path
-# dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
-# 
-# # Read and tag each file
-# dt_list <- lapply(dataFls, function(file) {
-#   dt <- fread(file, fill = TRUE)
-#   dt[, source_file_combined := basename(file)]  # Add column with filename
-#   return(dt)
-# })
-# 
-# # Combine all tagged data tables
-# papers_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
-# rm(dt_list)
-
-
-# folder_path_affils <- "./data_raw/affils/year_files_fed"
-# folder_path_papers <- "./data_raw/papers/year_files_fed"
-# folder_path_authors <- "./data_raw/authors/year_files_fed"
-
-
-affils_df<-read_csv("./data_raw/affils/all_affils_df_fed.csv")
-authors_df<-read_csv("./data_raw/authors/all_authors_df_fed.csv")
-papers_df<-read_csv("./data_raw/papers/all_papers_df_fed.csv")
 
 # IDENTIFY FEDERAL AFFILIATIONS -------------------------------------------
 
 ## NEED TO CONFIRM THE DOD CDC ESP. INTENRATIONAL
 
+affils_df<-read_csv("./data_raw/affils/all_affils_df_fed.csv")
+scopus_ids_searched<-read_csv("./data_clean/api_affils_searched_2025-09-01.csv")
 source("./code/ID_fed_affiliations.R")
-affils_df<-ID_fed_affiliations(affils_df)
+affils_df<-ID_fed_affiliations(affils_df,scopus_ids_searched)
  
 
-# find the remainder that aren't catching federal yet
-# 
-# check<-affils_df %>% 
-#   filter(federal==FALSE) %>% 
-#   
-#   distinct(affil_id,.keep_all = TRUE)
-# 
-# check_va<-check %>% 
-#   filter(str_detect(affiliation,"federal"))
-
 # ADD FEDERAL AFFILIATIONS TO AUTHORS_DF ----------------------------------
+
+authors_df<-read_csv("./data_raw/authors/all_authors_df_fed.csv")
+papers_df<-read_csv("./data_raw/papers/all_papers_df_fed.csv")
 
 source("./code/ID_fed_authors.R")
 
 authors_df<-ID_fed_authors(authors_df,affils_df)
-# 
-# # 
-# foo<-
-#   # authors_data_set %>%
-#   affils_df %>%
-#   filter(federal==TRUE) %>%
-#   group_by(federal,agency,agency_primary) %>%
-#   tally() %>%
-#   arrange(desc(n))
-# 
-# %>%
-#   head(20)
 
-authors_df
-
-# 
-# # MERGE WITH USGS ---------------------------------------------------------
-# 
-# source("./code/merge_with_usgs.R")
-# usgs_results<-merge_with_usgs(authors_df,papers_df)
-# papers_df<-usgs_results$papers
-# authors_df<-usgs_results$authors
-
-
-
-# 
-# # ADD FEDERAL AFFILIATIONS TO AUTHORS_DF ----------------------------------
-# 
-#     source("./code/ID_fed_authors.R")
-# 
-#   authors_df<-ID_fed_authors(authors_df,affils_df)
-
-
-  # there are some where affil not brought over as fed or not or
-  # missing affil_id but can try to infer and fill in
-  # authors_df %>% select(AF,federal) %>% distinct() %>% group_by(AF) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
-  # authors_df %>% select(author_url,federal) %>% distinct() %>% group_by(author_url) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
-
-
-# final edits of agency and affils ---------------------------------------
-# 
-# 
-# papers_df<-papers_df %>% 
-#   mutate(source=case_when(
-#     is.na(source)~"scopus",
-#     .default = as.character(source)
-#   ))
-# 
-
-
-
+# edits ---------------------------------------
 # remove useless columns
 
 authors_df<-authors_df %>% 
   select(-`afid.@_fa`
          # ,-authorID
          )
-# 
-# papers_df$SO
-# papers_df$PY
-# unique(papers_df$AF)
-
-# 
-# papers_df %>% filter(is.na(DI)) %>% tally()
-# 
-# papers_df %>% filter(!is.na(DI)) %>% tally()
-# 
-# unique(papers_df$DT)
-# 
-# papers_df %>% filter(is.na(DT)) %>% tally()
-# papers_df %>% filter(!is.na(DT)) %>% tally()
-
 
 papers_df_trim<-
   papers_df %>% 
@@ -206,12 +54,6 @@ papers_df_trim<-
   
 papers_df_trim<-papers_df_trim %>% 
   distinct(SO,PY,DI,TI,.keep_all = TRUE)
-
-# 
-# papers_df_trim %>% 
-#   distinct(SO,PY,DI,.keep_all = TRUE)
-# 
-# anti_join(papers_df_trim,papers_df_trim_2)
 
 
 dup_titles<-papers_df_trim %>%
@@ -235,31 +77,11 @@ affils_df_trim<-affils_df %>%
 
 # use ellefsen k.j. to check
 
-# authors_df_trim %>% distinct(refID) %>% tally()
-# 
-# papers_df %>% distinct(refID) %>% tally()
-# papers_df %>% distinct(DI) %>% tally()
-# 
-# papers_df_trim %>% distinct(refID) %>% tally()
-# papers_df_trim %>% distinct(DI) %>% tally()
-
-
 
 
 
 # SAVE CLEAN FILES --------------------------------------------------------
-# authors_df_trim %>% summarize(n=n_distinct(refID))
-# papers_df_trim %>% summarize(n=n_distinct(refID))
-# affils_df_trim %>% summarize(n=n_distinct(refID))
-# 
-# authors_refid<-authors_df %>% select(refID) %>% distinct()
-# papers_refid<-papers_df %>% select(refID) %>% distinct() %>% tibble()
-# 
-# 
-# 
-# authors_df_trim %>%  filter(federal==TRUE) %>% summarize(n=n_distinct(refID))
-# 
-# affils_df_trim %>%  filter(federal==TRUE) %>% summarize(n=n_distinct(affil_id))
+
 
 affil_vector<-authors_df_trim %>% select(affil_id) %>% distinct()
 
@@ -309,6 +131,49 @@ authors_df_trim<-authors_df_trim %>%
 source("./code/fix_usgs_affils.R")
 updated_authors<-fix_usgs_affils(authors_df_trim,papers_df_trim)
 authors_df_trim<-updated_authors
+
+
+
+# There are still some that are showing up as FEDERAL  in some articles but 
+# not others, eg because USGS Coop Units are coded as university and not usgs by 
+# scopus. This takes those that have records coded as both fed and non-fed and
+# changes them all to fed.
+
+# tandf<-authors_df_trim %>% select(SID,federal) %>% distinct() %>% group_by(SID) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
+
+FED<-authors_df_trim %>% 
+  filter(federal==TRUE) %>% 
+  select(SID,federal,agency,agency_primary) %>% 
+  distinct()
+
+NONFED<-authors_df_trim %>% 
+  filter(federal!=TRUE|is.na(federal)) %>% 
+  select(SID,federal,agency,agency_primary) %>% 
+  distinct()
+
+need_to_fix<-inner_join(NONFED,FED,by="SID") %>% 
+  distinct(SID,.keep_all = TRUE) %>% 
+  filter(!is.na(agency_primary.y)) %>% 
+  select(SID,federal=federal.y,
+         agency=agency.y,
+         agency_primary=agency_primary.y)
+
+authors_df_trim<-authors_df_trim %>% 
+  left_join(need_to_fix,by="SID") %>% 
+  relocate(federal.y,.after=federal.x) %>% 
+  relocate(agency.y,.after=agency.x) %>% 
+  relocate(agency_primary.y,.after=agency_primary.x) %>% 
+  mutate(federal.x=coalesce(federal.y,federal.x)) %>% 
+  mutate(agency.x=coalesce(agency.x,agency.y)) %>% 
+  mutate(agency_primary.x=coalesce(agency_primary.x,agency_primary.y)) %>% 
+  select(-agency_primary.y,
+         -agency.y,
+         -federal.y) %>% 
+  rename(agency_primary=agency_primary.x,
+         agency=agency.x,
+         federal=federal.x)
+
+
 
 write_rds(papers_df_trim,"./data_clean/papers_df_clean.rds")
 write_rds(authors_df_trim,"./data_clean/authors_df_clean.rds")

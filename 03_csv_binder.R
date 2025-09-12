@@ -16,9 +16,7 @@ library(data.table)
 
 
 # data_dir<-"./data_raw/scopus_api/unis_files"
-data_dir<-"./data_raw/scopus_api/fed_files/redux"
-# data_dir<-"./data_raw/scopus_api/2025-2"
-# folder<-c("2025-2") # 8
+data_dir<-"./data_raw/feds_20250901"
 
 folder<-c(
   "2019", # 1
@@ -31,6 +29,76 @@ folder<-c(
   
 
 
+
+
+
+# create folders  ---------------------------------------------------------
+
+
+# setting up the main directory
+main_dir <- "./data_raw/affils/"
+main_dir <- "./data_raw/papers/"
+main_dir <- "./data_raw/authors/"
+# setting up the sub directory
+sub_dir <- "year_files_fed"
+
+# check if sub directory exists 
+if (file.exists(sub_dir)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir, sub_dir))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir, sub_dir))
+  
+}
+
+
+# create folders - incomplete records --------------------------------------
+
+
+# setting up the main directory
+main_dir <- "./data_raw/"
+
+# setting up the sub directory
+sub_dir <- "incomplete_records_removed"
+
+# check if sub directory exists 
+if (file.exists(sub_dir)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir, sub_dir))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir, sub_dir))
+  
+}
+
+
+# setting up the main directory
+main_dir <- "./data_raw/incomplete_records_removed/"
+
+# setting up the sub directory
+sub_dir <- "fed"
+
+# check if sub directory exists 
+if (file.exists(sub_dir)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir, sub_dir))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir, sub_dir))
+  
+}
+
+# begin binding csv files for diff affils ---------------------------------
 
 
 
@@ -70,8 +138,8 @@ validate_csv_structure <- function(...) {
       tibble() %>% 
       rename(file=".") %>% 
       mutate(file=str_remove(file,"scopus_affil_")) %>% 
-      mutate(file=str_remove(file,"_authors.csv")) %>% 
-      mutate(file=str_remove(file,"_authors ")) %>% 
+      mutate(file=str_remove(file,"_author.csv")) %>% 
+      mutate(file=str_remove(file,"_author ")) %>% 
       mutate(folder="authors")
     
     affils_list<-list.files(folder_path_affils)%>% 
@@ -236,7 +304,7 @@ papers_df<-papers_df %>%
 authors_df<-authors_df %>% 
   mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
     mutate(source_file = str_replace(source_file, "/scopus_affil_", "")) %>% 
-    separate(source_file,c("source_file","left_over"),"_authors",remove=TRUE,extra="warn") %>% 
+    separate(source_file,c("source_file","left_over"),"_author",remove=TRUE,extra="warn") %>% 
   select(-left_over) %>% 
   mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
   relocate(refID,.before=1) %>% 
@@ -353,22 +421,13 @@ authors_df<-authors_df %>%
 # save --------------------------------------------------------------------
 
   # # FOR WITHIN YEAR BINDING - FEDS
-
+  # data_dir<-"./data_raw/feds_20250901"
   write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
   write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
   write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
 
   write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
 
-  
-  # # FOR WITHIN YEAR BINDING - UNIS
-  # 
-  # write_csv(affils_df,paste("./data_raw/affils/year_files_uni/affils_df_",folder[k],".csv",sep=""))
-  # write_csv(authors_df,paste("./data_raw/authors/year_files_uni/authors_df_",folder[k],".csv",sep=""))
-  # write_csv(papers_df,paste("./data_raw/papers/year_files_uni/papers_df_",folder[k],".csv",sep=""))
-  # 
-  # 
-  # write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/uni/incompletes_removed_",folder[k],".csv",sep=""))
 
   
     }

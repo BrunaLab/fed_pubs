@@ -9,6 +9,7 @@ library(progress)
 library(fs)
 library(data.table)
 
+PM_max<-8
 
 papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) %>% 
   mutate(PM=
@@ -125,7 +126,7 @@ mo_data<-first_authors %>%
   group_by(PY,PM) %>% 
   tally() %>% 
   arrange(PM) %>% 
-  filter(PM<7)
+  filter(PM<PM_max+1)
 
 
 rm(
@@ -214,12 +215,12 @@ c_pubs_25<-mo_data %>%
   rename(n25=n) %>% 
   select(-PY)
 
-
-
-
-# avg_19_24 cumulative and mo
-avg_cum_obs<-tibble(PM=seq(1:6),
-                    mean_obs_c_pubs=c(5722,7298,9074,10669,12236,13980))
+# averegae cumulative publications by month 2019-2024
+avg_cum_obs<-mo_data %>% 
+  filter(PY!=2025) %>% 
+  group_by(PM) %>% 
+  summarize(avg19_24=mean(n))
+  
 bs_stats<-bs_output %>% 
   ungroup() %>% 
   select(-yr,-index) %>% 
@@ -231,24 +232,59 @@ bs_stats<-bs_output %>%
 
 bs_stats
 
-
+x_min<-round(
+  (as.numeric(bs_stats %>% filter(PM==PM_max) %>% select(n_c_25))-2000),-3)
+  
+x_max<-round((max(bs_output$cumul_pubs)+1000),-3)
+bs_output
 
 final_bs_n<-bs_output %>% 
-  filter(PM==6) %>% 
+  filter(PM==PM_max) %>% 
 ggplot(aes(cumul_pubs)) +
   geom_histogram(color="darkgray", 
                  fill="white",
                  bins=50)+
   theme_classic()+
-  geom_segment(x = as.numeric(bs_stats %>% filter(PM==6) %>% select(n_c_25)), y= 0 , 
-               xend = as.numeric(bs_stats %>% filter(PM==6) %>% select(n_c_25)), yend = 40, 
+  labs(x = paste("Cumulative publications (N = ",runs," Bootstrap Runs)",sep=""), size=5)+
+  labs(y = "No. of Bootstrap runs", size=5)+
+  geom_segment(x = as.numeric(bs_stats %>% filter(PM==PM_max) %>% select(n_c_25)), 
+               y= 0 , 
+               xend = as.numeric(bs_stats %>% filter(PM==PM_max) %>% select(n_c_25)), 
+               yend = 100, 
                colour = "darkred",
                linetype = 2,
                linewidth = 0.05)+
-  # ylim(0,100)+
-  # xlim(10000,17000)+
-  expand_limits(x= c(9000,17000))+
-  scale_x_continuous(limits = c(9000, 17000), breaks = seq(9000, 17000, by = 500))
+  annotate(geom="text", x=as.numeric(bs_stats %>% filter(PM==PM_max) %>% select(n_c_25)),
+           y=103,
+           label="2025 Cumulative Publications",
+           color="darkred",
+           size=3)+
+  theme(axis.text.y = element_text(size = 10))+
+  theme(axis.text.x =element_text(size = 10))+
+  theme(axis.title.y = element_text(size = 12,face = "bold"))+
+  theme(axis.title.x =element_text(size = 12,face = "bold"))+
+  theme(strip.text.x = element_text(face = "bold"))+
+  expand_limits(x= c(x_min,x_max))+
+  scale_x_continuous(limits = c(x_min,
+                                x_max,
+                                breaks = seq(x_min, x_max,by = 1000)))
+
+
+
+final_bs_n
+
+# Percent < 2025
+obs<-bs_stats %>% filter(PM==PM_max) %>% select(n_c_25)
+
+
+n_runs_less_than_obs<-bs_output %>% 
+  filter(PM==PM_max) %>% 
+  ungroup() %>% 
+  select(cumul_pubs) %>% 
+  mutate(less_than_obs=cumul_pubs<obs) %>% 
+  tally(less_than_obs)
+
+percent_below<-n_runs_less_than_obs/runs*100
 
 # plot of cumulative pubs BS ----------------------------------------------
 
@@ -292,34 +328,34 @@ ggplot(aes(cumul_pubs)) +
 
 
 
-
-# histogram of cumulative pubs month 6 ------------------------------------
-
-
-final_bs_n<-bs_output %>% 
-  filter(PM==6) %>% 
-ggplot(aes(cumul_pubs)) +
-  geom_histogram(color="darkgray", 
-                 fill="white",
-                 bins=50)+
-  theme_classic()+
-  geom_segment(x = 10335, y= 0 , 
-               xend = 10335, yend = 500, 
-               colour = "darkred",
-               linetype = 2,
-               linewidth = 0.05)+
-  geom_segment(x = 13980, y= 0 , 
-               xend = 13980, yend = 500, 
-               colour = "navy",
-               linetype = 2,
-               linewidth = 0.05)+ 
-  
-  # ylim(0,100)+
-  # xlim(10000,17000)+
-  expand_limits(x= c(9000,17000))+
-  # scale_x_continuous(limits = c(9000, 17000), breaks = seq(9000, 17000, by = 500))
-scale_x_continuous(breaks = seq(9000, 17000, by = 500))
-final_bs_n
+# 
+# # histogram of cumulative pubs month 6 ------------------------------------
+# 
+# 
+# final_bs_n<-bs_output %>% 
+#   filter(PM==6) %>% 
+# ggplot(aes(cumul_pubs)) +
+#   geom_histogram(color="darkgray", 
+#                  fill="white",
+#                  bins=50)+
+#   theme_classic()+
+#   geom_segment(x = 10335, y= 0 , 
+#                xend = 10335, yend = 500, 
+#                colour = "darkred",
+#                linetype = 2,
+#                linewidth = 0.05)+
+#   geom_segment(x = 13980, y= 0 , 
+#                xend = 13980, yend = 500, 
+#                colour = "navy",
+#                linetype = 2,
+#                linewidth = 0.05)+ 
+#   
+#   # ylim(0,100)+
+#   # xlim(10000,17000)+
+#   expand_limits(x= c(9000,17000))+
+#   # scale_x_continuous(limits = c(9000, 17000), breaks = seq(9000, 17000, by = 500))
+# scale_x_continuous(breaks = seq(9000, 17000, by = 500))
+# final_bs_n
 
 
 

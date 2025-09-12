@@ -1,5 +1,5 @@
-ID_fed_affiliations <- function(affils_df) {
-  # affils_df<-affils_df_original
+ID_fed_affiliations <- function(affils_df,scopus_ids_searched) {
+
   affils_df_original<-affils_df
   
   
@@ -59,8 +59,13 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
     mutate(country = recode(country,
       "united states" = "usa",
       "virgin islands (u.s.)" = "us virgin islands",
+      "virgin islands (british)" = "british virgin islands",
       "viet nam" = "vietnam",
       "cote d'ivoire" = "ivory coast",
+      "syrian arab republic"  = "syria",
+      "russian federation"  = "russia",
+      "falkland islands (malvinas)"="falkland islands", 
+      
       "timor-leste" = "east timor"
     ))
   
@@ -80,8 +85,9 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
   # 
   
   
-  
-  fed_affils <- read_csv("./data_clean/fed_affils_07102025.csv") %>%
+  fed_affils <- scopus_ids_searched %>% 
+    rename(agency_short=agency) %>% 
+  # fed_affils <- read_csv("./data_clean/fed_affils_07102025.csv") %>%
     
     filter(!(affil_id==113727207)) %>% 
     filter(!(affil_id==126243689)) %>% 
@@ -123,7 +129,8 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
                        affil_id==126243689~NA,
                        affil_id==105428030~NA,
                           .default = as.character(agency_short))) %>% 
-    arrange(affil_id, affiliation,agency_short, city, country, acronym) %>% 
+    # arrange(affil_id, affiliation,agency_short, city, country, acronym) %>% 
+    arrange(affil_id, affiliation,agency_short, agency_primary,city) %>% 
     distinct(affil_id, agency_short,.keep_all = TRUE) 
   
   nonfed_affils <- read_csv("./data_clean/NONFED_affils_07102025.csv") %>% 
@@ -132,7 +139,8 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
   # remove the NIH and nat park foundations , etc.
   fed_affils<-fed_affils %>% filter(!affil_id%in%nonfed_affils$affil_id)
   
-  fed_affils<-fed_affils %>% select(affil_id,agency_short,city,country,federal) %>% distinct()
+  # fed_affils<-fed_affils %>% select(affil_id,agency_short,city,country,federal) %>% distinct()
+  fed_affils<-fed_affils %>% select(affil_id,agency_short,agency_primary,city,federal) %>% distinct()
   
   # fed_affils %>% group_by(affil_id,agency_short) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
   
@@ -145,16 +153,16 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
   fed_affils$affil_id <- as.numeric(fed_affils$affil_id)
   affils_df <- left_join(affils_df, fed_affils, by = c("affil_id"))
 
-  affils_df %>% filter(!is.na(federal)) %>% filter(is.na(agency_short))
-  affils_df %>% filter(is.na(federal)) %>% filter(!is.na(agency_short))
+  # affils_df %>% filter(!is.na(federal)) %>% filter(is.na(agency_short))
+  # affils_df %>% filter(is.na(federal)) %>% filter(!is.na(agency_short))
   ##################### 
 
-  affils_df$affil_check <- affils_df$country.x == affils_df$country.y
-
-  affils_df <- affils_df %>%
-    mutate(country.y = if_else((affil_check == FALSE | is.na(affil_check)), country.y, NA)) %>%
-    mutate(country.x = if_else(is.na(country.x), country.y, country.x)) %>%
-    select(-country.y)
+  # affils_df$affil_check <- affils_df$country.x == affils_df$country.y
+  # 
+  # affils_df <- affils_df %>%
+  #   mutate(country.y = if_else((affil_check == FALSE | is.na(affil_check)), country.y, NA)) %>%
+  #   mutate(country.x = if_else(is.na(country.x), country.y, country.x)) %>%
+  #   select(-country.y)
 
   affils_df$affil_check <- affils_df$city.x == affils_df$city.y
 
@@ -193,7 +201,7 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
   affils_df <- affils_df %>%
     rename(
       # affiliation = affiliation.x,
-      country = country.x,
+      # country = country.x,
       city = city.x
       
     )
@@ -203,89 +211,6 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
 
 # 
 # 
-# 
-#   affils_df <- affils_df %>%
-#     mutate(agency_short = case_when(
-#       affil_id %in% c(
-#         112775938,131119053,118935998,123885611,128217908,130150084,118330540,
-#         115228508,116423594,131357366,129449620, 128137569, 120040598, 
-#         105736912, 128316397, 125952897, 112805663, 121072296, 112730052, 
-#         105477399, 100968866, 123254863, 121472110, 121382041,118575532, 
-#         118211212, 117458915, 113044510, 112967639, 112887996, 109557356, 
-#         101708480, 101532374, 127337699, 112893603, 101522669, 122233128, 
-#         113221153,122565152, 112568591, 101619277, 118206330, 128848258, 
-#         131254563, 131254559, 132421887, 122667304, 127632018, 115220797, 
-#         125807927, 112704723, 132434964, 132434964, 109505309, 109505309, 
-#         115385473, 113184770, 122498102, 109516894, 106929327, 106585504,
-#         124221191, 119639166, 114301940, 109911421, 113538038, 100886222, 
-#         112813607, 107070864, 114523236, 123693818, 114322561, 113018271, 
-#         126381674, 129979905, 106580709, 112669335, 117410704, 114456193, 
-#         125862540, 123665217, 114654204, 101972100, 121430097, 113171964, 
-#         101232419, 125849010, 126672045, 112234684, 125302977, 119847200, 
-#         108145124, 100764674, 130308845, 117356276, 123693690, 128684090, 
-#         128123367, 118657357, 112833665, 112670485, 131506759, 112868925, 
-#         130536578, 122243495, 116280683, 112911890, 124409139, 108181713, 
-#         126791257, 112955278, 112955278, 112967581, 115209092, 107773789, 
-#         128306669, 115003090, 113384350, 113345733, 114320094, 114270246, 
-#         129674417, 118657132, 129243419, 113197759, 114674838, 112647481, 
-#         106923974, 127864166, 105146112, 121989107, 128182625, 116593767, 
-#         117453904, 113007703, 114000323, 124285483, 116422949, 114442747, 
-#         127726999, 127726903, 127726892, 127726815, 127726735, 127726717,
-#         127726694, 117121465, 131478202, 121489108, 101641629, 118122905, 
-#         120135959, 105437969, 132383244, 106998694, 112994936, 130650522, 
-#         108699047, 101536146, 124532433, 128306891, 128123526, 108214510, 
-#         130621744, 123338971, 123338953, 113149283, 106707030, 129327605, 
-#         129318198, 113200931, 113023651, 130974414, 122221036, 130090966,
-#         129215697, 110525158, 128983928, 112587243, 109994213, 129650313, 
-#         121153711, 132533172, 131344873, 100678433, 119310297, 119310297, 
-#         120168487, 128241149,128726575, 100372859,128588933,
-#         119086596, 116522307, 118637327, 129236469, 113211184, 131950071, 
-#         112912153, 132475090, 102070450, 109640198, 127018884, 110031881, 
-#         106656485, 100387381,112941552, 120338449,116697494, 125868776,
-#         127580461, 106663664, 132431795, 106621898, 113114472, 112752240, 
-#         118022065, 107253064, 126426809, 129188352, 129865395, 127123981,
-#         131588681, 106379948, 128403318, 128403318, 131380914, 130095884, 
-#         127814565, 108171312, 121099507, 121773398, 100725217, 106984557,
-#         112648306, 126273729, 125628855, 106341010, 128444166, 129423473, 
-#         130718131, 129457503, 113144135, 110245040, 126626246, 112582935,
-#         106661173, 123341752, 112626061, 112635512, 120096391, 121697128, 
-#         112952363, 101823272, 107413093, 108341947, 120452456, 113823270, 
-#         118423712, 100620080,105885121, 114699239,113468202, 123897005,
-#         115972055, 125461327, 122875627, 113848867, 125520925, 125101833, 
-#         130285399, 101701694, 110915458, 112627278, 116452049, 112900864,
-#         114406258, 109168654, 116775161, 113000532, 112614222, 130132540, 
-#         128347842, 119221332, 124333534, 128497769, 123795863, 101069107,
-#         123924359, 122934559, 127905519, 127904778, 124122851, 128092351, 
-#         128084398, 122704640, 127013764, 112688333, 108062319, 101490818, 
-#         127657130, 126684569,112665895, 114721270,122040486, 130158995,
-#         130085442, 130084925, 118806977, 118661466, 102043815, 101786025, 
-#         112694640, 112702309, 108243819, 126672057, 121943653, 127418326, 
-#         112912020, 131329650, 131179893, 100533555, 113296020, 105478672, 
-#         113130842, 130837812, 100477351, 106969174, 101576389, 132184908,
-#         132434184, 132417343, 132417343, 113206441, 130454573, 107673059,
-#         105605863, 129587609, 131246092, 123625235, 123615351, 120076617, 
-#         121988696, 106657223,106644942, 132434184,119943502, 125582716,
-#         129963166, 121267960, 120575516, 115956000, 107323255, 112366927, 
-#         129899603, 128177152, 132524792, 126765566, 108468409, 112836578, 
-#         107061891, 120248788, 126647356, 113060643, 127310335, 108338060, 
-#         129973711, 127089255, 127631504, 112456046, 129646779, 123108259, 
-#         113261742, 122513041, 101480320, 126418410, 125336447, 125253311, 
-#         132305240, 132122123, 127586974, 128065395, 112930872, 128051819, 
-#         128387888, 125791023,109859472, 131642253,108444951, 112445788,
-#         129160431, 112940072, 132389249, 132389249, 112834500, 112834500,
-#         115560703, 126820526, 122958104, 122466475, 127637878, 117688024, 
-#         112363151, 111166218, 113081538, 129045481, 131948470, 132229247,
-#         131341658, 100538844, 109505181, 123123752, 125545011, 113198685, 
-#         128491187, 106709234, 106587413, 122597158, 132389675, 132389675, 
-#         120185586, 122864212, 129556304, 112746892, 112617455, 112760468,
-#         127828413, 122233128,112627278, 107064152,113333922, 127965231,
-#         113007703, 132670425, 131344873, 108062319, 131950071, 102070450, 
-#         132670499, 132618487, 100558018, 112886523, 115803040, 112991515, 
-#         130454573, 114320094, 121989107, 112936183, 127631504, 121390655
-#       ) ~ "va",
-#       TRUE ~ as.character(agency_short)
-#     ))
-
   # Modify the ones we know to be non-fed
 
   # affils_df <- affils_df %>%
@@ -311,76 +236,6 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
     ))
 
   # 
-  # 
-  # affils_df <- affils_df %>%
-  #   mutate(federal = case_when(
-  #     affil_id %in% c(
-  #       112838889,
-  #       60006762,
-  #       128561286,
-  #       128464417,
-  #       100641183,
-  #       112591249,
-  #       124526765,
-  #       113727207,
-  #       126243689,
-  #       129587280
-  #     ) ~ TRUE,
-  #     TRUE ~ federal
-  #   ))
-  
-# 
-#   affils_df <- affils_df %>%
-#     mutate(federal = case_when(
-#       affil_id %in% c(
-#         113727207,
-#         126243689,
-#         129587280
-#       ) ~ TRUE,
-#       TRUE ~ federal
-#     ))
-# 
-# 
-#   affils_df <- affils_df %>%
-#     mutate(agency_short = case_when(
-#       affiliation == "nuclear regulatory commission" ~ "nrc",
-#       TRUE ~ agency_short
-#     ))
-
-# 
-# 
-#   affils_df <- affils_df %>%
-#     mutate(agency_short = case_when(
-#       affil_id == 112838889 ~ "doj",
-#       affil_id == 128561286 ~ "federal reserve system",
-#       affil_id == 128464417 ~ "federal reserve system",
-#       affil_id == 100641183 ~ "dot",
-#       affil_id == 112591249 ~ "va",
-#       affil_id == 124526765 ~ "dot",
-#       TRUE ~ agency_short
-#     ))
-  
-  # affils_df <- affils_df %>%
-  #   mutate(
-  #     federal = case_when(
-  #       str_detect(affiliation, " llc") ~ FALSE,
-  #       str_ends(affiliation, " inc") ~ FALSE,
-  #       str_ends(affiliation, " ltd") ~ FALSE,
-  #       str_ends(affiliation, " , usa| , uk| , austria| , australia| , france| , germany| , mexico| , mexico city") ~ FALSE,
-  #       str_detect(affiliation, ", inc") ~ FALSE,
-  #       str_detect(affiliation, " corporation") ~ FALSE,
-  #       str_detect(affiliation, "california department") ~ FALSE,
-  #       str_detect(affiliation, "corteva agriscience") ~ FALSE,
-  #       str_detect(affiliation, "inova ") ~ FALSE,
-  #       TRUE ~ federal
-  #     ),
-  #     agency_short = case_when(
-  #       str_detect(affiliation, "california department") ~ NA_character_,
-  #       str_detect(affiliation, "uniformed services university ") ~ "dod",
-  #       TRUE ~ agency_short
-  #     )
-  #   )
-
 
 
   # now search the ones with is.na(federal) to assign
@@ -418,30 +273,117 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
   
   
   
+  
+  
+  
+  
+  
+  
   affils_df <- affils_df %>%
-    
     mutate(agency_short = case_when(
-      
       agency_short == "usgs" ~ "interior",
       agency_short == "usaid funded" ~ "usaid",
       affil_id == "125807845" ~ "usaid",
       affil_id == "112988162" ~ "usaid",
-      
       agency_short == "nphs" ~ "usphs",
       affil_id == "122988512" ~ "ahrq",
-      
-      
-      
-    
+      affil_id == "131002032" ~ "doj",
+      affil_id == "125170239" ~ "fema",
       affil_id == "112838889" ~ "doj",
-      affil_id == "124336178" ~ "cdc",
+      affil_id == "127329180" ~ "nist",
+      affil_id == "123432690" ~ "commerce",
+      affil_id == "113467768" ~ "commerce",
       affil_id == "123502999" ~ "epa",
-    
+      affil_id == "123659258"~"us arctic research commission",
+      
+      
+      affil_id %in% c(
+      "100773517",
+      "114126333",
+      "100317858",
+      "100617587",
+      "101444011",
+      "114126333",
+      "100317858",
+      "108170709",
+      "101995785",
+      "100773517",
+      "100808805",
+      "105546659",
+      "100535921"
+      ) ~ "usgs",
+      
+      affil_id %in% c(
+      "130329984",
+      "129486490",
+      "101141403",
+      "118487053",
+      "132829770",
+      "132829487"
+      ) ~ "blm",
+      
+      affil_id %in% c(
+        "124336178",
+        "128680080",
+        "60022275",
+        "60015279",
+        "123339623", 
+        "124081001", 
+        "126950235",
+        "129080953",
+        "129181812",
+        "130171851",
+        "128867769",
+        "128127675",
+        "130730232",
+        "130627323",
+        "131266521",
+        "132864364",
+        "125225634",
+        "125860850",
+        "124395404",
+        "131572977",
+        "127318717",
+        "126208434",
+        "127987974",
+        "127864136",
+        "128059652",
+        "128083864",
+        "128152922",
+        "128224612",
+        "128305921",
+        "128533480",
+        "129084679",
+        "127674722",
+        "129074829",
+        "129310471",
+        "120168305"
+      ) ~ "cdc",
+      
+      
       affil_id %in% c(
         "60012320",
+        "129587280",
+        "60012320",
+        "130603485",
         "129587280"
       ) ~ "dhs",
       
+      affil_id %in% c(
+      "60006164",
+      "60006099",
+      "60004377",
+      "106684626",
+      "124479237 ",
+      "124479100",
+      "60121404",
+      "60141505",
+      "128565580",
+      "101552443",
+      "129771088",
+      "133048613",
+      "60014338"
+      ) ~ "doe",
       
       affil_id %in% c(
         "124526765",
@@ -455,11 +397,22 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         "128306628",
         "131558906",
         "125763856",
-        "125364545"
+        "125364545",
+        "105516842",
+        "130337909"
       ) ~ "usda",
       
       affil_id %in% c(
-        "128450129"
+        "128450129",
+        "127171725",
+        "123830987",
+        "128670802",
+        "129662258",
+        "129663248",
+        "131211757",
+        "132139018",
+        "132139551",
+        "129074906"
       )~ "fda",
       
       affil_id %in% c(
@@ -495,6 +448,99 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         "128757432",
         "131466439",
         "60003959",
+        "115851627",
+        "130708596",
+        "109402409",
+        "128906900",
+        "121805703",
+        "101839787",
+        "127239532",
+        "130730598",
+        "132742152",
+        "100620632",
+        "132506175",
+        "130729347",
+        "132188997",
+        "128735733",
+        "100845501",
+        "101384240",
+        "101724877",
+        "130321515",
+        "128491484",
+        "131503864",
+        "132708157",
+        "130213541",
+        "131291247",
+        "127591346",
+        "127401697",
+        "126193465",
+        "126678674",
+        "129694734",
+        "122934618",
+        "100646981",
+        "105776297",
+        "130454559",
+        "130730427",
+        "126683827",
+        "132581032",
+        "125225772",
+        "127805534",
+        "110885103",
+        "122799414",
+        "125545322",
+        "131625597",
+        "132623337",
+        "132506119",
+        "128983245",
+        "120418534",
+        "132961216",
+        "132622958",
+        "112598304",
+        "101814819",
+        "129556203",
+        "113072167",
+        "100764194",
+        "128763235",
+        "129855060",
+        "130408261",
+        "130048692",
+        "129246116",
+        "129940124",
+        "130370921",
+        "123301399",
+        "130109281",
+        "101372917",
+        "115518219",
+        "132664964",
+        "113465398",
+        "118681437",
+        "132007577",
+        "121212747",
+        "130880561",
+        "112945703",
+        "113615606",
+        "126654882",
+        "100807874",
+        "100669963",
+        "129449295",
+        "126233553",
+        "130702561",
+        "100610206",
+        "120666598",
+        "131019983",
+        "123125274",
+        "114347620",
+        "123822365",
+        "112739829",
+        "131063672",
+        "60023515",
+        "127827923",
+        "121212747",
+        "119708722",
+        "106076060 ",
+        "132255938",
+        "128300450",
+        "133051324",
         "112456278"
       ) ~ "dod",
       
@@ -507,7 +553,10 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         "112920600",
         "112922559",
         "60004328",
-        "120168333"
+        "120168333",
+        "60026875",
+        "60003029",
+        "60003577"
       ) ~ "doe",
       
       affil_id %in% c(
@@ -521,13 +570,36 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
       affil_id %in% c(
         "101140478",
         "128172361",
-        "130391142"
+        "130391142",
+        "124656248",
+        "127374226",
+        "131329119",
+        "109598951",
+        "109209167",
+        "131277202",
+        "116774579",
+        "130135912",
+        "107892846",
+        "112617321",
+        "115034241",
+        "100818142",
+        "125118197",
+        "113536195",
+        "127070019",
+        "127423822",
+        "112303691",
+        "132758027",
+        "119792149"    
       ) ~ "interior",
       
       affil_id %in% c(
         "123678203",
+        "109696971",
+        "130637348",
         "123865204"
       ) ~ "nasa",
+      
+      
       
       affil_id %in% c(
         "107986893",
@@ -542,7 +614,15 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         "125381761",
         "125755037",
         "131324608",
-        "131324998"
+        "131324998",
+        "60078460",
+        "130764442",
+        "132914042",
+        "131376663",
+        "131354905",
+        "122564665",
+        "122564665",
+        "60078461"
       ) ~ "nih",
       
       affil_id %in% c(
@@ -550,7 +630,12 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         "101000910",
         "123141776",
         "125755512",
-        "130557216"
+        "130557216",
+        "123839652",
+        "130773259",
+        "131589844",
+        "101619367",
+        "127394362"
       ) ~ "noaa",
     
       
@@ -558,7 +643,13 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         "60071501",
         "100587655",
         "101394353",
-        "106456794"
+        "106456794",
+        "60076152",
+        "60076164",
+        "60076171",
+        "60076174"
+        
+        
       ) ~ "nsf",
       
       affil_id %in% c(
@@ -566,9 +657,11 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         "114159234",
         "128149737"
       ) ~ "smithsonian",
+      
       affil_id %in% c(
         "115539127",
         "123896933",
+        "119946023",
         "126381052"
       ) ~ "usphs",
       
@@ -684,15 +777,15 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         "131997553",
         "112888033"
       ) ~ "va",
-      
+  
       affil_id %in% c(
-        112775938,131119053,118935998,123885611,128217908,130150084,118330540,
-        115228508,116423594,131357366,129449620, 128137569, 120040598, 
+        112775938, 131119053,118935998,123885611,128217908,130150084,118330540,
+        115228508, 116423594,131357366,129449620, 128137569, 120040598, 
         105736912, 128316397, 125952897, 112805663, 121072296, 112730052, 
         105477399, 100968866, 123254863, 121472110, 121382041,118575532, 
         118211212, 117458915, 113044510, 112967639, 112887996, 109557356, 
         101708480, 101532374, 127337699, 112893603, 101522669, 122233128, 
-        113221153,122565152, 112568591, 101619277, 118206330, 128848258, 
+        113221153, 122565152, 112568591, 101619277, 118206330, 128848258, 
         131254563, 131254559, 132421887, 122667304, 127632018, 115220797, 
         125807927, 112704723, 132434964, 132434964, 109505309, 109505309, 
         115385473, 113184770, 122498102, 109516894, 106929327, 106585504,
@@ -729,21 +822,21 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         130718131, 129457503, 113144135, 110245040, 126626246, 112582935,
         106661173, 123341752, 112626061, 112635512, 120096391, 121697128, 
         112952363, 101823272, 107413093, 108341947, 120452456, 113823270, 
-        118423712, 100620080,105885121, 114699239,113468202, 123897005,
+        118423712, 100620080, 105885121, 114699239,113468202, 123897005,
         115972055, 125461327, 122875627, 113848867, 125520925, 125101833, 
         130285399, 101701694, 110915458, 112627278, 116452049, 112900864,
         114406258, 109168654, 116775161, 113000532, 112614222, 130132540, 
         128347842, 119221332, 124333534, 128497769, 123795863, 101069107,
         123924359, 122934559, 127905519, 127904778, 124122851, 128092351, 
         128084398, 122704640, 127013764, 112688333, 108062319, 101490818, 
-        127657130, 126684569,112665895, 114721270,122040486, 130158995,
+        127657130, 126684569, 112665895, 114721270,122040486, 130158995,
         130085442, 130084925, 118806977, 118661466, 102043815, 101786025, 
         112694640, 112702309, 108243819, 126672057, 121943653, 127418326, 
         112912020, 131329650, 131179893, 100533555, 113296020, 105478672, 
         113130842, 130837812, 100477351, 106969174, 101576389, 132184908,
         132434184, 132417343, 132417343, 113206441, 130454573, 107673059,
         105605863, 129587609, 131246092, 123625235, 123615351, 120076617, 
-        121988696, 106657223,106644942, 132434184,119943502, 125582716,
+        121988696, 106657223, 106644942, 132434184,119943502, 125582716,
         129963166, 121267960, 120575516, 115956000, 107323255, 112366927, 
         129899603, 128177152, 132524792, 126765566, 108468409, 112836578, 
         107061891, 120248788, 126647356, 113060643, 127310335, 108338060, 
@@ -757,36 +850,57 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
         131341658, 100538844, 109505181, 123123752, 125545011, 113198685, 
         128491187, 106709234, 106587413, 122597158, 132389675, 132389675, 
         120185586, 122864212, 129556304, 112746892, 112617455, 112760468,
-        127828413, 122233128,112627278, 107064152,113333922, 127965231,
+        127828413, 122233128, 112627278, 107064152,113333922, 127965231,
         113007703, 132670425, 131344873, 108062319, 131950071, 102070450, 
         132670499, 132618487, 100558018, 112886523, 115803040, 112991515, 
         130454573, 114320094, 121989107, 112936183, 127631504, 121390655,
-        120305441,122903836,112842411,123720575,125203918,106077252,
-        123882638,129946937,130647354,127864124,128101244,126671995,126868980,
-        128418759,129646493,126299689,116522483,128565778,129286600,108201705,
-        123720575,107962105,127827363,109030680,110168190,129688435,126446713,
-        126457262,125759628,125785988,112928373, 123149707, 128478576, 127864124,
+        120305441,122903836,  112842411,123720575,125203918,106077252,
+        123882638,129946937,  130647354,127864124,128101244,126671995,126868980,
+        128418759,129646493,  126299689,116522483,128565778,129286600,108201705,
+        123720575,107962105,  127827363,109030680,110168190,129688435,126446713,
+        126457262,125759628,  125785988,112928373, 123149707, 128478576, 127864124,
         129846776, 111505024, 122903836, 128478576, 105477766, 112678032, 
         128064936, 112671825, 125336568,129125631,132208416, 108062034, 108928269,
-        107875046,123985164,118654374,100479614,123145084,124475407,112687253,
-        126981536,128754886,100317364,132413735,112677640,100479614,122411378,
-        118654415,122981065,112648370,123145084,112649013,124475407,124376601,
-        112946911,112687253,127347050,106077452,126483911,128116947,129231656,
-        129231656,112906884,132010539,118654196,126981536,128754886,100317364,
-        132413735,132228479,132623540,112906884,122111615, 130213698,125108842,
-        123861380,112746677,108502296,123536086,130095995,125884412,127991848,
-        124841698,129832151,132073152,132475883,132782404,132421577,112612124,
-        101581722,101106154,115858329,131793716,130982688,127569623,116069117,
-        130707843,131534170,131968872,114761681,126140998,106915186,112830535,
-        117529542,131940290,128312894,122229514,101767082,128408661,132421860,
+        107875046, 123985164, 118654374,100479614,123145084,124475407,112687253,
+        126981536, 128754886, 100317364,132413735,112677640,100479614,122411378,
+        118654415, 122981065, 112648370,123145084,112649013,124475407,124376601,
+        112946911, 112687253, 127347050,106077452,126483911,128116947,129231656,
+        129231656, 112906884, 132010539,118654196,126981536,128754886,100317364,
+        132413735, 132228479, 132623540,112906884,122111615, 130213698,125108842,
+        123861380, 112746677, 108502296,123536086,130095995,125884412,127991848,
+        124841698, 129832151, 132073152,132475883,132782404,132421577,112612124,
+        101581722, 101106154, 115858329,131793716,130982688,127569623,116069117,
+        130707843, 131534170, 131968872,114761681,126140998,106915186,112830535,
+        117529542, 131940290, 128312894,122229514,101767082,128408661,132421860,
         132421344,128408855,132714087,128409203,132570113,122434728,130163250,
         123149610,110426483,118911845,112768796,115003811,130214020,132552524,
         119174436,132550315,101735330,132222426,119591807,123748020,130796795,
-        127618307,127622360,127352990,128814775,131444371
+        127618307,127622360,127352990,128814775,131444371,101714921,105477071,
+        106667493,106998425,108109176,109402899,110795774,112959192,112994645,
+        113135121,114944534,122277613,123095507,60016990, 60025164,60016164,
+        60011319,60012838, 60026736,100665441,108121718,106073747,108119577,
+        112632912,112650207,112888228,114640318,115565960,114835322,121440940,
+        124832745,105418915,105780753,106645063,126907205,116206723,112965857,
+        114349303,117475782,123934102,124226055,126257397,129282179,120768177,
+        127324486,128392162,112705412,115132336,117330172,129872956,60010020, 
+        131380626,113036925,131957894,106562040,107038673,108244387,115489777,
+        123070507,123382255,60018615,106663984,115836505,112842434,116421204,
+        109503007,126381245,101377744,105516246,106740795,107029136,113089756,
+        115756448, 130536524,101576842,129858904,132560153,132872166,112897039,
+        105305290,121849879,122466566,123255702,106969089,109533056,114656432,
+        122328677,113871672,123703864,126641632,124461560,112585488,120729112,
+        100976808,121484596,109159247,101755254,123206206,106107392,112842193,
+        127580505,108578205,128160895,127987934,127657239,108578205,118899316,
+        115064282,116363665,129854951,128272382,112919181,113478829,129080831,
+        117242886,130095964,114634725,119676659,131341214,123757372,112955206,
+        112589593,132969805,132356770,112234835,108430849,112587228,
+        132475438
         ) ~ "va",
-      
-      TRUE ~ agency_short
-    ))
+  TRUE ~ agency_short))
+
+
+  
+  
   
   
   # brought from doc --------------------------------------------------------
@@ -807,7 +921,9 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
     mutate(affiliation = gsub("veterans administration", "va", affiliation)) %>%
     mutate(affiliation = gsub("us agency for international development", "usaid", affiliation)) %>%
     mutate(affiliation = gsub("usaid's", "usaid", affiliation)) %>%
+    mutate(affiliation = gsub("nsf's", "nsf", affiliation)) %>%
     mutate(affiliation = gsub("us department of agriculture", "usda", affiliation))%>%
+    mutate(affiliation = gsub("united state epa", "epa", affiliation))%>%
     # mutate(affiliation = gsub("US FOREST SERVICE", "US Forest Service", affiliation))%>%
     mutate(affiliation = gsub(" servhice", " service", affiliation))%>%
     # mutate(affiliation = gsub("Us ", "US ", affiliation))%>%
@@ -1343,6 +1459,7 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
                affiliation == "sacramento national wildlife refuge complex"~"sacramento national wildlife refuge",
                affiliation == "u s fish and wildlife service"~"us fish and wildlife service",
                affiliation == "us geologic survey (usgs) geology"~"us geologic survey",
+               affiliation == "us of america usaid"~"usaid",
                affiliation == "us geologico survey"~"us geologic survey",
                affiliation == "usdi national park service"~"national park service",
                affiliation == "usdoi national park service"~"national park service",
@@ -1724,17 +1841,149 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
     mutate(affiliation = gsub("[(]visn[)]","",affiliation)) %>% 
     mutate(affiliation = gsub("[(]aetc psse[)]","",affiliation)) %>% 
     mutate(affiliation = gsub("[(]visn 1)","",affiliation)) %>% 
-    mutate(affiliation = gsub("health care","healthcare",affiliation)) %>% 
-    
-  mutate(affiliation = gsub("natural resources conservation service","nrcs",affiliation)) %>% 
-  mutate(affiliation = gsub("animal and plant health inspection service","aphis",affiliation)) %>% 
-    mutate(affiliation = gsub("usda agricultural research service","usda ars",affiliation)) %>% 
-    
-    mutate(affiliation = gsub("u s ","us ",affiliation)) 
+    mutate(affiliation = gsub("health care","healthcare",affiliation))
+  
   
   
   affils_df<-affils_df %>%
-    
+    mutate(affiliation = 
+             case_when(
+               affil_id == "117974904"~"national institute for childrens health quality",
+               affil_id == "125021094"~"us presidents malaria initiative",
+               affil_id == "100825548"~"national institute for childrens health quality",
+               affil_id == "125585876"~"university of hawaii sea grant",
+               affil_id == "110231280"~"us presidents malaria initiative",
+               affil_id == "124072602"~"us presidents malaria initiative",
+               affil_id == "118990068"~"us presidents malaria initiative",
+               affil_id == "114358001"~"us presidents malaria initiative",
+               affil_id == "116351316"~"us presidents malaria initiative",
+               affil_id == "118763835"~"us presidents malaria initiative",
+               affil_id == "125947150"~"us presidents malaria initiative",
+               affil_id == "129000709"~"us presidents malaria initiative",
+               affil_id == "127808105"~"us presidents malaria initiative",
+               affil_id == "129842651"~"us presidents malaria initiative vectorlink project",
+               affil_id == "128994948"~"us presidents malaria initiative vectorlink project",
+               affil_id == "129517741"~"university of hawaii sea grant",
+               affil_id == "130217483"~"us presidents malaria initiative vectorlink project",
+               affil_id == "126093909"~"national institute for childrens health quality",
+               affil_id == "130729379"~"1st special forces command",
+               affil_id == "124899230"~"us presidents malaria initiative",
+               affil_id == "127251082"~"us presidents malaria initiative",
+               affil_id == "131842689"~"usgs",
+               affil_id == "131130538"~"us presidents malaria initiative",
+               affil_id == "112510227"~"usgs",
+               affil_id == "112704723"~"roseburg va healthcare system",
+               affil_id == "107842993"~"puget sound va healthcare system",
+               affil_id == "60008438"~"national institute of diabetes digestive and kidney diseases",
+               affil_id == "117334935"~"jet propulsion laboratory",
+               affil_id == "122277613"~"va rocky mountain mental illness research",
+               affil_id == "121897686"~"us army reserves",
+               affil_id == "122466566"~"va office of clinical systems development & evaluation",
+               affil_id == "122864026"~"fredrick national laboratory for cancer research",
+               affil_id == "122928775"~"usda ars corn host plant resistance research unit",
+               affil_id == "123149379"~"loma linda va healthcare system",
+               affil_id == "60033281"~"centers for medicare and medicaid services",
+               affil_id == "60008135"~"usda ars childrens nutrition research center",
+               affil_id == "60071501"~"national astronomy and ionosphere center",
+               affil_id == "128408661"~"veteran engagement panel",
+               affil_id == "128408855"~"veteran engagement panel",
+               affil_id == "108579573"~"puget sound va healthcare system",
+               affil_id == "120096391"~"beckley va healthcare system",
+               affil_id == "112888033"~"puget sound va healthcare",
+               affil_id == "112805663"~"tennessee valley va geriatric research education clinical center",
+               affil_id == "116280683"~"washington dc va healthcare system",
+               affil_id == "122434728"~"veterans integrated service network7",
+               affil_id == "112363151"~"long beach va healthcare system",
+               affil_id == "101822051"~"pacific northwest national laboratory",
+               affil_id == "115220797"~"va diabetes quality enhancement research initiative",
+               affil_id == "124645423"~"veterans integrated service network 19",
+               affil_id == "121440940"~"va rocky mountain mental illness research",
+               affil_id == "123988749"~"naval information warfare center pacific",
+               affil_id == "124975404"~"naval medical readiness training command",
+               affil_id == "125585817"~"heeia national estuarine research reserve",
+               affil_id == "117529542"~"denver seattle center of innovation for veteran centered and value driven care",
+               affil_id == "124461560"~"va multiple sclerosis centers of excellence",
+               affil_id == "120729112"~"va office of systems redesign and improvement",
+               affil_id == "121988696"~"washington dc va healthcare system",
+               affil_id == "112687253"~"baltimore va medical center",
+               affil_id == "100448403"~"us forest service northern research station",
+               affil_id == "127418346"~"vha co",
+               affil_id == "125251113"~"puget sound va healthcare system",
+               affil_id == "117475782"~"carl t hayden va medical center",
+               affil_id == "120063750"~"usgs northern prairie wildlife research center",
+               affil_id == "124656248"~"national park service air resources division",
+               affil_id == "126413640"~"veterans integrated practice network 21",
+               affil_id == "125956300"~"wisconsin national cancer institute community oncology research program",
+               affil_id == "127423108"~"kauai national wildlife refuge complex",
+               affil_id == "130243044"~"heeia national estuarine research reserve",
+               affil_id == "109908284"~"chalmers p wylie va ambulatory care center",
+               affil_id == "129946937"~"va multiple sclerosis centers of excellence",
+               affil_id == "112888033"~"veterans affairs puget sound",
+               affil_id == "112888033"~"puget sound va healthcare",
+               affil_id == "126625848"~"centers for medicare and medicaid services",
+               affil_id == "112617455"~"ann arbor va healthcare system",
+               affil_id == "129449620"~"center for care delivery and outcomes research",
+               affil_id == "101516366"~"veterans integrated service network7",
+               affil_id == "117410704"~"tampa va research and education foundation",
+               affil_id == "112684574"~"usda ars jornada experimental range",
+               affil_id == "128327590"~"noaa southeast fisheries science center",
+               affil_id == "125764308"~"heeia national estuarine research reserve",
+               affil_id == "127007944"~"us army devcom data analysis center",
+               affil_id == "128521162"~"usgs",
+               affil_id == "128747025"~"national center for ptsd dissemination and training division",
+               affil_id == "128756619"~"usgs",
+               affil_id == "128444098"~"veterans rural health resource center portland",
+               affil_id == "130796795"~"center to improve veteran involvement in care",
+               affil_id == "127618307"~"growing rural outreach through veteran engagement center",
+               affil_id == "100792621"~"puget sound va healthcare",
+               affil_id == "101091378"~"usda nrcs",
+               affil_id == "101656153"~"noaa fisheries",
+               affil_id == "130163250"~"veterans integrated service network7",
+               affil_id == "129320613"~"defense health agency",
+               affil_id == "129987247"~"federal emergency management agency",
+               affil_id == "130210942"~"department of defense",
+               affil_id == "130001433"~"us army medical research directorate africa",
+               affil_id == "114262117"~"usda aphis veterinary services",
+               affil_id == "107592739"~"centers for medicare and medicaid services",
+               affil_id == "131254588"~"va quality scholars program",
+               affil_id == "131594478"~"naval medical research unit indo pacific",
+               affil_id == "120310236"~"usgs forest and rangeland ecosystem science center",
+               affil_id == "125612374"~"usda ars childrens nutrition research center",
+               affil_id == "131341214"~"va office of healthcare transformation",
+               affil_id == "131182471"~"gemini observatory",
+               affil_id == "131324555"~"nsf engineering research center for cell manufacturing technologies",
+               affil_id == "131329119"~"national park service air resources division",
+               affil_id == "131507085"~"us forest service southern research station",
+               affil_id == "131507085"~"us forest service southern research station",
+               affil_id == "131800245"~"defense health agency",
+               affil_id == "131936796"~"nsf ires 2022 lake victoria research consortium",
+               affil_id == "132017890"~"usgs",
+               affil_id == "105885121"~"loma linda va healthcare system",
+               affil_id == "131793716"~"midwest veterans biomedical research foundation",
+               affil_id == "115858329"~"midwest veterans biomedical research foundation",
+               affil_id == "100448403"~"us forest service",
+               affil_id == "129449620"~"minneapolis va center for care delivery and outcomes research",
+               affil_id == "131594478"~"us naval medical research unit indo pacific",
+               affil_id == "132670425"~"va national onoclogy program",
+               affil_id == "124975404"~"naval medical readiness and training command",
+               affil_id == "126413640"~"veterans integrated service network 21",
+               affil_id == "128747025"~"dissemination and education division of the national center for ptsd",
+               affil_id == "129320613"~"defense health agency public health",
+               affil_id == "128754886"~"baltimore va medical center",
+               affil_id == "132618477"~"va national onoclogy program",
+               affil_id == "128444098"~"veterans rural health resource center",
+               affil_id == "110915487"~"centers for medicare and medicaid services",
+               affil_id == "132356770"~"va central office",
+               affil_id == "113809321"~"usgs national wildlife health center",
+               .default = as.character(affiliation)
+             )
+    )
+  
+  
+  affils_df<-affils_df %>%
+    mutate(affiliation = gsub(" veterans affairs "," va ",affiliation)) %>% 
+    mutate(affiliation = gsub("smithsonian's","smithsonian",affiliation))
+  affils_df<-affils_df %>%
     mutate(country = 
              case_when(
                affil_id=="123149707"~"usa",
@@ -1798,18 +2047,21 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
              )
     )
      
+  # 
+  # scopus_id_1<-read_csv("./data_raw/affiliations_to_search/agencies_redux_clean.csv")
+  # scopus_id_2<-read_csv("./data_raw/affiliations_to_search/agencies_orig_clean.csv")
+  # search_affil_ids<-bind_rows(scopus_id_2,scopus_id_1) %>%  
+  #   distinct(affil_id,.keep_all = TRUE) %>% 
+  #   select(affil_id) 
+  search_affil_ids<-scopus_ids_searched %>% 
+      distinct(affil_id,.keep_all = TRUE) %>%
+      select(affil_id)
   
-  scopus_id_1<-read_csv("./data_raw/agencies/agencies_redux_clean.csv")
-  scopus_id_2<-read_csv("./data_raw/agencies/agencies_orig_clean.csv")
-  search_affil_ids<-bind_rows(scopus_id_2,scopus_id_1) %>%  
-    distinct(affil_id,.keep_all = TRUE) %>% 
-    select(affil_id) 
-  
-  
-  not_feds<-data.frame(affil_id=c(100320615,100597450,105428030,110075293,
-              112377346,113727207,115973022,117887308,118462400,
-              119020150,120290071,122485294,124235648,125377399,
-              126149601,129357068,130701562,60013443,60002294,
+  # notfed # nonfed
+  not_feds<-data.frame(affil_id=c(100320615,100597450,105428030,110075293,113216252,
+              112377346,113727207,115973022,117887308,118462400,60009225,60162091,
+              119020150,120290071,122485294,124235648,125377399,117318312,128783545,
+              126149601,129357068,130701562,60013443,60002294,100770790,
               60082598,60091251,60088290,60004435,60012284,
               60175885,60103346,60106655,60029115,60118175,60086597,
               60089351,60090486,60096341,60118178,60162091,106562201,
@@ -1821,8 +2073,12 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
               121816043,127905605,128058768,128064856,128186702,128609279,
               101869475,101967749,119493734,125136769,128853540,
               129556287,60028451,121848755,116732570,129349573,130790299,
-              131676655,131736517,131974087,60023942,60119229,
-              105637145,132392674,132488945))
+              131676655,131736517,131974087,60023942,60119229,60091347,
+              112865718,131793716,115858329,131599771,100407102,
+              113044510,106077252,105605863,112813607,117410704,121153711,
+              106755309,121947101,115489430,129482029,108199661,122400747,
+              60023515,113210840,121623565,127361156,105840497,113216446,
+              109525091,105637145,132392674,132488945))
   
   
   affils_df<-affils_df %>% 
@@ -2476,16 +2732,122 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
     )
     )
   
+  
+  # Final text changes
+  affils_df_corrected <- affils_df_corrected %>%
+    
+    mutate(affiliation = gsub("natural resources conservation service","nrcs",affiliation)) %>% 
+    mutate(affiliation = gsub("animal and plant health inspection service","aphis",affiliation)) %>% 
+    mutate(affiliation = gsub("usda agricultural research service","usda ars",affiliation)) %>%
+    
+    mutate(affiliation = gsub("national oceanic and atmospheric association","noaa",affiliation)) %>%
+    mutate(affiliation = gsub("national oceanic atmospheric administration","noaa",affiliation)) %>%
+    mutate(affiliation = gsub("national oceanic atmospheric admin","noaa",affiliation)) %>%
+    mutate(affiliation = gsub("center's","centers",affiliation)) %>%
+    mutate(affiliation = gsub(" (cwc)","",affiliation)) %>%
+    mutate(affiliation = gsub("noaanws","noaa nws",affiliation)) %>%
+    mutate(affiliation = gsub("patant &","patent and",affiliation)) %>%
+    mutate(affiliation = gsub("us bureau of the census","us census bureau",affiliation)) %>%
+    
+    
+    
+    
+    
+    mutate(affiliation = gsub("servicegeneva","service geneva",affiliation)) %>% 
+    mutate(affiliation = gsub("usda fs ","us forest service",affiliation)) %>% 
+    mutate(affiliation = gsub("usfs","us forest service",affiliation)) %>% 
+    mutate(affiliation = gsub("usda forut service","us forest service",affiliation)) %>% 
+    mutate(affiliation = gsub("u s ","us ",affiliation)) %>% 
+  
+    mutate(affiliation = gsub("united state ", "us ", affiliation)) %>%
+    mutate(affiliation = gsub("us epa", "epa", affiliation)) %>%
+    mutate(affiliation = gsub("us department of agriculture", "usda", affiliation)) %>%
+    
+    mutate(affiliation = gsub("usaf", "air force", affiliation)) %>%
+    mutate(affiliation = gsub("us naval", "naval", affiliation)) %>%
+    mutate(affiliation = gsub("us navy", "navy", affiliation)) %>%
+    mutate(affiliation = gsub("us army's", "army", affiliation)) %>%
+    mutate(affiliation = gsub("us army", "army", affiliation)) %>%
+    mutate(affiliation = gsub("us military", "military", affiliation)) %>%
+    mutate(affiliation = gsub("us marine corps", "marine corps", affiliation)) %>%
+    mutate(affiliation = gsub("usmc ", "marine corps ", affiliation)) %>%
+    mutate(affiliation = gsub("department of energy's", "doe", affiliation)) %>%
+    mutate(affiliation = gsub("department of energy", "doe", affiliation)) %>%
+    mutate(affiliation = gsub("doewind", "doe wind", affiliation)) %>%
+    mutate(affiliation = gsub("veterans administration", "va", affiliation)) %>%
+    mutate(affiliation = gsub("veterans healthcare administration", "vha", affiliation)) %>%
+    
+    mutate(affiliation = gsub("us veterans health administration", "vha", affiliation)) %>%
+    mutate(affiliation = gsub("veterans health administration", "vha", affiliation)) %>%
+    mutate(affiliation = gsub("usdi bureau of land management", "blm", affiliation)) %>%
+    mutate(affiliation = gsub("usdi fish and wildlife service", "us fish and wildlife service", affiliation)) %>%
+    mutate(affiliation = gsub("usdi fish and wildlife service", "us fish and wildlife service", affiliation)) %>%
+    mutate(affiliation = gsub("bureau of land management", "blm", affiliation)) %>%
+    mutate(affiliation = gsub("us bureau of land management", "blm", affiliation)) %>%
+    mutate(affiliation = gsub("us blm", "blm", affiliation)) %>%
+    mutate(affiliation = gsub("usdi blm", "blm", affiliation)) %>%
+    mutate(affiliation = gsub(" & ", " and ", affiliation)) %>%
+    mutate(affiliation = gsub("&", "and", affiliation)) %>%
+    mutate(affiliation = gsub("&", "and", affiliation)) %>%
+    mutate(affiliation = gsub("& amp; ", "and ", affiliation)) %>%
+    mutate(affiliation = gsub("agency for healthcare research and quality", "ahrq", affiliation)) %>%
+    mutate(affiliation = gsub("us air force", "air force", affiliation)) %>%
+    mutate(affiliation = gsub("doe's", "doe", affiliation)) %>%
+    mutate(affiliation = gsub("nnss - ", "", affiliation)) %>%
+    mutate(affiliation = gsub("laboratory's", "laboratory", affiliation)) %>%
+    mutate(affiliation = gsub("ornl ", "oak ridge national laboratory ", affiliation)) %>%
+    mutate(affiliation = gsub("1242centers", "centers", affiliation)) %>%
+    mutate(affiliation = gsub("centers for disease control and prevention ", "cdc ", affiliation)) %>%  
+    mutate(affiliation = gsub(" (rmrmc)", "", affiliation)) %>%  
+    
+    mutate(affiliation=case_when(
+      affiliation=="usaf"~"air force",
+      affiliation=="usn"~"navy",
+      affiliation=="us navy"~"navy",
+      affiliation=="usmc"~"marine corps",
+      affiliation=="usna"~"naval academy",
+      affiliation=="noaa national centers for environmental informationcenter for weather and climate(cwc)"~"national centers for environmental information",
+      affiliation=="noaa ncei"~"noaa national centers for environmental information",
+      affiliation=="nws"~"noaa nws",
+      affiliation=="us noaa nws"~"noaa nws",
+      affiliation=="us patent patent and trademark office"~"us patent and trademark office",
+      affiliation=="army combat capabilities development command aviation"~"army combat capabilities development command aviation and missle center",
+      affiliation=="army corps"~"army corps of engineers",
+      affiliation=="army corp of engineers"~"army corps of engineers",
+      affiliation=="army corps engineer research and development center (erdc"~"army corps engineer research and development center",
+      affiliation=="army corpsarmy corps of engineering"~"army corps of engineers",
+      affiliation=="army medical research directorate africa kenya (usamrd a k"~"army medical research directorate africa kenya",
+      affiliation=="army research inst"~"army research institute",
+      affiliation=="army research inst of"~"army research institute",
+      affiliation=="lawrence bekeley national laboratory"~"lawrence berkeley national laboratory",
+      affiliation=="lawrence berkekely national laboratory"~"lawrence berkeley national laboratory",
+      affiliation=="national research laboratory of berkeley"~"lawrence berkeley national laboratory",
+      affiliation=="oak ridge"~"oak ridge national laboratory",
+      affiliation=="oak ridge lab"~"oak ridge national laboratory",
+      affiliation=="centers for disease control and prevention"~"cdc",
+      affiliation=="federal bureau of investigation"~"fbi",
+      affiliation=="national center for post traumatic stress disorder"~"national center for ptsd",
+      affiliation=="bureau land management"~"blm",
+      affiliation=="enivronmental protection agency"~"epa",
+      affiliation=="national science foundation"~"nsf",
+      
+      .default = as.character(affiliation)
+    ))
+    
+  # mutate(affiliation = gsub("[)]","",affiliation)) %>%
+  #   mutate(affiliation = gsub("[(]","",affiliation)) %>%
+  #
   affils_df_corrected <- affils_df_corrected %>%
     mutate(agency_primary = case_when(
       federal == TRUE & !(agency_primary %in% c(
         "dod", "va", "interior", "usda", "commerce",
         "hhs", "state", "doe", "smithsonian", "nasa",
-        "nsf", "epa"
+        "nsf", "epa","hud","education","treasury","dot",
+  "federal reserve system" ,"labor","doj","dhs"
       )) ~ "other",
       .default = agency_primary
     ))
-  
+
   
   
   # foo<-affils_df_corrected %>% filter(federal==TRUE) %>% group_by(agency_primary, agency_short) %>% tally()%>% arrange(desc(n))
@@ -2565,9 +2927,30 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
   # affils_df %>% filter(federal==TRUE) %>% select(agency) %>% distinct() %>% arrange(agency)
   
   
-  affils_df_original
+  
+  
+  
+  # Final check with open refine
+  # write_csv(affils_df_corrected %>% filter(federal=="TRUE"),"./data_intermediate/affils_for_or.csv")
+  
+  
+  
+  # refined<-read_csv("./data_intermediate/affils-for-or-csv_OPEN_REFINED5.csv") %>%
+  #   mutate(cat="refined") %>%
+  #   select(-affiliation) %>%
+  # mutate(affil_id=as.character(affil_id))
+  # # 
+  # refine_both<-left_join(affils_df_corrected,refined,by=c("agency_primary","affil_id")) %>%
+  #   mutate(match=(affiliation==affiliation_mod)) %>%
+  #   filter(match==FALSE)
+  #   write_csv(refine_both,"./data_intermediate/refined_for_correcting.csv")
+  # 
+  
+  
+  
+  
   fed_pull<-affils_df_corrected %>% 
-    select(affil_id,agency,agency_primary,federal) %>% 
+    select(affil_id,affiliation,agency,agency_primary,federal) %>% 
     distinct() %>% 
     mutate(affil_id=as.numeric(affil_id))
   
@@ -2582,8 +2965,100 @@ affils_df<-affils_df %>% select(affil_url,affil_id,affiliation,city,country) %>%
   # 
   
   affils_df_original<-affils_df_original %>% 
-    left_join(fed_pull,by="affil_id")
+    left_join(fed_pull,by=c("affil_id"))
+  
+  
+  affils_df_original <-affils_df_original %>% 
+    mutate(affils_match=affiliation.x==affiliation.y) %>% 
+    mutate(affiliation.x=if_else(affiliation.x!=affiliation.y,affiliation.y,affiliation.x)) %>% 
+    select(-affils_match,-affiliation.y) 
   # 
+  # affils_df_original <-affils_df_original %>% 
+  #   mutate(agency_match=agency.x==agency.y) %>% 
+  #   mutate(agency.x=if_else(agency.x!=agency.y,agency.y,agency.x)) %>% 
+  #   select(-agency_match,-agency.y)
+  
+  # 
+  # affils_df_original <-affils_df_original %>% 
+  #   mutate(agency_match=agency_primary.x==agency_primary.y) %>% 
+  #   mutate(agency_primary.x=if_else(agency_primary.x!=agency_primary.y,agency_primary.y,agency_primary.x)) %>% 
+  #   select(-agency_match,-agency_primary.y)
+  # 
+  # 
+  # affils_df_original <-affils_df_original %>% 
+  #   mutate(agency_match=federal.x==federal.y) %>% 
+  #   mutate(federal.x=if_else(federal.x!=federal.y,federal.y,federal.x)) %>% 
+  #   select(-agency_match,-federal.y)
+  #   
+  
+  affils_df_original<-affils_df_original %>% 
+    rename(
+      # agency=agency.x,
+      #      agency_primary=agency_primary.x,
+      #      federal=federal.x,
+      affiliation=affiliation.x)
+  
+  # CONTRACTORS AND CONSULTANTS = CORREECT FEDERAL TO FALSE
+  
+  affils_df_original<-affils_df_original %>% 
+    mutate(federal = case_when(
+      affil_id %in% c(
+        124366686,
+        131099988,
+        125125015,
+        126483809,
+        129402606,
+        129074890,
+        130554499,
+        125341111,
+        121502463,
+        124520435,
+        131291373,
+        128018345,
+        131291408,
+        110885103,
+        122799414,
+        124999103,
+        129646744,
+        126412492,
+        129195276,
+        129136549,
+        131216093,
+        123233457,
+        131757399,
+        121236597,
+        130621829,
+        130939726,
+        131642517,
+        114986873,
+        118735849,
+        119756321,
+        125564413,
+        124147905,
+        130621205,
+        131146576,
+        129771404,
+        101568411,
+        129027339,
+        125868899,
+        132236003,
+        121850386,
+        127059382,
+        125366315,
+        123102696,
+        126342874,
+        126457955,
+        129214899,
+        124218979,
+        129787947,
+        127423673,
+        132506320
+    ) ~ FALSE,
+    .default = federal
+    )
+    )
+
+  
   # 
   # other_agencies<-affils_df_original %>% 
   #   filter(federal==TRUE) %>% 
