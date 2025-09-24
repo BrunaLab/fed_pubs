@@ -48,11 +48,11 @@
   </macro>
   <macro name="access">
     <choose>
-      <if match="any" type="webpage post post-weblog article">
+      <if match="any" type="webpage report online post post-weblog article">
         <group delimiter=" ">
           <group delimiter=": ">
             <text term="available at" text-case="capitalize-first"/>
-            <text variable="URL"/>
+            <text variable="url"/>
           </group>
           <group prefix=" [" suffix="]">
             <text term="accessed" text-case="capitalize-first" suffix=" "/>
@@ -75,7 +75,7 @@
         <group delimiter=" ">
           <group delimiter=": ">
             <text term="available at" text-case="capitalize-first"/>
-            <text variable="URL"/>
+            <text variable="url"/>
           </group>
           <group prefix="(" suffix=")">
             <text term="accessed" suffix=" "/>
@@ -89,7 +89,7 @@
       </else-if>
       <else-if type="dataset software" match="any">
         <group delimiter=". ">
-          <text variable="DOI" prefix="https://doi.org/"/>
+          <text variable="url" prefix="DOI: "/>
           <date variable="issued" prefix="Deposited ">
             <date-part name="day" suffix=" "/>
             <date-part name="month" suffix=" "/>
@@ -104,7 +104,7 @@
       <if type="book">
         <text variable="title" font-style="italic"/>
       </if>
-      <else-if type="chapter report thesis" match="any">
+      <else-if type="chapter report report thesis" match="any">
         <text variable="title" quotes="true"/>
       </else-if>
       <else>

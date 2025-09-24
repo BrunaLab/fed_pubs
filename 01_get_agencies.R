@@ -674,7 +674,7 @@ unique_affils<-complete_affil_list %>%
 write_delim(unique_affils,"./data_clean/unique_affils.txt")
 
 oiginal_search<-anti_join(unique_affils,left_to_search,)
-write_delim(oiginal_search,"./data_clean/oiginal_search.txt")
+write_delim(oiginal_search,"./data_clean/orginal_search.txt")
 
 # DID NOT INCLUDE:
 # University_Affiliated_Research_Center
