@@ -1,5 +1,6 @@
-pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_max,PM_max) {
+pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY_max,PM_max) {
 
+  
   papers_df_info<-papers_dataset %>% 
     select(refID,PY,PM)
   
@@ -136,8 +137,32 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     rename(perc_change=perc_previous) %>% 
     filter(PY==2025) %>% 
     select(perc_change,agency_primary)
-  plot_data<-plot_data %>% left_join(perc_change,by="agency_primary") %>% 
+  
+  
+  plot_data<-plot_data %>% 
+    left_join(perc_change,by="agency_primary") %>% 
+    
+    mutate(agency_primary=case_when(
+      agency_primary == "DOE"~"Energy",
+      agency_primary == "HHS"~"Health & Human Services",
+      agency_primary == "VA"~"Veterans Affairs",
+      agency_primary == "DHS"~"Homeland Security",
+      agency_primary == "DOD"~"Defense",
+      agency_primary == "USDA"~"Agriculture",
+      agency_primary == "NASA"~"National Aeronautics & Space Admin",
+      agency_primary == "Smithsonian"~"Smithsonian Institution",
+      agency_primary == "NSF"~"National Science Foundation",
+      agency_primary == "EPA"~"Environmental Protection Agency",
+      agency_primary == "DOJ"~"Justice",
+      agency_primary == "DOT"~"Transportation",
+      agency_primary == "HUD"~"Housing & Urban Development",
+      agency_primary == "Other"~"Other federal units",
+      .default = as.character(agency_primary)
+    )
+    ) %>% 
     mutate(agency_primary=paste(agency_primary," (",perc_change,"%)", sep=""))
+  
+  
   
   order<-plot_data %>% group_by(agency_primary) %>% 
     mutate(rank=sum(n)) %>% 
@@ -145,6 +170,10 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     arrange(desc(rank)) %>% 
     mutate(agency_primary = fct_reorder(agency_primary, rank)) %>%
     select(agency_primary)
+  
+  
+  
+  
   
   
   pubs_mo_cum_fig<-
@@ -156,12 +185,13 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
     mutate(label = if_else(PY == "avg", NA, as.character(label))) %>% 
     mutate(label = if_else((PY == "2019"|PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
-    ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY)) +
+    ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY,  linetype=PY))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
     geom_line() + 
     geom_point(size=0.5)+
     scale_color_manual(values=c(rep("gray57",6),"#8B0000","#36648B"))+
+    scale_linetype_manual(values = c(rep("solid", 6), "solid", "dashed"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+
@@ -180,8 +210,9 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
                nudge_y = 0.8, 
                nudge_x = 0.5, 
                size =2.5,
-               fill=NA,
-               label.size = unit(0,"mm")
+               fill=NA
+               # ,
+               # label.size = unit(0,"mm")
     ) +
     theme(plot.background = element_rect(color = 1,
                                          size = 0),
@@ -190,7 +221,8 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
                                b = 20,  # Bottom margin
                                l = 20))  # Left margin
   
-  ggsave("./docs/images/pubs_mo_cum_agency_lines.png", width = 11, height = 7, units = "in", device='png', dpi=700)
+  ggsave("./docs/images/pubs_mo_cum_agency_lines.png", width = 11, height = 14, units = "in", device='png', dpi=700)
   # 
   return(pubs_mo_cum_fig)
-}
+
+  }

@@ -1,0 +1,698 @@
+---
+title: "Scopus Codes"
+subtitle: "January 2019 - August 2025)"
+author: "Emilio M. Bruna"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+# output: html_document
+# output: pdf_document
+output:
+  pdf_document:
+    latex_engine: xelatex
+    keep_tex: true
+# mainfont: "Palatino"
+mainfont: "Times New Roman"
+geometry: margin=1in
+fontsize: 11pt
+linkcolor: darkmidnightblue
+urlcolor: darkmidnightblue
+header-includes:
+  # - \usepackage{fontspec}
+  # - \setmainfont{Times New Roman}
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  # - \usepackage[default]{sourcesanspro}
+  - \usepackage{parskip}
+  - \usepackage{geometry}
+  - \usepackage{caption}
+  - \usepackage{xcolor}
+  - \definecolor{darkmidnightblue}{rgb}{0.0, 0.2, 0.4}
+  - \AtBeginDocument{\let\maketitle\relax}
+  - \usepackage[none]{hyphenat}
+  - \usepackage{setspace}
+  - \usepackage[document]{ragged2e}
+  - \usepackage{graphicx}
+  - \usepackage{sectsty}\allsectionsfont{\raggedright}
+  - \usepackage{sectsty}\sectionfont{\centering\color{darkmidnightblue}}
+  - \usepackage{sectsty}\subsectionfont{\centering\color{darkmidnightblue}}
+  - \usepackage{titlesec}
+  - \usepackage[export]{adjustbox}
+  - \titlespacing{\section}{0pt}{24pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \titlespacing{\subsection}{0pt}{12pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \titlespacing{\subsubsection}{0pt}{12pt plus 2pt minus 1pt}{0pt plus 1pt minus 1pt}
+  - \usepackage{floatrow}
+  - \DeclareFloatSeparators{mysep}{\hskip-94em}
+  # - \floatsetup[figure]{capposition=beside,capbesidesep=mysep,capbesideposition={right, center}}
+  - \usepackage{float}
+  - \usepackage{wrapfig} 
+  - \usepackage{pdflscape}
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
+  # - \usepackage[font=small,labelfont=bf,labelsep=space]{caption}
+  # - \captionsetup{figurename=Fig.,tablename=Table}
+  # - \usepackage[labelfont=bf]{caption}
+  # - \captionsetup{font=footnotesize, textfont=footnotesize}
+  - \fancyfoot{} # cues the use of fancy footer
+  - \fancyhead[L]{Emilio M Bruna} # month & year on header left 
+  - \fancyhead[R]{`r format(Sys.time(), '%d %B %Y')`} # name and page on header right
+#Required for specifying captions t
+  # - \usepackage{indentfirst}
+  # - \setlength\parindent{22pt} # uncomment if you want indented paragraphs
+
+
+# https://pubs.usgs.gov/search?q=&startYear=2019&__ncforminfo=Rf6y9tBB_4xn4sDOJ7tdSPmxI5Eu33dcCKy8YpAAAQRE-JJvXyAJAosPJMziEEMnxQE_iCi7dgGWVwrbQe9Gpb9a-7115VxO
+
+---
+
+<!-- ## Supplementary Materials - Scopus Affiliation Codes for Focal Universities -->
+
+```{r setup-uni, include=FALSE}
+
+library(tidyverse)
+library(janitor)
+library(gghighlight)
+library(kableExtra)
+library(data.table)
+# library(knitr)
+
+knitr::opts_chunk$set(echo = FALSE, message=FALSE,warning=FALSE)
+
+options(scipen=999)
+
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+
+knitr::opts_chunk$set(fig.pos = 'H')
+
+knitr::opts_chunk$set(dpi=300,fig.width=6)
+
+```
+
+\newpage
+
+```{r unicodes}
+
+
+scopus_id<-read_csv("./data_clean/uni_affils_clean.csv") %>% 
+  # mutate(uni=case_when(
+  #   # uni == "minn"~"other",
+  #   uni == "unc_ch"~"other",
+  #   uni == "ohio_state"~"other",
+  #   is.na(uni) ~ "other",
+  #   .default = as.character(uni)
+  # )) %>% 
+  filter(uni!="other") %>%
+  filter(uni!="mass_general") %>%
+  # filter(uni=="florida") %>%
+  # slice_head(n=30) %>% 
+  distinct(affil_id,.keep_all=TRUE) %>% 
+  arrange(uni,desc(pub_count)) %>% 
+  select(uni,affil_id,affiliation) %>% 
+  mutate(affiliation=tolower(affiliation)) %>% 
+  mutate(uni=case_when(
+    uni == "unc_ch"~"UNC Chapel Hill",
+    uni == "ohio_state"~"The Ohio State University",
+    uni == "florida"~"University of Florida",
+    uni == "harvard"~"Harvard University",
+    uni == "mass_general"~"Massachusetts General Hospital",
+    uni == "michigan"~"University of Michigan",
+    uni == "penn"~"University of Pennsylvania",
+    uni == "stanford"~"Stanford University",
+    uni == "ucla"~"University of California, Los Angeles",
+    uni == "minn"~"University of Minnesota",
+    uni == "ucsd"~"University of California, San Diego",
+    uni == "ucsf"~"University of California, San Francisco",
+    uni == "washington"~"University of Washington",
+    .default = as.character(uni)
+  )) %>% 
+  arrange(uni)
+# %>% 
+#   mutate(row=row_number())
+
+# scopus_id %>% group_by(uni) %>% tally() %>% mutate(row_start=cumsum(n)-n+1) %>% mutate(row_end=cumsum(n))
+
+first<-scopus_id %>% 
+    mutate(first=row_number()) %>% 
+  group_by(uni) %>% slice_head(n=1) %>%
+select(uni,first)
+last<-scopus_id %>% 
+  mutate(last=row_number()) %>% 
+  group_by(uni) %>% 
+  slice_tail(n=1) %>% 
+  select(uni,last)
+first_last<-left_join(first,last) %>% 
+  arrange(uni)
+rm(first,last)
+
+
+  
+scopus_id %>% 
+    select(`Scopus ID`=affil_id,
+         Affiliation=affiliation) %>% 
+  mutate(Affiliation=tolower(Affiliation)) %>% 
+  kable(
+      format    = "latex", 
+      longtable = T, 
+      booktabs  = T, 
+      caption   = "Scopus Affiliation ID codes used in the search of research productivity by ten US research-intensive universities and the affiliations associated with these codes.",
+      align = "rl",
+      ) %>%
+  kable_styling(
+    # longtable = T, 
+    bootstrap_options = c("hover"),
+    full_width = T,
+    latex_options = c("hold_position", "repeat_header"),
+    repeat_header_continued = "\\textit{(Continued on next page...)}",
+    position = "center",
+    font_size = 8
+  ) %>% 
+  row_spec(0, bold = T) %>%
+  column_spec(1, width = "20em") %>%
+  column_spec(2, width = "37em") %>% 
+  # column_spec(3, width = "25em") %>% 
+  
+  pack_rows("HARVARD UNIVERSITY", as.numeric(first_last[1,2]), as.numeric(first_last[1,3]), indent = TRUE) %>% 
+  
+  pack_rows("STANFORD UNIVERSITY", as.numeric(first_last[2,2]), as.numeric(first_last[2,3]), indent = TRUE) %>% 
+  
+  pack_rows("THE OHIO STATE UNIVERSITY", as.numeric(first_last[3,2]), as.numeric(first_last[3,3]), indent = TRUE) %>% 
+  
+ pack_rows("UNIVERSITY OF NORTH CAROLINA, CHAPEL HILL" , as.numeric(first_last[4,2]), as.numeric(first_last[4,3]), indent = TRUE) %>% 
+  
+  
+  pack_rows("UNIVERSITY OF CALIFORNIA, LOS ANGELES", as.numeric(first_last[5,2]), as.numeric(first_last[5,3]), indent = TRUE) %>% 
+  pack_rows("UNIVERSITY OF CALIFORNIA, SAN DIEGO", as.numeric(first_last[6,2]), as.numeric(first_last[6,3]), indent = TRUE) %>% 
+  pack_rows("UNIVERSITY OF CALIFORNIA, SAN FRANCISCO", as.numeric(first_last[7,2]), as.numeric(first_last[7,3]), indent = TRUE) %>% 
+  
+  pack_rows("UNIVERSITY OF FLORIDA", as.numeric(first_last[8,2]), as.numeric(first_last[8,3]), indent = TRUE) %>% 
+  
+  pack_rows("UNIVERSITY OF MICHIGAN, ANN ARBOR", as.numeric(first_last[9,2]), as.numeric(first_last[9,3]), indent = TRUE) %>% 
+  pack_rows("UNIVERSITY OF MINNESOTA, TWIN CITIES", as.numeric(first_last[10,2]), as.numeric(first_last[10,3]), indent = TRUE) %>% 
+  pack_rows("UNIVERSITY OF PENNSYLVANIA", as.numeric(first_last[11,2]), as.numeric(first_last[11,3]), indent = TRUE) %>% 
+  pack_rows("UNIVERSITY OF WASHINGTON", as.numeric(first_last[12,2]), as.numeric(first_last[12,3]), indent = TRUE) 
+  
+```
+
+
+<!-- \end{landscape} -->
+
+<!-- Sept 12, 2025 Scopus  -->
+<!-- "PUBYEAR > 2018 AND ( LIMIT-TO ( DOCTYPE , "ar" ) OR LIMIT-TO ( DOCTYPE , "re" ) OR LIMIT-TO ( DOCTYPE , "ch" ) OR LIMIT-TO ( DOCTYPE , "no" ) OR LIMIT-TO ( DOCTYPE , "dp" ) )" -->
+
+
+<!-- Harvard Medical School/Harvard -->
+<!-- University of Michigan, Ann Arbor -->
+<!-- University of Washington -->
+<!-- University of Pennsylvania -->
+<!-- Stanford University -->
+<!-- University of California, Los Angeles -->
+<!-- Massachusetts General Hospital -->
+<!-- University of California, San Diego -->
+<!-- University of California, San Francisco -->
+<!-- University of Florida -->
+<!-- University of Minnesota Twin Cities -->
+<!-- The Ohio State University -->
+<!-- <!-- University of Wisconsin-Madison --> 
+<!-- <!-- Columbia University --> 
+<!-- The University of North Carolina at Chapel Hill -->
+<!-- University of California, Berkeley -->
+
+
+<!-- Ministry of Education of the People's Republic of China -->
+<!-- 553,751 -->
+
+<!-- Chinese Academy of Sciences -->
+<!-- 470,108 -->
+
+<!-- CNRS Centre National de la Recherche Scientifique -->
+<!-- 256,059 -->
+
+<!-- University of Chinese Academy of Sciences -->
+<!-- 216,720 -->
+
+<!-- Russian Academy of Sciences -->
+<!-- 136,646 -->
+
+<!-- Zhejiang University -->
+<!-- 130,042 -->
+
+<!-- Harvard Medical School -->
+<!-- 127,171 -->
+
+<!-- Tsinghua University -->
+<!-- 119,405 -->
+
+<!-- University of Toronto -->
+<!-- 117,750 -->
+
+<!-- Shanghai Jiao Tong University -->
+<!-- 113,429 -->
+
+<!-- Universidade de São Paulo -->
+<!-- 105,269 -->
+
+<!-- Sichuan University -->
+<!-- 101,944 -->
+
+<!-- University of Oxford -->
+<!-- 99,702 -->
+
+<!-- Huazhong University of Science and Technology -->
+<!-- 98,927 -->
+
+<!-- Central South University -->
+<!-- 96,958 -->
+
+<!-- University College London -->
+<!-- 96,223 -->
+
+<!-- Sun Yat-Sen University -->
+<!-- 94,343 -->
+
+<!-- Peking University -->
+<!-- 93,139 -->
+
+<!-- Fudan University -->
+<!-- 92,288 -->
+
+<!-- Inserm -->
+<!-- 89,242 -->
+
+<!-- University of Melbourne -->
+<!-- 86,073 -->
+
+<!-- Xi'an Jiaotong University -->
+<!-- 83,213 -->
+
+<!-- University of Michigan, Ann Arbor -->
+<!-- 81,959 -->
+
+<!-- University of Science and Technology of China -->
+<!-- 81,666 -->
+
+<!-- Harbin Institute of Technology -->
+<!-- 80,339 -->
+
+<!-- University of Cambridge -->
+<!-- 76,819 -->
+
+<!-- The University of Sydney -->
+<!-- 76,786 -->
+
+<!-- Southeast University -->
+<!-- 74,492 -->
+
+<!-- University of Washington -->
+<!-- 73,972 -->
+
+<!-- The University of Tokyo -->
+<!-- 73,889 -->
+
+<!-- Imperial College London -->
+<!-- 73,650 -->
+
+<!-- Shandong University -->
+<!-- 73,485 -->
+
+<!-- Monash University -->
+<!-- 73,397 -->
+
+<!-- Tongji University -->
+<!-- 73,371 -->
+
+<!-- Tianjin University -->
+<!-- 73,075 -->
+
+<!-- University of Pennsylvania -->
+<!-- 70,680 -->
+
+<!-- Stanford University -->
+<!-- 70,100 -->
+
+<!-- The University of Queensland -->
+<!-- 69,645 -->
+
+<!-- Wuhan University -->
+<!-- 69,079 -->
+
+<!-- The University of British Columbia -->
+<!-- 68,974 -->
+
+<!-- Chinese Academy of Medical Sciences & Peking Union Medical College -->
+<!-- 68,253 -->
+
+<!-- University of California, Los Angeles -->
+<!-- 68,174 -->
+
+<!-- King Saud University -->
+<!-- 68,163 -->
+
+<!-- National University of Singapore -->
+<!-- 67,080 -->
+
+<!-- Ministry of Agriculture of the People's Republic of China -->
+<!-- 67,044 -->
+
+<!-- UNSW Sydney -->
+<!-- 65,817 -->
+
+<!-- Zhengzhou University -->
+<!-- 65,800 -->
+
+<!-- Københavns Universitet -->
+<!-- 64,719 -->
+
+<!-- Sorbonne Université -->
+<!-- 64,245 -->
+
+<!-- Massachusetts General Hospital -->
+<!-- 63,557 -->
+
+<!-- University of California, San Diego -->
+<!-- 63,086 -->
+
+<!-- Jilin University -->
+<!-- 62,897 -->
+
+<!-- Sapienza Università di Roma -->
+<!-- 62,830 -->
+
+<!-- Université Paris-Saclay -->
+<!-- 62,823 -->
+
+<!-- University of California, San Francisco -->
+<!-- 62,555 -->
+
+<!-- Consejo Superior de Investigaciones Científicas -->
+<!-- 61,981 -->
+
+<!-- Nanjing University -->
+<!-- 61,543 -->
+
+<!-- University of Florida -->
+<!-- 61,117 -->
+
+<!-- King's College London -->
+<!-- 60,911 -->
+
+<!-- Consiglio Nazionale delle Ricerche -->
+<!-- 60,335 -->
+
+<!-- South China University of Technology -->
+<!-- 60,306 -->
+
+<!-- Consejo Nacional de Investigaciones Científicas y Técnicas -->
+<!-- 59,739 -->
+
+<!-- Chongqing University -->
+<!-- 59,384 -->
+
+<!-- Capital Medical University -->
+<!-- 59,052 -->
+
+<!-- University of Minnesota Twin Cities -->
+<!-- 58,809 -->
+
+<!-- KU Leuven -->
+<!-- 58,790 -->
+
+<!-- Université Paris Cité -->
+<!-- 57,234 -->
+
+<!-- The Ohio State University -->
+<!-- 55,564 -->
+
+<!-- The University of Manchester -->
+<!-- 55,341 -->
+
+<!-- Northwestern Polytechnical University -->
+<!-- 54,958 -->
+
+<!-- University of Alberta -->
+<!-- 54,894 -->
+
+<!-- Beijing Institute of Technology -->
+<!-- 54,431 -->
+
+<!-- University of Wisconsin-Madison -->
+<!-- 54,279 -->
+
+<!-- Columbia University -->
+<!-- 54,250 -->
+
+<!-- The University of North Carolina at Chapel Hill -->
+<!-- 54,206 -->
+
+<!-- Dalian University of Technology -->
+<!-- 54,008 -->
+
+<!-- Université McGill -->
+<!-- 53,515 -->
+
+<!-- University of California, Berkeley -->
+<!-- 53,029 -->
+
+<!-- Università degli Studi di Milano -->
+<!-- 52,458 -->
+
+<!-- Beihang University -->
+<!-- 51,971 -->
+
+<!-- Karolinska Institutet -->
+<!-- 51,824 -->
+
+<!-- Technische Universität München -->
+<!-- 51,533 -->
+
+<!-- The University of Edinburgh -->
+<!-- 51,471 -->
+
+<!-- Shanghai Jiao Tong University School of Medicine -->
+<!-- 51,380 -->
+
+<!-- Brigham and Women's Hospital -->
+<!-- 51,285 -->
+
+<!-- University of Electronic Science and Technology of China -->
+<!-- 50,904 -->
+
+<!-- Mayo Clinic -->
+<!-- 50,788 -->
+
+<!-- Lomonosov Moscow State University -->
+<!-- 50,728 -->
+
+<!-- Seoul National University -->
+<!-- 50,724 -->
+
+<!-- Università degli Studi di Padova -->
+<!-- 50,430 -->
+
+<!-- Universiteit van Amsterdam -->
+<!-- 50,066 -->
+
+<!-- Alma Mater Studiorum Università di Bologna -->
+<!-- 49,973 -->
+
+<!-- Johns Hopkins University -->
+<!-- 49,733 -->
+
+<!-- Johns Hopkins University School of Medicine -->
+<!-- 49,210 -->
+
+<!-- University of California, Davis -->
+<!-- 49,188 -->
+
+<!-- ETH Zürich -->
+<!-- 48,924 -->
+
+<!-- INRAE -->
+<!-- 48,668 -->
+
+<!-- Nanyang Technological University -->
+<!-- 48,420 -->
+
+<!-- The Hong Kong Polytechnic University -->
+<!-- 48,410 -->
+
+<!-- Ludwig-Maximilians-Universität München -->
+<!-- 48,317 -->
+
+<!-- Pennsylvania State University -->
+<!-- 48,009 -->
+
+<!-- Kyoto University -->
+<!-- 47,992 -->
+
+<!-- Universiteit Gent -->
+<!-- 47,735 -->
+
+<!-- Massachusetts Institute of Technology -->
+<!-- 47,144 -->
+
+<!-- Texas A&M University -->
+<!-- 47,035 -->
+
+<!-- The University of Hong Kong -->
+<!-- 46,837 -->
+
+<!-- Chinese Academy of Agricultural Sciences -->
+<!-- 46,538 -->
+
+<!-- Universitat de Barcelona -->
+<!-- 46,360 -->
+
+<!-- Università degli Studi di Napoli Federico II -->
+<!-- 46,108 -->
+
+<!-- The University of Texas at Austin -->
+<!-- 45,552 -->
+
+<!-- Helsingin Yliopisto -->
+<!-- 45,132 -->
+
+<!-- Xiamen University -->
+<!-- 45,017 -->
+
+<!-- University of Illinois Urbana-Champaign -->
+<!-- 44,833 -->
+
+<!-- Harvard University -->
+<!-- 44,749 -->
+
+<!-- Shenzhen University -->
+<!-- 44,445 -->
+
+<!-- University of Pittsburgh -->
+<!-- 44,004 -->
+
+<!-- UCSF School of Medicine -->
+<!-- 43,893 -->
+
+<!-- University of Southern California -->
+<!-- 43,804 -->
+
+<!-- Universität Zürich -->
+<!-- 43,757 -->
+
+<!-- Northwestern University -->
+<!-- 43,755 -->
+
+<!-- Universidade de Lisboa -->
+<!-- 43,722 -->
+
+<!-- Universidad Nacional Autónoma de México -->
+<!-- 43,678 -->
+
+<!-- National Institutes of Health (NIH) -->
+<!-- 43,650 -->
+
+<!-- Rijksuniversiteit Groningen -->
+<!-- 43,498 -->
+
+<!-- University of Science and Technology Beijing -->
+<!-- 43,469 -->
+
+<!-- Yale University -->
+<!-- 42,988 -->
+
+<!-- University of Calgary -->
+<!-- 42,954 -->
+
+<!-- Aarhus Universitet -->
+<!-- 42,925 -->
+
+<!-- Yale School of Medicine -->
+<!-- 42,634 -->
+
+<!-- AP-HP Assistance Publique - Hopitaux de Paris -->
+<!-- 42,631 -->
+
+<!-- Northeastern University -->
+<!-- 42,113 -->
+
+<!-- Lanzhou University -->
+<!-- 41,856 -->
+
+<!-- Stanford University School of Medicine -->
+<!-- 41,639 -->
+
+<!-- Lunds Universitet -->
+<!-- 41,490 -->
+
+<!-- Tel Aviv University -->
+<!-- 41,479 -->
+
+<!-- Beijing Normal University -->
+<!-- 41,378 -->
+
+<!-- Universitetet i Oslo -->
+<!-- 41,345 -->
+
+<!-- Universidade do Porto -->
+<!-- 41,227 -->
+
+<!-- Cornell University -->
+<!-- 41,047 -->
+
+<!-- Michigan State University -->
+<!-- 41,027 -->
+
+<!-- Hunan University -->
+<!-- 40,880 -->
+
+<!-- University of Birmingham -->
+<!-- 40,873 -->
+
+<!-- Universiteit Utrecht -->
+<!-- 40,859 -->
+
+<!-- Duke University -->
+<!-- 40,783 -->
+
+<!-- Zhejiang University School of Medicine -->
+<!-- 40,662 -->
+
+<!-- Jiangsu University -->
+<!-- 40,648 -->
+
+<!-- Universidad Complutense de Madrid -->
+<!-- 40,280 -->
+
+<!-- Tehran University of Medical Sciences -->
+<!-- 40,120 -->
+
+<!-- Purdue University -->
+<!-- 40,001 -->
+
+<!-- University of Toronto Faculty of Medicine -->
+<!-- 39,953 -->
+
+<!-- Uppsala Universitet -->
+<!-- 39,875 -->
+
+<!-- Nanjing University of Aeronautics and Astronautics -->
+<!-- 39,702 -->
+
+<!-- Universidade Estadual Paulista "Júlio de Mesquita Filho" -->
+<!-- 39,640 -->
+
+<!-- King Abdulaziz University -->
+<!-- 39,565 -->
+
+<!-- Charles University -->
+<!-- 39,358 -->
+
+<!-- Cairo University -->
+<!-- 39,294 -->
+
+<!-- McMaster University -->
+<!-- 39,083 -->
+
+<!-- Nankai University -->
+<!-- 38,849 -->
+
+<!-- Chinese University of Hong Kong -->
+<!-- 38,747 -->
+
+<!-- Università degli Studi di Torino -->
+<!-- 38,552 -->
+

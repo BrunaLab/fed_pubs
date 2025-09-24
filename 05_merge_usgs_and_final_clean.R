@@ -1,6 +1,3 @@
-# 60138915: CURENT, Center for Ultra-Wide-Area Resilient Electric Energy Transmission Networks, is a graduated National Science Foundation (NSF) Engineering Research Center that was jointly supported by NSF and the Department of Energy (DoE) for a period of 10 years before becoming self-sustaining. A collaboration between academia, industry, and national laboratories, CURENT is led by the University of Tennessee, Knoxville. Partner institutions include:
-# DO WE KEEP? 
-
 # into --------------------------------------------------------------------
 # 
 # This will take the super-file of all years together, 
@@ -20,7 +17,6 @@ library(data.table)
 
 # IDENTIFY FEDERAL AFFILIATIONS -------------------------------------------
 
-## NEED TO CONFIRM THE DOD CDC ESP. INTENRATIONAL
 
 affils_df<-read_csv("./data_raw/affils/all_affils_df_fed.csv")
 scopus_ids_searched<-read_csv("./data_clean/api_affils_searched_2025-09-01.csv")
@@ -53,7 +49,14 @@ papers_df_trim<-
   tibble()
   
 papers_df_trim<-papers_df_trim %>% 
-  distinct(SO,PY,DI,TI,.keep_all = TRUE)
+  distinct(SO,PY,DI,TI,.keep_all = TRUE) %>% 
+  mutate(PM=
+         case_when(
+           is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
+           .default = as.numeric(PM)
+         )
+) %>% 
+  mutate(PT=if_else(PT=="j","journal",PT))
 
 
 dup_titles<-papers_df_trim %>%
@@ -171,16 +174,85 @@ authors_df_trim<-authors_df_trim %>%
          -federal.y) %>% 
   rename(agency_primary=agency_primary.x,
          agency=agency.x,
-         federal=federal.x)
+         federal=federal.x) %>% 
+  mutate(federal=if_else(is.na(federal),FALSE,federal))
+
+
+
+# chose publication types or titles to remove -----------------------------
+
+# unique(papers_df$DT)
+# ARTICLE TYPES - KEEP
+# "book chapter"
+# "article"
+# "review"
+# "note"
+# "data paper"
+# ARTICLE TYPES - REMOVE
+# "letter" # excluded below
+# "editorial" # excluded below" 
+
+# papers_df %>% filter(DT=="editorial") %>% select(TI)
+# authors_df %>% filter(is.na(agency)) %>% group_by(federal) %>% tally()
+
+papers_cat<-c("article","book chapter","data paper","note","review")
+
+papers_df_trim <- papers_df_trim %>% 
+  filter(DT%in%papers_cat) 
+
+authors_df<-authors_df_trim %>% 
+  filter(refID%in%papers_df_trim$refID)
+
+rm(papers_cat)
+
+# this calclulates how many papers have authors from each institution
+papers_by_agency<-authors_df_trim %>% 
+  select(refID,agency_primary,author_order) %>% 
+  group_by(refID) %>% 
+  count(agency_primary) %>% 
+  pivot_wider(names_from = agency_primary, values_from = n) %>% 
+  replace(is.na(.), 0)
+
+# But wait! SCOPUS returned articles that included focal agency 
+# as any affiliation (2nd, 3rd, etc). for instance for refID = 60000650_2021-13,
+# the primary affiliation of all authors is 'Brigham and Women's Hospital' but 
+# harvard medical school or harvard college are secondary affiliations.
+# Need to 2x these to make sure should keep (i.e.) do we treat BW, Mass General
+# etc as harvard or not. 
+# Decision: NO primary affil only.
+
+
+NA_only_pubs<-papers_by_agency %>% 
+  ungroup() %>% 
+  rowwise() %>%
+  mutate(flag = `NA` > 0 && all(c_across(-c(refID, `NA`)) == 0)) %>%
+  ungroup() %>% 
+  filter(flag==TRUE)
+
+# Filter out the ones where fed isn't primary affil
+authors_df_trim<-authors_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+
+papers_df_trim<-papers_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+
+# can 2x they were removed here: 
+# papers_by_agency2<-authors_df_trim %>% 
+#   select(refID,agency_primary,author_order) %>% 
+#   group_by(refID) %>% 
+#   count(agency_primary) %>% 
+#   pivot_wider(names_from = agency_primary, values_from = n) %>% 
+#   replace(is.na(.), 0)
+
+# NA_only_pubs2<-papers_by_agency2 %>%
+#   ungroup() %>%
+#   rowwise() %>%
+#   mutate(flag = `NA` > 0 && all(c_across(-c(refID, `NA`)) == 0)) %>%
+#   ungroup() %>%
+#   filter(flag==TRUE)
 
 
 
 write_rds(papers_df_trim,"./data_clean/papers_df_clean.rds")
 write_rds(authors_df_trim,"./data_clean/authors_df_clean.rds")
 write_rds(affils_df_trim,"./data_clean/affils_df_clean.rds")
-
-
-
-
 
 

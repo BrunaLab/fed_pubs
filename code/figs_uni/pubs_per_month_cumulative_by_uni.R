@@ -164,12 +164,13 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
     mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
     mutate(label = if_else(PY == "avg", NA, as.character(label))) %>% 
     mutate(label = if_else((PY == "2019"|PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
-    ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY)) +
+    ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY,  linetype=PY))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
     geom_line() + 
     geom_point(size=0.5)+
     scale_color_manual(values=c(rep("gray57",6),"#8B0000","#36648B"))+
+    scale_linetype_manual(values = c(rep("solid", 6), "solid", "dashed"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+
@@ -188,8 +189,9 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
                nudge_y = 0.8, 
                nudge_x = 0.5, 
                size =2.5,
-               fill=NA,
-               label.size = unit(0,"mm")
+               fill=NA
+               # ,
+               # label.size = unit(0,"mm")
     ) +
     theme(plot.background = element_rect(color = 1,
                                          size = 0),
@@ -198,7 +200,7 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
                                b = 20,  # Bottom margin
                                l = 20))  # Left margin
   
-  ggsave("./docs/images/pubs_mo_cum_uni_lines.png", width = 11, height = 7, units = "in", device='png', dpi=700)
+  ggsave("./docs/images/pubs_mo_cum_uni_lines.png", width = 11, height = 14, units = "in", device='png', dpi=700)
   
   return(pubs_mo_cum_fig)
 }

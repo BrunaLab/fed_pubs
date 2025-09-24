@@ -1,4 +1,3 @@
-
 # intro -------------------------------------------------------------------
 # 
 # this binds the csv files downloaded for a given year into a single
@@ -431,6 +430,4 @@ authors_df<-authors_df %>%
 
   
     }
-  
-  
   

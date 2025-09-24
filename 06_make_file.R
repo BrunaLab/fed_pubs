@@ -11,37 +11,25 @@ library(progress)
 library(fs)
 library(data.table)
 
-
-
 # select max month to analyze & plot --------------------------------------
 
 # PM_max<-6 # june
-# PM_max<-7 # july
-PM_max<-8 # aug
+PM_max<-7 # july
+# PM_max<-8 # aug
 
 # load data  --------------------------------------------------------------
 
 # Affiliations
-affils_df_complete  <- setDT(read_rds("./data_clean/affils_df_clean.rds"))
+affils_df  <- setDT(read_rds("./data_clean/affils_df_clean.rds"))
 
 # unique(affils_df_complete$agency_primary)
 
 # Publications
-papers_df_complete  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) %>% 
-  mutate(PM=
-           case_when(
-             is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
-             .default = as.numeric(PM)
-           )
-  ) %>% 
-  mutate(PT=if_else(PT=="j","journal",PT))
+papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
   
   
 # Authors
-
-authors_df_complete <- setDT(read_rds("./data_clean/authors_df_clean.rds")) %>% 
-  mutate(federal=if_else(is.na(federal),FALSE,federal))
-
+authors_df <- setDT(read_rds("./data_clean/authors_df_clean.rds")) 
 
 
 # chose publication types or titles to remove -----------------------------
@@ -53,29 +41,45 @@ authors_df_complete <- setDT(read_rds("./data_clean/authors_df_clean.rds")) %>%
 #  "- reply"
 
 
-# unique(papers_df$DT)
-# ARTICLE TYPES - KEEP
-# "book chapter"
-# "article"
-# "review"
-# "note"
-# "data paper"
-# ARTICLE TYPES - REMOVE
-# "letter" # excluded below
-# "editorial" # excluded below" 
+# can 2x they were removed here: 
+papers_by_agency <- authors_df %>% 
+  select(refID,agency_primary,author_order) %>% 
+  group_by(refID) %>% 
+  count(agency_primary) %>% 
+  pivot_wider(names_from = agency_primary, values_from = n) %>% 
+  replace(is.na(.), 0)
 
-# papers_df %>% filter(DT=="editorial") %>% select(TI)
-# authors_df %>% filter(is.na(agency)) %>% group_by(federal) %>% tally()
+# papers by agency --------------------------------------------------------
 
-papers_cat<-c("article","book chapter","data paper","note","review")
 
-papers_df <- papers_df_complete %>% 
-  filter(DT%in%papers_cat) 
+# NA_only_pubs2<-papers_by_agency2 %>%
+#   ungroup() %>%
+#   rowwise() %>%
+#   mutate(flag = `NA` > 0 && all(c_across(-c(refID, `NA`)) == 0)) %>%
+#   ungroup() %>%
+#   filter(flag==TRUE)
 
-authors_df<-authors_df_complete %>% 
-  filter(refID%in%papers_df$refID)
+# can now count how many papers by university (note - no fractional authorship)
+counts<-papers_by_agency %>% 
+  ungroup() %>% 
+  select(-refID) %>% 
+  summarise(across(everything(), ~ sum(. > 0))) %>% 
+  pivot_longer(everything(),names_to="agency_primary", values_to = "total_papers") %>% 
+  arrange(desc(total_papers))
 
-rm(papers_cat)
+write_csv(counts,"./docs/summary_info/total_papers_by_agency.csv")
+
+
+# and also count how many papers by article category
+papers_by_cat_agency<-
+  papers_df %>% 
+  group_by(DT) %>% 
+  tally() %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(desc(n))
+
+write_csv(papers_by_cat_agency,"./docs/summary_info/papers_by_cat_agency.csv")
+
 # data summaries ----------------------------------------------------------
 
 # N and % of articles in each category after cleanup
@@ -131,7 +135,7 @@ authors_df<-authors_df %>%
   filter(refID%in%auth_per_pub$refID)
 papers_df<-papers_df %>% 
   filter(refID%in%auth_per_pub$refID)
-affils_df<-affils_df_complete %>% 
+affils_df<-affils_df %>% 
   filter(refID%in%auth_per_pub$refID)
 
 # total number of scopus IDs in the initial search
@@ -556,6 +560,9 @@ pubs_mo_cumulative <-
 
 pubs_mo_cumulative %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
+
+
+
 source("code/figs/pubs_per_month_cumulative.R")
 pubs_mo_fig_cumulative<-pubs_per_month_cumulative(pubs_mo,2025,PM_max)
 
@@ -669,7 +676,7 @@ filter(PY > 2023)
 # agency_n_decline_2_fig <- agency_n_decline_2(agency_n_decline)
 
 source("code/figs/pubs_per_month_cumulative_agency.R")
-pubs_per_month_cumulative_agency<-pubs_per_month_cumulative_agency(papers_dataset,authors_dataset,2025,PM_max)
+pubs_per_month_cumulative_agency<-pubs_per_month_cumulative_agency(papers_dataset,authors_data_set,2025,PM_max)
   
 
 
@@ -693,7 +700,7 @@ agency_n_decline_first <-
   group_by(agency_primary) %>%
   mutate(decline_n = (n - lag(n))) %>%
   mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>%
-  mutate(author_position="first")
+  mutate(author_position="first") 
 write_csv(agency_n_decline_first,"./docs/summary_info/agency_n_decline_first.csv")
 
 
@@ -705,28 +712,56 @@ total_pubs_per_agency_first<-read_csv("./docs/summary_info/total_pubs_per_agency
   group_by(agency_primary) %>%
   slice_head(n=1) %>% 
   ungroup() %>% 
-  mutate(perc=total/sum(total)*100) %>% 
+  mutate(perc_first=total/sum(total)*100) %>% 
   arrange(desc(total)) %>% 
-  mutate(perc=round(perc,2))
+  mutate(perc_first=round(perc_first,2))
 
 perc_data<-read_csv("./docs/summary_info/agency_n_decline_first.csv") %>% 
-  filter(PY==2025) %>% select(agency_primary,n,perc_decline=perc_previous)
+  filter(PY==2025) %>% select(agency_primary,n,perc_decline=perc_previous) %>% 
+  rename(Unit=agency_primary,
+         n24=n) 
+  
+
+
+
+agency_total<-authors_df %>% 
+  filter(federal==TRUE) %>% 
+  group_by(agency_primary) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  drop_na() %>% 
+  mutate(agency_primary= case_when(
+    agency_primary=="OTHER"~"Misc.",
+    .default = as.character(agency_primary))) %>% 
+  mutate(agency_primary=if_else(nchar(agency_primary)<5,str_to_upper(agency_primary),str_to_title(agency_primary))) %>%
+  mutate(agency_primary=gsub(" THE "," the ",agency_primary)) %>% 
+  mutate(agency_primary=gsub(" OF "," of ",agency_primary)) %>% 
+  mutate(agency_primary=gsub(" THE "," the ",agency_primary)) %>% 
+  mutate(agency_primary=gsub("Us ","US ",agency_primary)) %>% 
+  mutate(agency_primary=gsub(" AND "," and ",agency_primary)) %>% 
+  rename(Unit=agency_primary) %>% 
+  mutate(perc=n/sum(n)*100) 
+
 
 agency_table<-  total_pubs_per_agency_first %>%
-  left_join(perc_data,by="agency_primary") %>% 
-  mutate(agency_primary=if_else(nchar(agency_primary)<5,str_to_upper(agency_primary),str_to_title(agency_primary))) %>%
+  rename(Unit=agency_primary) %>% 
+  left_join(perc_data,by="Unit") %>% 
+  mutate(Unit=if_else(nchar(Unit)<5,str_to_upper(Unit),str_to_title(Unit))) %>%
+  left_join(agency_total) %>% 
+  relocate(perc,.after=1) %>% 
+  relocate(n,.after=1) %>% 
+
   # filter(agency_primary!="other") %>%
   # filter(agency_primary!="state") %>%
-  mutate(perc=as.character(perc)) %>% 
-  mutate(total=as.character(total)) %>% 
-  mutate(n=as.character(n)) %>% 
+  # mutate(total=comma(total)) %>% 
+  # mutate(perc=as.character(perc)) %>% 
+  # mutate(total=as.character(total)) %>% 
+  # mutate(n=as.character(n)) %>% 
   mutate(perc_decline=round(perc_decline,2)) %>%
-  mutate(perc_decline=as.character(perc_decline)) %>%
-  mutate(total=paste(total," (",perc,")",sep="")) %>% 
-  select(-perc) %>% 
-  replace_na(list(n = "-", perc_decline="-")) 
-
-write_csv(agency_table,"./docs/summary_info/agency_table.csv") 
+  mutate(perc=round(perc,2)) %>%
+  mutate(perc_first=round(perc_first,2)) 
+  
+  write_csv(agency_table,"./docs/summary_info/agency_table.csv") 
 
 other_affils<-authors_data_set %>% filter(federal==TRUE) %>%
   filter(agency_primary=="other") %>% 
