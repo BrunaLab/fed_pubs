@@ -5,8 +5,6 @@ ID_univ_authors <- function(authors_df, affils_df) {
     mutate(entry_no=as.character(entry_no)) %>% 
     mutate(affil_id=as.character(affil_id)) 
   
-  # affil_ids$affil_id<-as.character(affil_id$affil_id)
-  
   univ_bind<-affils_df %>% select(univ,affil_id)
   
   univ_bind$affil_id<-as.character(univ_bind$affil_id)

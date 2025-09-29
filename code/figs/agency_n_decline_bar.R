@@ -22,8 +22,6 @@ agency_n_decline_bar <- function(agency_n_decline_sum, PY_max) {
     theme(axis.text.x =element_text(size = 12))+
     gghighlight(PY == 2025)
   
-  ggsave("./docs/images/agency_n_decline_sum.png", width = 7, height = 10, units = "in", device='png', dpi=700)
-  
 
   return(agency_n_decline_sum_fig)
   

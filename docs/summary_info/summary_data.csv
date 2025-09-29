@@ -1,11 +1,12 @@
 value,n
 scopus_id_initial,5360
 scopus_id_followup,7355
-no_fed_affils,7336
+no_fed_affils,7337
 total_pubs,457421
 total_authors,4413234
 total_unique_authors,1207501
-total_federals,217569
-total_NOTfederals,989932
+total_federals,217570
+total_NOTfederals,989931
+papers_w_allfed_authors,100532
 prop_papers_fed_1st,49.499913646290835
 prop_papers_fed_last,51.53239575795602

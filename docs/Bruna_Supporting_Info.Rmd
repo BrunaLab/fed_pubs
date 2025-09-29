@@ -81,7 +81,8 @@ header-includes:
   - \fancyfoot{} # cues the use of fancy footer
   - \fancyhead[L]{Bruna, Supporting Information} # month & year on header left 
   - \fancyhead[R]{p. \thepage} # name and page on header right. 
-  - \renewcommand{\thefigure}{\arabic{figure}S}
+  - \renewcommand{\thefigure}{S\arabic{figure}}
+  - \renewcommand{\thetable}{S\arabic{table}}
   
 #Required for specifying captions t
   # - \usepackage{indentfirst}

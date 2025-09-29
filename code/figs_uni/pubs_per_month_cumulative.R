@@ -86,9 +86,9 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
     geom_line(linewidth = 1.5) + 
-    geom_point(size=0.5)+
+    # geom_point(size=0.5)+
     scale_color_manual(values=c(rep("gray",6),"#8B0000","#36648B"))+
-    scale_linetype_manual(values = c(rep("solid", 6), "solid", "dashed"))+
+    scale_linetype_manual(values = c(rep("dotted", 6), "solid", "longdash"))+
     # expand_limits(y = 0)+
     # expand_limits(x= c(0,length(levels(plot_data$month_name)) + 1.25))+
     expand_limits(x= c(1,length(levels(plot_data %>% filter(PM<=PM_max) %>% select(month_name))) + 5))+

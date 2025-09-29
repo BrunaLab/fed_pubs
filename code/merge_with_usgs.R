@@ -1,6 +1,5 @@
 merge_with_usgs <- function(authors_df) {
   
-  
   # THIS IS TO CONFIRM THAT USGS AUTHORS ARE CORRECTLY IDENTIFIED AS SUCH
   # (SCOPUS DOESNT CODE ALL OF THEM AS USGS EG COOP UNITS)
   
@@ -32,19 +31,13 @@ merge_with_usgs <- function(authors_df) {
   
   names(usgs_authors)
   
-  
   usgs_authors$federal<-as.logical(usgs_authors$federal)
-  
   
   usgs_authors<-usgs_authors %>% 
     distinct() %>% 
     select(author_order,AF,surname,given_name,affil_id,affiliation,agency_primary,federal)
   
-  
   usgs_authors$AF
-  
-  
-  
   
   authors_df<-authors_df %>% 
     mutate(AF=str_replace_all(AF,"[.]",""))

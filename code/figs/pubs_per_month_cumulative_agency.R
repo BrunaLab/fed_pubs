@@ -189,9 +189,9 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
     geom_line() + 
-    geom_point(size=0.5)+
+    # geom_point(size=0.5)+
     scale_color_manual(values=c(rep("gray57",6),"#8B0000","#36648B"))+
-    scale_linetype_manual(values = c(rep("solid", 6), "solid", "dashed"))+
+    scale_linetype_manual(values = c(rep("dotted", 6), "solid", "longdash"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+
@@ -221,8 +221,6 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
                                b = 20,  # Bottom margin
                                l = 20))  # Left margin
   
-  ggsave("./docs/images/pubs_mo_cum_agency_lines.png", width = 11, height = 14, units = "in", device='png', dpi=700)
-  # 
   return(pubs_mo_cum_fig)
 
   }

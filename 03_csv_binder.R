@@ -159,10 +159,12 @@ validate_csv_structure <- function(...) {
     
     print(file_checker)
     
-    stop("ERROR: Either the file path is incorrect OR folders contain non-CSV or mismatched files. Here is the file mismatch.")
+    stop("ERROR: Either the file path is incorrect OR folders contain non-CSV or 
+         mismatched files. Here is the file mismatch.")
   }
   
-  message("All files are csvs. If comparing multiple folders, all have the same number of files.")
+  message("All files are csvs. If comparing multiple folders, all have the 
+          same number of files.")
 }
 
 

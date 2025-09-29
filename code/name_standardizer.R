@@ -62,16 +62,6 @@ names_standardizer <- function(combined_data) {
   names(combined_data)[names(combined_data) == "affiliation-url"] <- "affil_url"
   
   combined_data<-replace(combined_data, combined_data =="", NA)  
-  # 
-  # combined_data<-combined_data %>%
-  #   mutate(source_file=str_replace(source_file, "./data_raw/scopus_api/papers/scopus_", "")) %>%
-  #   mutate(source_file=str_replace(source_file, "_papers", "")) %>%
-  #   mutate(source_file=str_replace(source_file, "./data_raw/scopus_api/authors/scopus_", "")) %>%
-  #   mutate(source_file=str_replace(source_file, "_authors", "")) %>%
-  #   mutate(source_file=str_replace(source_file, "./data_raw/scopus_api/affils/scopus_", "")) %>%
-  #   mutate(source_file=str_replace(source_file, "_affils", "")) %>%
-  #   
-  #   relocate(entry_no,.before = 1)
   
   return(combined_data)
 }  

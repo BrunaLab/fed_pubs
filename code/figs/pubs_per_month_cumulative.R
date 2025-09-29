@@ -1,75 +1,8 @@
-pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
+pubs_per_month_cumulative <- function(plot_data,perc_change, PY_max,PM_max) {
 
   
   library(gghighlight)
   
-  pubs_mo_cum<-pubs_mo %>% 
-    group_by(PY) %>% 
-    mutate(cumul_pubs=cumsum(n)) 
-  
-  final_yr<-pubs_mo_cum %>% 
-    filter(PY==PY_max) %>% 
-    filter(PM<PM_max+1) 
-  
-  
-  prior_yrs<-pubs_mo_cum %>% 
-    filter(PY<PY_max) 
-  
-  counter<-pubs_mo_cum %>% 
-    select(PM,month_name) %>% 
-    ungroup() %>% 
-    select(-PY) %>% 
-    distinct()
-  
-  prior_yrs_avg<-pubs_mo_cum %>% 
-    filter(PY<PY_max) %>% 
-    group_by(PM) %>% 
-    summarize(n=mean(n)) %>% 
-    mutate(cumul_pubs=cumsum(n)) %>% 
-    mutate(PY="Avg. (all yrs)") %>% 
-    left_join(counter)
-  
-  plot_data<-bind_rows(final_yr,prior_yrs) %>% 
-    mutate(PY=as.character(PY)) %>% 
-    bind_rows(prior_yrs_avg)
-  
-  write_csv(plot_data,"./data_clean/cumulative_pubs_monthly.csv")
-  
-  # perc_change<-pubs_mo_cum %>% 
-  #   filter(PM==PM_max)%>% 
-  #   ungroup() %>% 
-  #   mutate(change_n = (cumul_pubs - lag(cumul_pubs))) %>%
-  # mutate(perc_previous = ((change_n) / lag(cumul_pubs)) * 100) %>% 
-  #   mutate(perc_previous=round(perc_previous,2))
-  
-  
-  perc_change_avg<-final_yr %>% 
-    mutate(PY=as.character(PY)) %>% 
-    bind_rows(prior_yrs_avg) %>% 
-    filter(PM==PM_max) %>% 
-    ungroup() %>% 
-    mutate(change_n = (cumul_pubs - lead(cumul_pubs))) %>%
-    mutate(perc_previous = ((change_n) / lead(cumul_pubs)) * 100) %>% 
-    mutate(perc_previous=round(perc_previous,2)) %>% 
-    filter(PY==PY_max) %>% 
-    rename(perc_mean=perc_previous)
-  
-  # nom<-perc_change_avg %>% filter(PY==PY_max) %>% select(cumul_pubs)
-  # denom<-perc_change_avg %>% filter(PY=="Avg. (all yrs") %>% select(cumul_pubs)  
-  # 
-  # perc_change_avg<-((round(nom$cumul_pubs/denom$cumul_pubs,3)*100)-100)
-  # 
-  
-  
-  perc_change<-pubs_mo_cum %>% 
-    filter(PM==PM_max)%>% 
-    ungroup() %>% 
-    mutate(change_n = (cumul_pubs - lag(cumul_pubs))) %>%
-    mutate(perc_previous = ((change_n) / lag(cumul_pubs)) * 100) %>% 
-    mutate(perc_previous=round(perc_previous,2))
-  
-  write_csv(perc_change,"./docs/summary_info/perc_change_fed.csv")
-  # data_cumulative<-pubs_mo_cum %>% left_join(perc_change,by=c("PY","PM","month"))
   library(ggrepel)
   # label<-plot_data %>% group_by(PY) %>% filter(PM==max(PM)) %>% select(PM)
   
@@ -88,9 +21,9 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
     geom_line(linewidth = 1.5) + 
-    geom_point(size=0.5)+
+    # geom_point(size=0.5)+
     scale_color_manual(values=c(rep("gray",6),"#8B0000","#36648B"))+
-    scale_linetype_manual(values = c(rep("solid", 6), "solid", "dashed"))+
+    scale_linetype_manual(values = c(rep("dotted", 6), "solid", "longdash"))+
     # scale_linetype_manual(values = if_else(plot_data$PY == "Avg. (all yrs)", "dashed", "solid"))+
     # expand_limits(y = 0)+
     # expand_limits(x= c(0,length(levels(plot_data$month_name)) + 1.25))+
@@ -113,8 +46,8 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     annotate(geom="text", 
              # x=PM_max+0.32,
              x=PM_max+1.6,
-             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))+2300),
-             # y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))-2000),
+             # y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))+2300), # 1st authors
+             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))+1300), # for pubs with only feds
              # label=paste("(", round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,")",sep=""),
              # label=paste(round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,sep=""),
              label=paste(round(perc_change %>% filter(PY==PY_max) %>% select(perc_previous)),"%",sep=""),
@@ -124,7 +57,8 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     annotate(geom="text", 
              # x=PM_max+0.32,
              x=PM_max+0.9,
-             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))+2300),
+             # y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))+2300), # fed 1st authors 
+             y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))+1300), # pubs with only feds
              # y=(max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))-2000),
              # label=paste("(", round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,")",sep=""),
              # label=paste(round(perc_change$perc_previous[PM_max+1]),"% from ",PY_max-1,sep=""),
@@ -170,18 +104,6 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
   
   
   
-  
-                     # ))
-                     # 
-                     # 
-  # +
-    # geom_label(aes(label = label), nudge_x = 0.25, size =4) 
-    # geom_label(aes(label = label), nudge_x = 0.25,nudge_y = -1.5, size =4) 
-    # geom_label_repel(aes(label = label),
-    #                  nudge_x = .2,
-    #                  na.rm = TRUE)
-  
-  ggsave("./docs/images/pubs_mo_cum_fig.png", width = 13, height = 10, units = "in", device='png', dpi=700)
   # 
   return(pubs_mo_cum_fig)
 }
