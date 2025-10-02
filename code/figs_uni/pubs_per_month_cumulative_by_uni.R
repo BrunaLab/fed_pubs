@@ -130,15 +130,31 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
     select(perc_change,uni)
   plot_data<-plot_data %>% left_join(perc_change,by="uni") %>% 
     
-    mutate(uni=if_else(nchar(uni)<5,str_to_upper(uni),str_to_title(uni))) %>% 
+    # mutate(uni=if_else(nchar(uni)<5,str_to_upper(uni),str_to_title(uni))) %>% 
+    # mutate(uni=case_when(
+    #   uni == "Unc_ch"~"UNC Chapel Hill",
+    #   uni == "Ohio_state"~"Ohio State",
+    #   uni == "PENN"~"Penn",
+    #   uni == "MINN"~"Minnesota",
+    #   .default = as.character(uni)
+    #   )
+    # ) %>% 
     mutate(uni=case_when(
-      uni == "Unc_ch"~"UNC Chapel Hill",
-      uni == "Ohio_state"~"Ohio State",
-      uni == "PENN"~"Penn",
-      uni == "MINN"~"Minnesota",
+      uni == "unc_ch"~"Univ of North Carolina, Chapel Hill",
+      uni == "ohio_state"~"The Ohio State Univ",
+      uni == "florida"~"Univ of Florida",
+      uni == "harvard"~"Harvard Univ",
+      uni == "mass_general"~"Massachusetts General Hospital",
+      uni == "michigan"~"Univ of Michigan, Ann Arbor",
+      uni == "penn"~"Univ of Pennsylvania",
+      uni == "stanford"~"Stanford Univ",
+      uni == "ucla"~"Univ of California, Los Angeles",
+      uni == "minn"~"Univ of Minnesota, Twin Cities",
+      uni == "ucsd"~"Univ of California, San Diego",
+      uni == "ucsf"~"Univ of California, San Francisco",
+      uni == "washington"~"Univ of Washington",
       .default = as.character(uni)
-      )
-    ) %>% 
+    )) %>% 
     mutate(uni=paste(uni," (",perc_change,"%)", sep=""))
   
   order<-plot_data %>% group_by(uni) %>% 
@@ -167,40 +183,44 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
     ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY,  linetype=PY))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
-    geom_line() + 
-    # geom_point(size=0.5)+
-    scale_color_manual(values=c(rep("gray57",6),"#8B0000","#36648B"))+
-    scale_linetype_manual(values = c(rep("dotted", 6), "solid", "longdash"))+
+    geom_line()+
+    # geom_line(linewidth = if_else(plot_data$PY == "avg",1.5,1)) + 
+    geom_point(size=1.5)+
+    scale_color_manual(values=c(rep("lightgray",6),"#8B0000","#36648B"))+
+    scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+
-    facet_wrap(~factor(uni, c(as.vector(order$uni))),ncol = 3, scales = "free")+
+    facet_wrap(~factor(uni, c(as.vector(order$uni))),ncol = 4, scales = "free")+
     theme(panel.spacing = unit(0.5, "cm", data = NULL))+
     # scale_x_continuous( breaks=seq(1,12,by=1))+
     # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_cumulative %>% select(cumul_pubs))+5000),by=2500))+
     theme(axis.text.y = element_text(size = 10))+
     theme(axis.text.x =element_text(size = 10))+
-    theme(axis.title.y = element_text(size = 12,face = "bold"))+
-    theme(axis.title.x =element_text(size = 12,face = "bold"))+
+    theme(axis.title.y = element_text(size = 16,face = "bold"))+
+    theme(axis.title.x =element_text(size = 16,face = "bold"))+
     theme(strip.text.x = element_text(face = "bold"))+
     theme(legend.position="none") + 
     geom_label(aes(label = label), 
                # position="jitter",
                nudge_y = 0.8, 
-               nudge_x = 0.5, 
+               nudge_x = 0.7, 
                size =2.5,
+               border.color = "white",
                fill=NA
                # ,
                # label.size = unit(0,"mm")
-    ) +
-    theme(plot.background = element_rect(color = 1,
-                                         size = 0),
-          plot.margin = margin(t = 20,  # Top margin
-                               r = 20,  # Right margin
-                               b = 20,  # Bottom margin
-                               l = 20))  # Left margin
+    )
   
-  ggsave("./docs/images/pubs_mo_cum_uni_lines.png", width = 11, height = 14, units = "in", device='png', dpi=700)
+  # +
+  #   theme(plot.background = element_rect(color = 1,
+  #                                        size = 0),
+  #         plot.margin = margin(t = 20,  # Top margin
+  #                              r = 20,  # Right margin
+  #                              b = 20,  # Bottom margin
+  #                              l = 20))  # Left margin
+  # 
+  ggsave("./docs/images/pubs_mo_cum_uni_lines.png", width = 12, height = 8, units = "in", device='png', dpi=700)
   
   return(pubs_mo_cum_fig)
 }
