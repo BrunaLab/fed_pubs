@@ -56,21 +56,18 @@ authornote: |
   
   Competing Interest Statement: The author declares no competing interests.  
   
-  
-  <!-- **Classification:** Paste the major and minor classification here. Dual classifications are permitted but cannot be within the same major classification. -->
-  
   This file includes: Main Text, Figures 1-3, Table 1  
 
   Preprint Information: A preprint of this article has been posted at ----- Preprints (link).  
 
-  <!-- **significance:** Authors must submit a 120-word maximum statement about the significance of their research paper written at a level understandable to an undergraduate educated scientist outside their field of speciality. The primary goal of the Significance Statement is to explain the relevance of the work in broad context to a broad readership. The Significance Statement appears in the paper itself and is required for all research papers. -->
 
 abstract: |
   
-  <!-- https://tinyurl.com/ybremelq -->
+  Departments and agencies of the United States federal government conduct research on topics ranging from nuclear technology to economic policy. Using the Scopus bibliographic database, I quantified the number of publications by US federal government authors from January 2019--July 2025. I found that the number of articles and book chapters published from January-July 2025 was 14%-19% lower than during the same time period of 2024, resulting in publication deficit of 2,638-6,489 articles. Changes in executive branch policy related to the funding and staffing of federal agencies have led to warnings of an imminent and potentially catastrophic decline in the scientific preeminence of the United States. The results presented here suggest that this decline has already been set in motion.
+    
   
 # appendix          : "./docs/SuppInfo_text.Rmd"
-keywords          : "research productivity, federal agencies, bibliometrics"
+keywords          : "authorship, bibliometrics, book chapters, federal agencies, articles, research productivity, Scopus, universities"
 wordcount         : "1721"
 
 bibliography      : "fed_pubs.bib"
@@ -403,17 +400,20 @@ agency_counts<-agency_counts %>%
          n24=comma(n24),
          n=comma(n)
          ) %>% 
-  mutate(total=paste(total," (",perc_first,")",sep="")) %>% 
-  replace_na(list(n24 = "-", perc_decline="-")) %>% 
-  mutate(n24=paste(n24," (",perc_decline,")",sep="")) %>% 
-  select(-perc_first,
-         -perc_decline) 
+  # mutate(total=paste(total," (",perc_first,")",sep="")) %>% 
+  replace_na(list(n24 = "-", perc_decline="-")) 
+# %>% 
+  # mutate(n24=paste(n24," (",perc_decline,")",sep="")) %>% 
+  # select(-perc_first,
+  #        -perc_decline) 
   
 
   agency_counts<-agency_counts %>% 
-  rename(`Jan 2019-July 2025Super1`=n,
-         `Jan 2019-July 2025 (\\%)`=total,
-         `Jan-July 2025 (\\% change vs. 2024)`=n24
+  rename(`Any author positionSuper1`=n,
+         `First author`=total,
+         `First author `=n24,
+         `\\%`=perc_first,
+         `\\% change vs. 2024`=perc_decline
          ) 
 
 
@@ -440,7 +440,7 @@ agency_table<-agency_counts %>%
     .default = as.character(Unit)
 )
 ) %>% 
-  arrange(cabinet,desc(`Jan 2019-July 2025Super1`)) 
+  arrange(cabinet,desc(`Any author positionSuper1`)) 
 
 
 
@@ -449,31 +449,35 @@ agency_counts_total<-agency_counts_total %>%
   mutate(total=comma(total),
          n24=comma(n24)
          ) %>% 
-  rename(`Jan 2019-July 2025 (\\%)`=total,
-         `Jan-July 2025 (\\% change vs. 2024)`=n24
+  rename(`Any author positionSuper1`=total,
+         `First author `=n24
          ) %>% 
   mutate(Unit="Total")
 
 agency_table<-bind_rows(agency_table,agency_counts_total) %>% 
-  replace_na(list(`Jan 2019-July 2025Super1`="",
-                  `Jan 2019-July 2025 (\\%)`="")) 
+  replace_na(list(`First author`="",
+                  `First author `="",
+                  `\\%`="",
+                  `\\% change vs. 2024`="",
+                  `Any author positionSuper1`=""
+                  )) 
 
 
 n_cabinet<-agency_table %>% filter(cabinet == "cabinet") %>% tally()
 n_noncabinet<-agency_table %>% filter(cabinet == "noncabinet") %>% tally()
 
 agency_table<-agency_table %>% select(-cabinet) %>% 
-  rename(" "=Unit)
+  rename("US federal government unit"=Unit)
 
 tmp <- knitr::kable(agency_table,
   # digits = 2,
   format = "latex",
   # format = "html",
-  align = "lrrr",
+  align = "lrrcrc",
   escape = FALSE,
   row.names = FALSE,
   booktabs = T,
-  caption = "The number of publications in  the data set with at least one author from an agency or department of the US federal government (any author position), the number of publications from 2019-2025 for which the first author's primary address is the federal department or agency, the number of 1st author publications from January-July 2025, and the percent change in productivity relative to the same time period in 2024.",
+  caption = "The number of publications with at least one federally affiliated author or whose first author is from different units of the US federal government.  Also shown is the percentage of 2019-2025 publications whose first author is from each government unit and the percent difference in first author publications (Jan-July 2025 vs. Jan - July 2024).",
   longtable = F,
   linesep = ""
 ) %>%
@@ -481,31 +485,31 @@ tmp <- knitr::kable(agency_table,
     bootstrap_options = c("hover"),
     # full_width = F,
     latex_options = c("scale_down",
-                      "hold_position",
-                      extra_css = ".footnote { margin-top: 3em; }"), # Adjust '1em' as needed),
+                      "hold_position"),
     font_size = 12,
     position = "center"
   ) %>% 
-  
-  add_header_above(c(" " = 1, 
-                     "Federal Author (any position)" = 1,
-                     "Federal 1st Author"=2)) %>%
+  add_header_above(c(
+    " "=1,
+    "2019-2025" = 3,
+    "Jan-July 2025" = 2
+    )) %>%
   footnote(
     # number = c("The sum of publications in this column is greater than the total number of publications in  the dataset because some publications include authors from multiple agencies (i.e., I did not attribute 'fractional authorship').", paste("Other federal author affiliations in the publications data set: ", other_affils, sep="")),
     symbol = c("The sum of publications in this column is greater than the total number of publications in  the dataset because some publications include authors from multiple agencies (i.e., I did not attribute 'fractional authorship').", paste("Other federal author affiliations in the publications data set: ", other_affils, sep="")),
     threeparttable = TRUE,
-    footnote_as_chunk = TRUE) %>% 
+    footnote_as_chunk = TRUE) %>%
 # alphabet = c("Footnote A; ", "Footnote B; "),
 # symbol = c("Footnote Symbol 1; ", "Footnote Symbol 2")
     # footnote(number=c("The sum of publications in this column is greater than the total number of publications in  the dataset because some publications include authors from multiple agencies (i.e., I did not attribute 'fractional authorship').",
     #                   other_affils),
     #          footnote_as_chunk = TRUE,
-    #          threeparttable = TRUE) %>% 
-    row_spec(22, bold = T) %>% 
-    row_spec(21, hline=1) %>% 
-  pack_rows("Cabinet Departments", 1, n_cabinet$n, indent = TRUE) %>% 
-  pack_rows("Agencies, Boards, & Commissions", n_cabinet$n+1, n_cabinet$n+n_noncabinet$n, indent = TRUE) 
-  
+    #          threeparttable = TRUE) %>%
+  row_spec(21, hline=1) %>%  
+  row_spec(22, bold = T) %>%
+  pack_rows("Cabinet Departments", 1, n_cabinet$n, indent = TRUE) %>%
+  pack_rows("Agencies, Boards, & Commissions", n_cabinet$n+1, n_cabinet$n+n_noncabinet$n, indent = TRUE)
+
 
 tmp <- str_replace(tmp, "Super1", "$^{*}$")
 tmp <- str_replace(tmp, "Super2", "$^{\\\\dagger}$")

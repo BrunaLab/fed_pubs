@@ -5,7 +5,7 @@ author: "Emilio M. Bruna"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 # output: html_document
 # output: pdf_document
-output:
+output: html_document
   pdf_document:
     latex_engine: xelatex
     keep_tex: true
@@ -152,7 +152,7 @@ scopus_id %>%
       format    = "latex", 
       longtable = T, 
       booktabs  = T, 
-      caption   = "Scopus Affiliation ID codes used in the search of research productivity by ten US research-intensive universities and the affiliations associated with these codes.",
+      caption   = "Scopus Affiliation ID codes used to search for publications by authors affiliated with twelve research-intensive universities in the United States. A .csv file with each individual code and its respective affiliation and agency is available for download at the projects Github repository (see Materials and Methods).",
       align = "rl",
       ) %>%
   kable_styling(

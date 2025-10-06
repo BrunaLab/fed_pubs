@@ -539,26 +539,31 @@ total_pubs_per_agency_first <- first_authors %>%
 write_csv(total_pubs_per_agency_first,"./docs/summary_info/total_pubs_per_agency_first.csv")
 
 
-# choose focal datasets ---------------------------------------------------
+# CHOOSE FOCAL DATASETS ---------------------------------------------------
 
 # fed first authors 
 papers_dataset<-papers_with_fed_first
-authors_data_set<-first_authors
+authors_dataset<-first_authors
 
 
-# papers_dataset<-papers_with_all_feds
-# authors_data_set<-all_fed_authors
+# papers_dataset_all_feds<-papers_with_all_feds
+# authors_dataset_all_feds<-all_fed_authors
+# 
+# papers_dataset<-papers_first_last
+# authors_dataset<-fed_first_last_authors
+
+
 
 # papers_dataset<-papers_with_all_interior
-# authors_data_set<-all_interior_authors
+# authors_dataset<-all_interior_authors
 
 # papers_dataset<-papers_with_all_hhs
-# authors_data_set<-all_hhs_authors
+# authors_dataset<-all_hhs_authors
 
 
 # fed authors anywhere on author list
 # papers_dataset<-papers_df
-# authors_data_set<-all_authors_df
+# authors_dataset<-all_authors_df
 
 
 
@@ -566,15 +571,21 @@ authors_data_set<-first_authors
 # publications per year ---------------------------------------------------
 
 
-pubs_yr <- papers_dataset %>% 
-  distinct(refID,PY) %>% 
-  group_by(PY) %>% 
-  tally()
+count_pubs_per_yr <- function(papers_dataset) {
   
+  pubs_yr <- papers_dataset %>% 
+    distinct(refID,PY) %>% 
+    group_by(PY) %>% 
+    tally()
 
+  return(pubs_yr)
+  
+}
+  
+pubs_yr<-count_pubs_per_yr(papers_with_fed_first)
 
 source("code/figs/total_pubs_per_year.R")
-pubs_yr_fig<-total_pubs_per_year(pubs_yr,2024)
+pubs_yr_fig<-total_pubs_per_year(pubs_yr,PY_max-1)
 pubs_yr_fig
 # SAVE FIGURE
 # ggsave("./docs/images/total_pubs_per_yr.png",
@@ -588,18 +599,26 @@ pubs_yr_fig
 month<-data.frame(month_name=month.abb,PM=seq(1:12)) %>% 
   mutate(month_name=as.factor(month_name)) 
 
-pubs_mo <-
-  papers_dataset %>%
-  group_by(PM, PY) %>%
-  tally() %>%
-  mutate(PM=as.numeric(PM),
-         PY=as.numeric(PY)) %>% 
-  arrange(PY, PM) %>% 
-  ungroup() %>% 
-  mutate(month=row_number()) %>% 
-  left_join(month) %>% 
-  mutate(month_name=reorder(month_name,PM))
 
+
+count_pubs_per_mo <- function(papers_dataset) {
+  
+  pubs_mo <-
+    papers_dataset %>%
+    group_by(PM, PY) %>%
+    tally() %>%
+    mutate(PM=as.numeric(PM),
+           PY=as.numeric(PY)) %>% 
+    arrange(PY, PM) %>% 
+    ungroup() %>% 
+    mutate(month=row_number()) %>% 
+    left_join(month) %>% 
+    mutate(month_name=reorder(month_name,PM))
+
+  return(pubs_mo)
+}
+
+pubs_mo<-count_pubs_per_mo(papers_with_fed_first)
 # 
 # pubs_mo %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
@@ -615,24 +634,26 @@ pubs_mo_fig
 # pubs per month_cumulative -----------------------------------------------
 
 
-pubs_mo_cumulative <-
-  papers_dataset %>%
-  group_by(PM, PY) %>%
-  tally() %>%
-  mutate(PM=as.numeric(PM),
-         PY=as.numeric(PY)) %>%
-  arrange(PY, PM) %>%
-  ungroup() %>%
-  mutate(month=row_number()) %>%
-  group_by(PY) %>%
-  mutate(cumul_pubs=cumsum(n))
+count_cumul_pubs_per_month <- function(papers_dataset) {
+  
+  pubs_mo_cumulative <-
+    papers_dataset %>%
+    group_by(PM, PY) %>%
+    tally() %>%
+    mutate(PM=as.numeric(PM),
+           PY=as.numeric(PY)) %>%
+    arrange(PY, PM) %>%
+    ungroup() %>%
+    mutate(month=row_number()) %>%
+    group_by(PY) %>%
+    mutate(cumul_pubs=cumsum(n))
 
+# pubs_mo_cumulative<-count_cumul_pubs_per_month(papers_with_fed_first)
 # last number is max month of focal year (ie 2025)
 
 # pubs_mo_cumulative %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
-
-
+pubs_mo<-count_pubs_per_mo(papers_dataset)
 
 pubs_mo_cum<-pubs_mo %>% 
   group_by(PY) %>% 
@@ -647,9 +668,8 @@ prior_yrs<-pubs_mo_cum %>%
   filter(PY<PY_max) 
 
 counter<-pubs_mo_cum %>% 
-  select(PM,month_name) %>% 
   ungroup() %>% 
-  select(-PY) %>% 
+  select(PM,month_name) %>% 
   distinct()
 
 prior_yrs_avg<-pubs_mo_cum %>% 
@@ -664,8 +684,7 @@ plot_data<-bind_rows(final_yr,prior_yrs) %>%
   mutate(PY=as.character(PY)) %>% 
   bind_rows(prior_yrs_avg)
 
-# write_csv(plot_data,"./data_clean/cumulative_pubs_monthly.csv")
-
+# percent change from previous years
 
 perc_change_avg<-final_yr %>% 
   mutate(PY=as.character(PY)) %>% 
@@ -678,24 +697,40 @@ perc_change_avg<-final_yr %>%
   filter(PY==PY_max) %>% 
   rename(perc_mean=perc_previous)
 
-
-
 perc_change<-pubs_mo_cum %>% 
   filter(PM==PM_max)%>% 
   ungroup() %>% 
   mutate(change_n = (cumul_pubs - lag(cumul_pubs))) %>%
   mutate(perc_previous = ((change_n) / lag(cumul_pubs)) * 100) %>% 
   mutate(perc_previous=round(perc_previous,2))
-# 
-# write_csv(perc_change,"./docs/summary_info/perc_change_fed.csv")
 
-source("code/figs/pubs_per_month_cumulative.R")
-pubs_mo_fig_cumulative<-pubs_per_month_cumulative(plot_data,perc_change,PY_max,PM_max)
+
+
+
+return(list(plot_data,perc_change,pubs_mo_cumulative))
+
+}
+
+# write_csv(plot_data[[1]],"./data_clean/cumulative_pubs_monthly_fed_first.csv")
+# write_csv(plot_data[[2]],"./docs/summary_info/perc_change_fed_first.csv")
+
+
+# write_csv(plot_data[[1]],"./data_clean/cumulative_pubs_monthly_fed_only.csv")
+# write_csv(plot_data[[2]],"./docs/summary_info/perc_change_fed_only.csv")
+
+
+source("code/figs/pubs_per_month_cumulative_multipanel.R")
+pubs_mo_fig_cumulative<-pubs_per_month_cumulative_multipanel(papers_with_fed_first,
+                                                             papers_with_all_feds,
+                                                             PM_max,
+                                                             PY_max)
 pubs_mo_fig_cumulative
-# SAVE IMAGE
-# ggsave("./docs/images/pubs_mo_cum_fig_only_fed_authors.png",
-#        width = 13, height = 10, units = "in",
-#        device='png', dpi=700)
+
+
+ggsave(file="./docs/images/pubs_mo_cum_fig_multipanel.png", pubs_mo_fig_cumulative,
+       width = 6, height = 10, units = "in",
+       device='png', dpi=700)  
+
 
 # ggsave("./docs/images/pubs_mo_cum_fig.png",
 #        width = 13, height = 10, units = "in",
@@ -744,8 +779,8 @@ pubs_per_quarter_fig<-pubs_per_quarter(pubs_mo,2024)
 # total pubs per agency ---------------------------------------------------
 
 
-# names(authors_data_set)
-total_pubs_per_agency <- authors_data_set %>% 
+# names(authors_dataset)
+total_pubs_per_agency <- authors_dataset %>% 
   filter(federal==TRUE) %>% 
   mutate(agency=if_else(agency=="us department of the interior", "interior",agency)) %>% 
   mutate(agency=if_else(agency=="federal reserve system", "frs",agency)) %>% 
@@ -773,7 +808,7 @@ agency_subset<-agencies_over_thresh$agency_primary
 
 
 agency_n_decline_first <-
-  authors_data_set %>%
+  authors_dataset %>%
   filter(agency_primary %in% tolower(agency_subset)) %>%
   # mutate(PM=if_else(PY==2025,5,PM)) %>%
   filter(PM<(PM_max+1)) %>%
@@ -817,11 +852,11 @@ agency_n_decline_sum<- agency_n_decline %>%
 # filter(PY > 2023)
 
 source("code/figs/pubs_per_month_cumulative_agency.R")
-pubs_per_month_cumulative_agency<-pubs_per_month_cumulative_agency(papers_dataset,authors_data_set,PY_max,PM_max)
+pubs_per_month_cumulative_agency<-pubs_per_month_cumulative_agency(papers_dataset,authors_dataset,PY_max,PM_max)
 pubs_per_month_cumulative_agency
-# ggsave("./docs/images/pubs_mo_cum_agency_lines.png",
-#        width = 11, height = 14, units = "in",
-#        device='png', dpi=700)
+ggsave("./docs/images/pubs_mo_cum_agency_lines.png",
+       width = 8, height = 14, units = "in",
+       device='png', dpi=700)
 
 
 # non_feds<-affils_df_complete %>% 
@@ -835,7 +870,7 @@ pubs_per_month_cumulative_agency
 
 
 agency_n_decline_first <-
-  authors_data_set %>%
+  authors_dataset %>%
   # filter(agency_primary %in% tolower(agency_subset)) %>%
   # mutate(PM=if_else(PY==2025,5,PM)) %>%
   filter(PM<(PM_max+1)) %>%
@@ -910,7 +945,7 @@ agency_table<-  total_pubs_per_agency_first %>%
   
   write_csv(agency_table,"./docs/summary_info/agency_table.csv") 
 
-other_affils<-authors_data_set %>% filter(federal==TRUE) %>%
+other_affils<-authors_dataset %>% filter(federal==TRUE) %>%
   filter(agency_primary=="other") %>% 
   select(agency) %>% 
   distinct() %>% 

@@ -213,7 +213,7 @@ pull %>%
     longtable = T,
     booktabs = T,
     linesep = "",
-    caption = "Scopus Affiliation ID codes used in the search of research productivity by federal agencies and departments and the affiliations associated with these codes.",
+    caption = "Scopus Affiliation ID codes used to search for publications by authors affiliated with US federal government agencies and departments. Differences in how authors or journals abbreviate or structure affiliations can result in the same affiliation having multiple ID codes. A .csv file with each individual code and its respective affiliation and agency is available for download at the projects Github repository (see Materials and Methods).",
     align = "rl",
   ) %>%
   # kable(digits = 2,

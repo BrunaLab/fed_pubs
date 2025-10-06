@@ -1,5 +1,5 @@
 ---
-title: "SUPPLEMENTARY INFORMATION: "
+title: "SUPPLEMENTARY MATERIALS: "
 subtitle: "<i>Declining contribution of the United States federal government to global research </i>corpus"
 author:
   - Emilio M. Bruna:
@@ -11,7 +11,8 @@ institute:
    - wec: Department of Wildlife Ecology & Conservation, University of Florida, PO Box 110530, Gainesville, Florida, 32611-0430 USA
 date: "`r format(Sys.time(), '%d %B %Y')`"
 bibliography      : "fed_pubs.bib"
-csl               : "pnas.csl"
+# csl               : "pnas.csl"
+csl               : "science.csl"
 floatsintext      : no
 # classoption       : "man, donotrepeattitle"
 classoption       : "man"
@@ -24,6 +25,7 @@ fig_caption       : yes #yes will automatically add "Figure X" to the start
 output:
   # pdf_document: 
   bookdown::pdf_document2:
+  # bookdown::word_document2:
     toc: false
     toc_float: false
     number_sections: false
@@ -79,7 +81,7 @@ header-includes:
   - \renewcommand{\headrulewidth}{0pt}
   - \pagestyle{fancy}
   - \fancyfoot{} # cues the use of fancy footer
-  - \fancyhead[L]{Bruna, Supporting Information} # month & year on header left 
+  - \fancyhead[L]{Bruna, Supporting Materials} # month & year on header left 
   - \fancyhead[R]{p. \thepage} # name and page on header right. 
   - \renewcommand{\thefigure}{S\arabic{figure}}
   - \renewcommand{\thetable}{S\arabic{table}}
@@ -92,7 +94,6 @@ header-includes:
 
 
 # https://pubs.usgs.gov/search?q=&startYear=2019&__ncforminfo=Rf6y9tBB_4xn4sDOJ7tdSPmxI5Eu33dcCKy8YpAAAQRE-JJvXyAJAosPJMziEEMnxQE_iCi7dgGWVwrbQe9Gpb9a-7115VxO
-
 ---
 
 ```{r, child=c('./docs/SuppInfo/SuppInfo_text.Rmd','./docs/SuppInfo/fed_codes_table.Rmd','./docs/SuppInfo/uni_codes_table.Rmd')}
@@ -100,4 +101,4 @@ header-includes:
 
 
 <!-- ```{r, child=c('./docs/SuppInfo/SuppInfo_text.Rmd')} -->
-<!-- ``` -->
+<!-- ```  -->

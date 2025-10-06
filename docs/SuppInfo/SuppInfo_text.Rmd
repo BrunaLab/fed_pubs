@@ -79,45 +79,73 @@ uni_names_flat<-paste(uni_pubs$uni, collapse=', ' )
 
 ```
 
-\newpage
+<!-- \newpage -->
+
+
+<!-- ```{r  label = science-logo, echo = FALSE, fig.align='center'} -->
+<!-- knitr::include_graphics("../docs/images/science.png", error=FALSE) -->
+<!-- ``` -->
+
+
+<!-- # Supplementary Materials for -->
+<!-- \bigskip   -->
+
+<!-- ## Declining contribution of the United States federal government to global research corpus   -->
+<!-- \bigskip  -->
+
+<!-- ## Emilio M. Bruna   -->
+<!-- \bigskip    -->
+
+<!-- ## Corresponding author: embruna@ufl.edu   -->
+<!-- \bigskip   -->
+<!-- \bigskip  -->
+
+\bigskip  
+\bigskip  
+\bigskip  
 
 **This PDF file includes:**
 
-> Supporting text  
-> Figures S1 to S4  
-> Tables S1 to S3  
-> SI References   
+> Materials & Methods  
+> Supplementary text   
+> References  
+> figures S1 to S4     
+> tables S1 to S3   
 
 
 
-# Supporting Text 
+\newpage
 
-Below we provide additional information on the procedures for harvesting and validating Scopus publication records for federal agencies and focal universities, as well as the bootstrapping procedure used to compare 2025 productivity with productivity during the same time period of 2024. The data used in this study are archived at Dryad [*url to be added*], while the code used for processing, analyzing, and visualizing data can be found at Github (<https://github.com/BrunaLab/fed_pubs>). Note that the version of the R code used for the analyses presented here is archived at Zenodo [*url to be added*]; any post-publication updates to the code or data will be available and documented on the Github repository.
+## Materials and Methods
 
-## Data Collection & Processing
+<!-- Below we provide additional information on the procedures for harvesting and validating Scopus publication records for federal agencies and focal universities, as well as the bootstrapping procedure used to compare 2025 productivity with productivity during the same time period of 2024. The data used in this study are archived at Dryad [*url to be added*], while the code used for processing, analyzing, and visualizing data can be found at Github (<https://github.com/BrunaLab/fed_pubs>). Note that the version of the R code used for the analyses presented here is archived at Zenodo [*url to be added*]; any post-publication updates to the code or data will be available and documented on the Github repository. -->
+
+<!-- ## Data Collection & Processing -->
 
 ### Validation of US Geological Survey publications and authors
 
-The Scopus Affiliation IDs used to search for publications by US Federal Government authors can be found in Table \@ref(tab:fedcodes). Some US Geological Survey (i.e., USGS) scientists are based at universities under the auspices of the Cooperative Fish and Wildlife Research Units Program. When reviewing the records returned by SCOPUS we found that publications by these USGS researchers are returned in Scopus searches using the Scopus ID code for the USGS (60011347), but the primary affiliation provided by Scopus for the USGS authors was that of the host university (e.g., the affiliation for USGS Scientists at the Florida Cooperative Fish and Wildlife Research Unit was "University of Florida"). To correct the affiliations for publications by these USGS authors we downloaded the complete list of USGS publications from the USGS Publications Warehouse [@USGeologicalSurvey2025]. The [`.csv`](https://pubs.usgs.gov/search?q=&__ncforminfo=QlYggikRS-BXoBZnKRyLp_RdoV7Dw8RCmr2MzQMevktrqQxDtIgOnT-H17W2qWdL_pZetw-0HTd7qfTpdOVFIE3W0S5oyopp) file includes the comprehensive metadata for N = 17,445 articles published from 2019-2025, including the article title, name of the journal or book in which it was published, the publication's DOI, the names and ORCID IDs of authors and - in the case of USGS affiliates - their email addresses (e.g., `author@usgs.gov`). This information allowed us to identify each publication's USGS authors and assign them the Scopus affiliation code for the USGS (60011347). We then cross-referenced each article's metadata with the processed Scopus downloads to determine (1) if any publications in the USGS file were missing from our Scopus data set and (2) validate the federal affiliation of authors for articles that were found in both the USGS and Scopus data sets. After validating the federal affiliations for these articles, we used the Scopus Author ID and ORCID numbers of the USGS authors to search for and correct any name variants that might be present in the data set (e.g., Abby Powell, Abby N Powell, AN Powell).
+Some US Geological Survey (i.e., USGS) scientists are based at universities under the auspices of the Cooperative Fish and Wildlife Research Units Program. When reviewing the records returned by SCOPUS we found that publications by these USGS researchers are returned in Scopus searches using the Scopus ID code for the USGS (60011347), but the primary affiliation provided by Scopus for the USGS authors was that of the host university (e.g., the affiliation for USGS Scientists at the Florida Cooperative Fish and Wildlife Research Unit was "University of Florida"). To correct the affiliations for publications by these USGS authors we downloaded the complete list of USGS publications from the USGS Publications Warehouse [@USGeologicalSurvey2025]. The [`.csv`](https://pubs.usgs.gov/search?q=&__ncforminfo=QlYggikRS-BXoBZnKRyLp_RdoV7Dw8RCmr2MzQMevktrqQxDtIgOnT-H17W2qWdL_pZetw-0HTd7qfTpdOVFIE3W0S5oyopp) file includes the comprehensive metadata for N = 17,445 articles published from 2019-2025, including the article title, name of the journal or book in which it was published, the publication's DOI, the names and ORCID IDs of authors and - in the case of USGS affiliates - their email addresses (e.g., `author@usgs.gov`). This information allowed us to identify each publication's USGS authors and assign them the Scopus affiliation code for the USGS (60011347). We then cross-referenced each article's metadata with the processed Scopus downloads to determine (1) if any publications in the USGS file were missing from our Scopus data set and (2) validate the federal affiliation of authors for articles that were found in both the USGS and Scopus data sets. After validating the federal affiliations for these articles, we used the Scopus Author ID and ORCID numbers of the USGS authors to search for and correct any name variants that might be present in the data set (e.g., Abby Powell, Abby N Powell, AN Powell).
 
-### Federal Scopus IDs      
+### Validation of federal Scopus IDs      
 
-Authors whose affiliations indicated they were a consultant to a federal agency or program or were working under contract were excluded from the list of federal affiliations, as were non-profit foundations and other organizations created by congress to support the activities of or services provided by the federal government (e.g., National Park Foundation, Foundation for the National Institutes of Health).  However, retired members of the armed forces or or federal employees were included if the article included their agency affiliation as their primary address. 
+Authors whose affiliations indicated they were a consultant to a federal agency or program or were working under contract were excluded from the list of federal affiliations, as were non-profit foundations and other organizations created by congress to support the activities of or services provided by the federal government (e.g., National Park Foundation, Foundation for the National Institutes of Health).  However, retired members of the armed forces or or federal employees were included if the article included their agency affiliation as their primary address. A .csv file with each Scopus ID in table \@ref(tab:fedcodes) with its respective affiliation and agency can be found at https://github.com/BrunaLab/fed_pubs.
 
-### Productivity of Focal Universities    
+### Quantifying productivity of focal universities    
 
 To quantify the scale of changes in publication productivity by the US Federal Government we used Scopus to identify the most productive non-federal institutions based in the United States during our reference time period of 2019-2025. With the exception of Massachusetts General Hospital (i.e., MGH), these institutions were all "Mixed Undergraduate/Graduate-Doctorate Large" universities (_sensu_ [@thecarnegieclassificationofinstitutionsofhighereducationCarnegieClassification2025]: `r uni_names_flat`. 
 
 Although MGH is the largest of the clinical education and research hospitals affiliated with the Harvard Medical School, it is not the only one. Moreover, many other universities are affiliated with hospitals for research purposes, but identifying these relationships and the extent to which research conducted there is directly supported by the the university and its infrastructure is challenging. We therefore excluded MGH from our analyses as a stand-alone institution and focused exclusively on publications whose authors had primary affiliations with a university or its medical school. For example, articles with at least one author with 'Harvard University' or 'Harvard Medical School' as a primary address were included. However, articles using 'Massachusetts General Hospital' as a primary address were not included, even if 'Harvard Medical School' was listed as an author's secondary address.  
 
 <!-- returned N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_affils") %>% select(n)))`.  -->
-The initial search of university productivity was conducted using N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id_initial") %>% select(n)))` Scopus affiliation IDs; following review of the results for additional affiliations the search was repeated using the N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id_followup") %>% select(n)))` Scopus Affiliation IDs found in Table \@ref(tab:unicodes). This search resulted in N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_pubs") %>% select(n)))` publications, of which `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="article") %>% select(perc)))`% were Articles, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="review") %>% select(perc)))`% were Reviews, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="book chapter") %>% select(perc)))`% were book chapters, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="note") %>% select(perc)))`% were Notes, and `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="data paper") %>% select(perc)))`% were Data Papers. These publications had N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_unique_authors") %>% select(n)))` unique authors; N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_focal") %>% select(n)))` of which had one of the focal universities as their primary affiliation. Each article had an average of N = `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD authors, of which `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Focal") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Focal") %>% select(sd)))` SD were affiliated with the focal universities. The number of articles published from January 2019 through July 2025 whose first-author was affiliated with each focal university can be found in Table \@ref(tab:unitable); the cumulative monthly productivity for each institution through July of 2019-2025 is in Figure \@ref(fig:uni-decline-3).  
+The initial search of university productivity was conducted using N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id_initial") %>% select(n)))` Scopus affiliation IDs; following review of the results for additional affiliations the search was repeated using the N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id_followup") %>% select(n)))` Scopus Affiliation IDs found in table \@ref(tab:unicodes). This search resulted in N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_pubs") %>% select(n)))` publications, of which `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="article") %>% select(perc)))`% were Articles, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="review") %>% select(perc)))`% were Reviews, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="book chapter") %>% select(perc)))`% were book chapters, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="note") %>% select(perc)))`% were Notes, and `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="data paper") %>% select(perc)))`% were Data Papers. These publications had N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_unique_authors") %>% select(n)))` unique authors; N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_focal") %>% select(n)))` of which had one of the focal universities as their primary affiliation. Each article had an average of N = `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD authors, of which `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Focal") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Focal") %>% select(sd)))` SD were affiliated with the focal universities. The number of articles published from January 2019 through July 2025 whose first-author was affiliated with each focal university can be found in table \@ref(tab:unicodes); the cumulative monthly productivity for each institution through July of 2019-2025 is in fig. \@ref(fig:uni-decline-3).  
 
-## Statistical analyses  
+A .csv file with the Scopus ID codes in table \@ref(tab:unicodes) and their respective affiliations can be downloaded from https://github.com/BrunaLab/fed_pubs.
 
-We used bootstrapping [@efronIntroductionBootstrap1994] to determine if the number of articles published from January-July 2025 with a federal first author was significantly different from the number published during this time period in previous years. Because the bootstrap sampling should reflect as closely as possible the structure of the underlying data, and the number of published articles differs by month (Figure \@ref(fig:pubs-monthly-fed)), we first used the 2019-2024 data to count the number of publications produced by each agency in each month of . We then simulated each agency's January-July productivity by sampling at random with replacement from each month's publication counts and then summing the January-July total across all agencies. This procedure was repeated N = 1000 times, after which we counted the percentage of bootstrap runs where the simulated number of total January-July papers was lower than the actual number published in 2025. Finally, we conducted a less conservative bootstrap test in which an agency's publication counts for each month of the simulation were selected without replacement from the pooled monthly counts.
+### Statistical analyses  
 
-The number of May-July publications in the 'strict' bootstrap ranged from `r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(min_bs_c_pubs)))`-`r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(max_bs_c_pubs)))` (median = `r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(median_bs_c_pubs)))`). In the less conservative simulations, the number of publications ranged from `r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(min_bs_c_pubs)))`-`r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(max_bs_c_pubs)))` (median = `r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(median_bs_c_pubs)))`). For both the 'strict' and less-conservative tests,`r comma(100-as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(perc_below_obs)))`% of the bootstrap runs had simulated 'strict' and less-conservative bootstrap tests, the observed number of 2025 publications was less than (Figure \@ref(fig:bs-fig)). Finally, we used these bootstrapping procedures to compare the number of publications with focal university first authors from January-July 2025 with the number produced during the same time period in the years 2019-2005. The results for universities were similar to those for the federal first author publications (Figure \@ref(fig:bs-fig-uni)).
+We used bootstrapping [@efronIntroductionBootstrap1994] to determine if the number of articles published from January-July 2025 with a federal first author was significantly different from the number published during this time period in previous years. Because the bootstrap sampling should reflect as closely as possible the structure of the underlying data, and the number of published articles differs by month (fig. \@ref(fig:pubs-monthly-fed)), we first used the 2019-2024 data to count the number of publications produced by each agency in each month of each year. We then simulated each agency's January-July productivity by sampling at random with replacement from each month's publication counts and then summing the January-July total across all agencies. This procedure was repeated N = 1000 times, after which we counted the percentage of bootstrap runs where the simulated number of total January-July papers was lower than the actual number published in 2025. Finally, we conducted a less conservative bootstrap test in which an agency's publication counts for each month of the simulation were selected without replacement from the pooled monthly counts.
+
+The number of May-July publications in the 'strict' bootstrap ranged from `r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(min_bs_c_pubs)))`-`r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(max_bs_c_pubs)))` (median = `r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(median_bs_c_pubs)))`). In the less conservative simulations, the number of publications ranged from `r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(min_bs_c_pubs)))`-`r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(max_bs_c_pubs)))` (median = `r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(median_bs_c_pubs)))`). For both the 'strict' and less-conservative tests,`r comma(100-as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(perc_below_obs)))`% of the bootstrap runs had simulated 'strict' and less-conservative bootstrap tests, the observed number of 2025 publications was less than (fig. \@ref(fig:bs-fig)). Finally, we used these bootstrapping procedures to compare the number of publications with focal university first authors from January-July 2025 with the number produced during the same time period in the years 2019-2005. The results for universities were similar to those for the federal first author publications (fig. \@ref(fig:bs-fig-uni)).
 
 \bigskip
 
@@ -132,8 +160,9 @@ The number of May-July publications in the 'strict' bootstrap ranged from `r com
 
 <!-- ``` -->
 
+## Supplementary Text 
 
-## Potential lags in Scopus uploads
+### Potential lags in Scopus uploads
 
 It is important to note that our estimates of institutional productivity must account for the temporal lag when article's  are published and their indexing in Scopus; information on the magnitude of this delay helps ensures the window selected for analysis will minimize potential underestimates of productivity. Despite the widespread use of bibliographic databases such as Scopus and the Web of Science [@baasScopusCuratedHighquality2020; @liuMatterTimePublication2024; @thelwallScopus19002020Growth2022] to assess institutional productivity, to our knowledge only one study has quantified the lag between an article's publication online and it being indexed in Scopus. @adeosunScopusIndexingDelays2024 found that once articles had been published online, the median time-to-Scopus-indexing was only 36 days, and that 91% of articles were indexed within 10 weeks. As a result "Scopus indexing delays do not support the arbitrarily prolonged wait for bibliometric data" [@adeosunScopusIndexingDelays2024], and a 10-week window between the date of data collection and the close of the analysis window provides a "reasonable balance between the recency and completeness of published data". We therefore chose July 31, 2025 as the end of analysis window.  This cut-off appears to be conservative - when comparing results of searches conducted in July and September 2025, we found similar resultsab: (<1% difference) when using windows as short as 4 weeks. 
 
@@ -147,7 +176,7 @@ It is important to note that our estimates of institutional productivity must ac
 
 \newpage
 
-```{r  label = pubs-monthly-fed, echo = FALSE, fig.cap = "Articles by federal government agency's indexed per month (2019-2024).", out.width = '50%',out.width = '70%', fig.align='center'}
+```{r  label = pubs-monthly-fed, echo = FALSE, fig.cap = "Articles by US federal government agency affiliates indexed monthly in Scopus (2019-2024).", out.width = '50%',out.width = '70%', fig.align='center'}
 knitr::include_graphics("../docs/images/pubs_per_month.png", error=FALSE)
 ```
 \newpage
@@ -166,14 +195,18 @@ knitr::include_graphics("../docs/images/bs_composite_fig_uni.png", error=FALSE)
 
 ```
 
-\newpage
+\blandscape
 
 
-```{r  label = uni-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through July of 2019-2025 whose 1st author was affiliated with one of 12 focal universities. The solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average.", out.width = '100%',fig.align='center', fig.fullwidth=TRUE}
+
+```{r  label = uni-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through July of 2019-2025 whose 1st author was affiliated with one of 12 focal universities. The solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average.", out.height = '90%', out.width = '90%',fig.align='center'}
 knitr::include_graphics("images/pubs_mo_cum_uni_lines.png", error=FALSE)
 ```
 
-\newpage
+\elandscape
+
+
+
 ```{r label = unitable}
 
 uni_pubs_table<-uni_pubs %>% 
@@ -223,12 +256,12 @@ uni_pubs_table<-uni_pubs %>%
   ) %>% 
   column_spec(2, width = "10em") %>%
   column_spec(3, width = "10em") %>% 
-  add_header_above(c(" " = 1, "No. of Pulications" = 2)) %>%
+  add_header_above(c(" " = 1, "No. of Publications" = 2)) %>%
   # footnote(footnote_as_chunk = TRUE,
   #          threeparttable = TRUE,
   #          general_title = "",
   #          general="The sum of publications in this column is greater than the total number of publications in our dataset because some publications include authors from multiple focal instituions (i.e., we did not attribute 'fractional authorship')."
-    footnote(number=c("The sum of publications in this column is greater than the total number of publications in our dataset because some publications include authors from multiple focal instituions (i.e., we did not attribute 'fractional authorship')."),
+    footnote(symbol=c("The sum of publications in this column is greater than the total number of publications in our dataset because some publications include authors from multiple focal institutions (i.e., we did not attribute 'fractional authorship')."),
              footnote_as_chunk = TRUE,
              threeparttable = TRUE)
   
@@ -239,11 +272,10 @@ uni_pubs_table<-uni_pubs %>%
   # add_indent(c(13)) %>% 
   # row_spec(13, bold = T) %>% 
   #   row_spec(12, hline=1)
-tmp <- str_replace(tmp, "Super1", "$^{1}$")
+tmp <- str_replace(tmp, "Super1", "$^{*}$")
 knitr::asis_output(tmp)
 
 
 ```
-
 
 
