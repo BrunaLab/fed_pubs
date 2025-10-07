@@ -1,14 +1,10 @@
 # fed_pub file updates (organized by date beginning with the most recent changes)
 
-## 18 July 2024
+## 7 October 2025
 
-### Enhancement 
+1. Manuscript submitted 
 
+## 6 October 2025
 
-## 2 July 2024
+1. Preprint Uploaded to [MetaArXiv](https://osf.io/preprints/metaarxiv/4hfe9_v1)
 
-### Enhancement
-### Corrections
-### versions for data/code review by _Ecology_ (0.9.0)
-        
-### ongoing review and clean-up (0.5.0)   

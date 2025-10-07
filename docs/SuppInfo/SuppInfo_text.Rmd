@@ -81,28 +81,26 @@ uni_names_flat<-paste(uni_pubs$uni, collapse=', ' )
 
 <!-- \newpage -->
 
-
 <!-- ```{r  label = science-logo, echo = FALSE, fig.align='center'} -->
 <!-- knitr::include_graphics("../docs/images/science.png", error=FALSE) -->
 <!-- ``` -->
 
-
 <!-- # Supplementary Materials for -->
+<!-- \bigskip -->
+
+<!-- ## Declining contribution of the United States federal government to global research corpus -->
+<!-- \bigskip -->
+
+<!-- ## Emilio M. Bruna -->
+<!-- \bigskip -->
+
+<!-- ## Corresponding author: embruna@ufl.edu -->
+<!-- \bigskip -->
+<!-- \bigskip -->
+
 <!-- \bigskip   -->
-
-<!-- ## Declining contribution of the United States federal government to global research corpus   -->
-<!-- \bigskip  -->
-
-<!-- ## Emilio M. Bruna   -->
-<!-- \bigskip    -->
-
-<!-- ## Corresponding author: embruna@ufl.edu   -->
 <!-- \bigskip   -->
-<!-- \bigskip  -->
-
-\bigskip  
-\bigskip  
-\bigskip  
+<!-- \bigskip   -->
 
 **This PDF file includes:**
 
@@ -182,7 +180,7 @@ knitr::include_graphics("../docs/images/pubs_per_month.png", error=FALSE)
 \newpage
 
 
-```{r  label = bs-fig, echo = FALSE, fig.cap = "Total publications produced from June-July by federal agencies and departments of the US Federal government in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the these agencies and departments in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '60%', out.height= '60%', fig.align='center'}
+```{r  label = bs-fig, echo = FALSE, fig.cap = "Total publications produced from June-July by federal agencies and departments of the US Federal government in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the these agencies and departments in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '90%', out.height= '90%', fig.align='center'}
 knitr::include_graphics("../docs/images/bs_composite_fig.png", error=FALSE)
 
 ```
@@ -190,7 +188,7 @@ knitr::include_graphics("../docs/images/bs_composite_fig.png", error=FALSE)
 \newpage
 
 
-```{r  label = bs-fig-uni, echo = FALSE, fig.cap = "Total publications produced from June-July by focal universities in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the focal universities in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '60%', out.height= '60%', fig.align='center'}
+```{r  label = bs-fig-uni, echo = FALSE, fig.cap = "Total publications produced from June-July by focal universities in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the focal universities in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '90%', out.height= '90%', fig.align='center'}
 knitr::include_graphics("../docs/images/bs_composite_fig_uni.png", error=FALSE)
 
 ```

@@ -728,7 +728,7 @@ pubs_mo_fig_cumulative
 
 
 ggsave(file="./docs/images/pubs_mo_cum_fig_multipanel.png", pubs_mo_fig_cumulative,
-       width = 6, height = 10, units = "in",
+       width = 6, height = 8, units = "in",
        device='png', dpi=700)  
 
 
@@ -855,7 +855,7 @@ source("code/figs/pubs_per_month_cumulative_agency.R")
 pubs_per_month_cumulative_agency<-pubs_per_month_cumulative_agency(papers_dataset,authors_dataset,PY_max,PM_max)
 pubs_per_month_cumulative_agency
 ggsave("./docs/images/pubs_mo_cum_agency_lines.png",
-       width = 8, height = 14, units = "in",
+       width = 11, height = 8, units = "in",
        device='png', dpi=700)
 
 

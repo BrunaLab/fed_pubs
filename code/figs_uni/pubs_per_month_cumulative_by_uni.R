@@ -140,19 +140,21 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
     #   )
     # ) %>% 
     mutate(uni=case_when(
-      uni == "unc_ch"~"Univ of North Carolina, Chapel Hill",
-      uni == "ohio_state"~"The Ohio State Univ",
-      uni == "florida"~"Univ of Florida",
-      uni == "harvard"~"Harvard Univ",
+      uni == "harvard"~"(A) Harvard Univ",
+      uni == "michigan"~"(B) Univ of Michigan",  
+      # uni == "michigan"~"(B) Univ of Michigan, Ann Arbor",  
+      uni == "penn"~"(C) Univ of Pennsylvania",
+      uni == "stanford"~"(D) Stanford Univ",
+      uni == "ucla"~"(E) UC Los Angeles",
+      uni == "washington"~"(F) Univ of Washington",
+      uni == "florida"~"(G) Univ of Florida",
+      uni == "ohio_state"~"(H) The Ohio State Univ",
+      # uni == "minn"~"(I) Univ of Minnesota, Twin Cities",
+      uni == "minn"~"(I) Univ of Minnesota",
+      uni == "ucsd"~"(J) UC San Diego",
+      uni == "unc_ch"~"(K) UNC Chapel Hill",
+      uni == "ucsf"~"(L) UC San Francisco",
       uni == "mass_general"~"Massachusetts General Hospital",
-      uni == "michigan"~"Univ of Michigan, Ann Arbor",
-      uni == "penn"~"Univ of Pennsylvania",
-      uni == "stanford"~"Stanford Univ",
-      uni == "ucla"~"Univ of California, Los Angeles",
-      uni == "minn"~"Univ of Minnesota, Twin Cities",
-      uni == "ucsd"~"Univ of California, San Diego",
-      uni == "ucsf"~"Univ of California, San Francisco",
-      uni == "washington"~"Univ of Washington",
       .default = as.character(uni)
     )) %>% 
     mutate(uni=paste(uni," (",perc_change,"%)", sep=""))
@@ -186,12 +188,13 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
     geom_line()+
     # geom_line(linewidth = if_else(plot_data$PY == "avg",1.5,1)) + 
     geom_point(size=1.5)+
-    scale_color_manual(values=c(rep("lightgray",6),"#8B0000","#36648B"))+
+    scale_color_manual(values=c(rep("darkgray",6),"#8B0000","#36648B"))+
     scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+
-    facet_wrap(~factor(uni, c(as.vector(order$uni))),ncol = 4, scales = "free")+
+    # facet_wrap(~factor(uni, c(as.vector(order$uni))),ncol = 4, scales = "free",labeller = label_wrap_gen(width=30))+ # label_wrap_gen cnmtrols length of facet strip text
+    facet_wrap(~factor(uni, c(as.vector(order$uni))),ncol = 4, scales = "free")+ # label_wrap_gen cnmtrols length of facet strip text
     theme(panel.spacing = unit(0.5, "cm", data = NULL))+
     # scale_x_continuous( breaks=seq(1,12,by=1))+
     # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_cumulative %>% select(cumul_pubs))+5000),by=2500))+
@@ -199,7 +202,10 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
     theme(axis.text.x =element_text(size = 10))+
     theme(axis.title.y = element_text(size = 16,face = "bold"))+
     theme(axis.title.x =element_text(size = 16,face = "bold"))+
-    theme(strip.text.x = element_text(face = "bold"))+
+    theme(strip.text.x = element_text(face = "bold",hjust = 0,size=10))+ #hjust makes it flush left in strip instead of default center
+    theme(strip.background.x = element_rect(fill = "white", color = "white", linetype = "solid", linewidth = 0))+
+    theme(
+      strip.placement = "outside")+
     theme(legend.position="none") + 
     geom_label(aes(label = label), 
                # position="jitter",

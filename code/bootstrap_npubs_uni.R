@@ -328,16 +328,18 @@ ggplot(aes(cumul_pubs)) +
            label=paste("No. Publications\n","Jan-",month[PM_max,1], " 2025",sep=""),
            color="darkred",
            size=3)+
-  theme(axis.text.y = element_text(size = 10))+
-  theme(axis.text.x =element_text(size = 10))+
-  theme(axis.title.y = element_text(size = 12,face = "bold"))+
-  theme(axis.title.x =element_text(size = 12,face = "bold"))+
+  theme(axis.text.y = element_text(size = 6))+
+  # theme(axis.text.x =element_text(size = 6))+
+  theme(axis.title.y = element_text(size = 8,face = "bold"))+
+  # theme(axis.title.x =element_text(size = 8,face = "bold"))+
+  theme(axis.title.x = element_blank())+
+  theme(axis.text.x = element_blank())+
   theme(strip.text.x = element_text(face = "bold"))+
   expand_limits(x= c(x_min,x_max))+
   # expand_limits(y= c(0,150))+
   scale_x_continuous(limits = c(x_min,
-                                x_max,
-                                breaks = seq(x_min, x_max,by = 1000)))
+                                x_max),
+                                breaks = seq(x_min, x_max,by = 2500))
 
 
 
@@ -508,16 +510,16 @@ final_bs_n_less_conservative<-bs_output_run_cml_less_conservative %>%
            label=paste("No. Publications\n","Jan-",month[PM_max,1], " 2025",sep=""),
            color="darkred",
            size=3)+
-  theme(axis.text.y = element_text(size = 10))+
-  theme(axis.text.x =element_text(size = 10))+
-  theme(axis.title.y = element_text(size = 12,face = "bold"))+
-  theme(axis.title.x =element_text(size = 12,face = "bold"))+
+  theme(axis.text.y = element_text(size = 6))+
+  theme(axis.text.x = element_text(size = 6))+
+  theme(axis.title.y = element_text(size = 8,face = "bold"))+
+  theme(axis.title.x =element_text(size = 8,face = "bold"))+
   theme(strip.text.x = element_text(face = "bold"))+
   expand_limits(x= c(x_min,x_max))+
   expand_limits(y= c(0,150))+
   scale_x_continuous(limits = c(x_min,
-                                x_max,
-                                breaks = seq(x_min, x_max,by = 1000)))
+                                x_max),
+                                breaks = seq(x_min, x_max,by = 2500))
 
 
 
@@ -577,6 +579,6 @@ write_csv(bs_stats_all,"./docs/summary_info/bs_stats_all_uni.csv")
 bs_composite_fig<-plot_grid(final_bs_n, final_bs_n_less_conservative, labels=c("A", "B"), ncol = 1, nrow = 2)
 
 
-ggsave("./docs/images/bs_composite_fig_uni.png", width = 8, height = 8, units = "in", device='png', dpi=700)
+ggsave("./docs/images/bs_composite_fig_uni.png", width = 4, height = 6, units = "in", device='png', dpi=700)
 
 

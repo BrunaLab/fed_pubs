@@ -39,7 +39,7 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,PM_max,PY_m
     # geom_line(linewidth = 1) + 
     geom_line(linewidth = if_else(plot_data_1$PY == "Avg. (all yrs)",1.5,1)) + 
     geom_point(size=1.5)+
-    scale_color_manual(values=c(rep("lightgray",6),"#8B0000","#36648B"))+
+    scale_color_manual(values=c(rep("darkgray",6),"#8B0000","#36648B"))+
     scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
     # expand_limits(y = 0)+
     # expand_limits(x= c(0,length(levels(plot_data_1$month_name)) + 1.25))+
@@ -47,9 +47,11 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,PM_max,PY_m
     theme_classic()+
     # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_cumulative_1 %>% filter(PM<=PM_max) %>% select(cumul_pubs))+2000),by=2500))+
     theme(axis.text.y = element_text(size = 10))+
-    theme(axis.text.x = element_text(size = 10))+
+    # theme(axis.text.x = element_text(size = 10))+
     theme(axis.title.y = element_text(size = 16))+
-    theme(axis.title.x =element_text(size = 16))+
+    # theme(axis.title.x =element_text(size = 16))+
+    theme(axis.title.x = element_blank())+
+    theme(axis.text.x = element_blank())+
     theme(legend.position="none")+
     annotate(geom="text", 
              # x=PM_max+0.32,
@@ -75,7 +77,8 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,PM_max,PY_m
                border.color = "white"
                # label.size = unit(0,"mm")
                ) +
-    ggtitle('(A) Federally affiliated 1st author' )
+    ggtitle('(A) Federally affiliated 1st author' )+
+    theme(plot.title=element_text(face='bold'))
   
   # +
   #   theme(plot.background = element_rect(color = 1,
@@ -106,7 +109,7 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,PM_max,PY_m
       labs(y = "No. of Publications", size=5)+
     geom_line(linewidth = if_else(plot_data_1$PY == "Avg. (all yrs)",1.5,1)) + 
     geom_point(size=1.5)+
-    scale_color_manual(values=c(rep("lightgray",6),"#8B0000","#36648B"))+
+    scale_color_manual(values=c(rep("darkgray",6),"#8B0000","#36648B"))+
     scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
       # expand_limits(y = 0)+
       # expand_limits(x= c(0,length(levels(plot_data_2$month_name)) + 1.25))+
@@ -143,7 +146,8 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,PM_max,PY_m
                  border.color = "white"
                  # label.size = unit(0,"mm")
       ) +
-    ggtitle('(B) All authors federally affiliated')
+    ggtitle('(B) All authors federally affiliated')+
+    theme(plot.title=element_text(face='bold'))
   # +
   #     theme(plot.background = element_rect(color = 1,
   #                                          size = 0),

@@ -143,19 +143,21 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
     left_join(perc_change,by="agency_primary") %>% 
     
     mutate(agency_primary=case_when(
-      agency_primary == "DOE"~"Energy",
-      agency_primary == "HHS"~"Health & Human Services",
-      agency_primary == "VA"~"Veterans Affairs",
-      agency_primary == "DHS"~"Homeland Security",
-      agency_primary == "DOD"~"Defense",
-      agency_primary == "USDA"~"Agriculture",
-      agency_primary == "NASA"~"National Aeronautics & Space Admin",
-      agency_primary == "Smithsonian"~"Smithsonian Institution",
+      agency_primary == "DOE"~"(A) Dept Energy",
+      agency_primary == "HHS"~"(B) Dept Health & Human Services",
+      agency_primary == "VA"~"(C) Dept Veterans Affairs",
+      agency_primary == "DOD"~"(D) Dept Defense",
+      agency_primary == "USDA"~"(E) Dept Agriculture",
+      agency_primary == "Commerce"~"(F) Dept Commerce",
+      agency_primary == "Interior"~"(G) Dept Interior",
+      agency_primary == "NASA"~" (H) NASA",
+      agency_primary == "Smithsonian"~"(I) Smithsonian",
       agency_primary == "NSF"~"National Science Foundation",
       agency_primary == "EPA"~"Environmental Protection Agency",
       agency_primary == "DOJ"~"Justice",
       agency_primary == "DOT"~"Transportation",
       agency_primary == "HUD"~"Housing & Urban Development",
+      agency_primary == "DHS"~"Homeland Security",
       agency_primary == "Other"~"Other federal units",
       .default = as.character(agency_primary)
     )
@@ -190,12 +192,14 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
     labs(y = "No. of Publications", size=5)+
     geom_line() + 
     geom_point(size=0.5)+
-    scale_color_manual(values=c(rep("lightgray",6),"#8B0000","#36648B"))+
+    scale_color_manual(values=c(rep("darkgray",6),"#8B0000","#36648B"))+
     scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+
-    facet_wrap(~factor(agency_primary, c(as.vector(order$agency_primary))),ncol = 3, scales = "free")+
+    facet_wrap(~factor(agency_primary, c(as.vector(order$agency_primary))),
+               ncol = 3, 
+               scales = "free")+
     theme(panel.spacing = unit(0.5, "cm", data = NULL))+
     # scale_x_continuous( breaks=seq(1,12,by=1))+
     # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_cumulative %>% select(cumul_pubs))+5000),by=2500))+
@@ -203,17 +207,23 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
     theme(axis.text.x =element_text(size = 10))+
     theme(axis.title.y = element_text(size = 12,face = "bold"))+
     theme(axis.title.x =element_text(size = 12,face = "bold"))+
-    theme(strip.text.x = element_text(face = "bold"))+
+    theme(strip.text.x = element_text(face = "bold",hjust = 0,size=10))+ #hjust makes it flush left in strip instead of default center
+    theme(strip.background.x = element_rect(fill = "white", color = "white", linetype = "solid", linewidth = 0))+
+    theme(
+      strip.placement = "outside")+
     theme(legend.position="none") + 
     geom_label(aes(label = label), 
                # position="jitter",
                nudge_y = 0.8, 
                nudge_x = 0.5, 
-               size =2.5,
-               fill=NA
-               # ,
+               size =3.5,
+               fill=NA,
+               border.color = "white"
                # label.size = unit(0,"mm")
     ) +
+               # ,
+               # label.size = unit(0,"mm")
+    
     theme(plot.background = element_rect(color = 1,
                                          size = 0),
           plot.margin = margin(t = 20,  # Top margin
