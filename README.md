@@ -9,40 +9,39 @@ An overview of the data and associated metadata will be archived in the Dryad Di
 **This repository includes the following:**
 
 1. **R Code** used to:
-    - download bibliographic records from Scopus using the API [(`code/---`)](code/---)
+    - download bibliographic records from Scopus using the API
       
-      > [(`02_scopus_API_search.R`)](02_scopus_API_search.R)
-      > [(`02_scopus_API_search_unis.R`)](02_scopus_API_search_unis.R)
+      > [(`02_scopus_API_search.R`)](02_scopus_API_search.R)  
+      > [(`02_scopus_API_search_unis.R`)](02_scopus_API_search_unis.R)   
     
     - process raw data files for a given year:
       
-      > [(`03_csv_binder.R`)](03_csv_binder.R)
-      > [(`03a_clean_usgs_csv.R`)](03a_clean_usgs_csv.R)
-      > [(`03c_csv_binder_unis.R`)](03c_csv_binder_unis.R)
+      > [(`03_csv_binder.R`)](03_csv_binder.R)  
+      > [(`03a_clean_usgs_csv.R`)](03a_clean_usgs_csv.R)   
+      > [(`03c_csv_binder_unis.R`)](03c_csv_binder_unis.R)  
       
     - process bind data files accross years:
       
-      > [(`04_csv_binder_cross_years.R`)](04_csv_binder_cross_years.R)
+      > [(`04_csv_binder_cross_years.R`)](04_csv_binder_cross_years.R)  
   
     - correct / make changes to author, affiliation, and publication records  (uses several functions in the `code`,`code\figs`, `code\figs_uni` folders):
       
-      > [(`05_merge_usgs_and_final_clean.R`)](05_merge_usgs_and_final_clean.R)
-      > [(`05a_clean_uni_affils.R`)](05a_clean_uni_affils.R)
-      > [(`05b_final_clean_unis.R`)](05b_final_clean_unis.R)
+      > [(`05_merge_usgs_and_final_clean.R`)](05_merge_usgs_and_final_clean.R)  
+      > [(`05a_clean_uni_affils.R`)](05a_clean_uni_affils.R)  
+      > [(`05b_final_clean_unis.R`)](05b_final_clean_unis.R)  
     
-    - generate and save data summaries, make figures (uses several functions in the `code`,`code\figs`, `code\figs_uni` folders):
+    - generate and save data summaries, make figures (uses several functions in the `code`,`code\figs`, `code\figs_uni` folders):  
       
-      > [(`06_make_file.R`)](06_make_file.R)
-      > [(`06_make_file_uni.R`)](06_make_file_uni.R) 
+      > [(`06_make_file.R`)](06_make_file.R)  
+      > [(`06_make_file_uni.R`)](06_make_file_uni.R)  
       
     - Bootstrap analysis
     
-      > [(`code/bootstrap_npubs.R`)](code/bootstrap_npubs.R)
-      > [(`code/bootstrap_npubs_uni.R`)](code/bootstrap_npubs_uni.R)
+      > [(`code/bootstrap_npubs.R`)](code/bootstrap_npubs.R)  
+      > [(`code/bootstrap_npubs_uni.R`)](code/bootstrap_npubs_uni.R)  
     
 2. Rmd files used to prepare the manuscript:   
-
-    - [(`docs/`)](docs/) folder
+    - [(`docs/`)](docs/) folder  
     
 3. **Data:** will be available upon manuscript acceptance (files are too large to store on Github)
     
