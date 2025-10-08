@@ -169,8 +169,17 @@ select(agency_primary, affil_id, affiliation) %>%
   )) %>%
   distinct()
 
+fed_scopus_codes<-pull %>%
+  arrange(agency_primary, affiliation, affil_id) %>% 
+  mutate(agency_primary = if_else(agency_primary == "Other Agencies, Commissions, or Institutions","other",agency_primary)) %>% 
+  mutate(agency_primary=tolower(agency_primary)) %>% 
+  mutate(agency_primary=gsub("[,]","",agency_primary)) %>% 
+  mutate(affiliation=gsub("[,]","",affiliation)) %>% 
+  write_csv("./data_archive/fed_scopus_codes.csv")
+rm(fed_scopus_codes)
+
 pull<-pull %>%
-  arrange(agency_primary, affiliation, affil_id) %>%
+  arrange(agency_primary, affiliation, affil_id) 
   group_by(affiliation) %>%
   mutate(affil_id=paste(affil_id,collapse=", ")) %>%
   distinct(affiliation, .keep_all = TRUE) %>%

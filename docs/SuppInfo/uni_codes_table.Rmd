@@ -92,13 +92,10 @@ knitr::opts_chunk$set(dpi=300,fig.width=6)
 
 
 scopus_id<-read_csv("./data_clean/uni_affils_clean.csv") %>% 
-  # mutate(uni=case_when(
-  #   # uni == "minn"~"other",
-  #   uni == "unc_ch"~"other",
-  #   uni == "ohio_state"~"other",
-  #   is.na(uni) ~ "other",
-  #   .default = as.character(uni)
-  # )) %>% 
+  mutate(uni=case_when(
+    is.na(uni) ~ "other",
+    .default = as.character(uni)
+  )) %>%
   filter(uni!="other") %>%
   filter(uni!="mass_general") %>%
   # filter(uni=="florida") %>%
@@ -124,6 +121,18 @@ scopus_id<-read_csv("./data_clean/uni_affils_clean.csv") %>%
     .default = as.character(uni)
   )) %>% 
   arrange(uni)
+
+
+
+
+uni_scopus_codes<-scopus_id %>%
+  arrange(uni, affiliation, affil_id) %>% 
+  mutate(uni=tolower(uni)) %>% 
+  mutate(uni=gsub("[,]","",uni)) %>% 
+  mutate(affiliation=gsub("[,]","",affiliation)) %>% 
+  write_csv("./data_archive/uni_scopus_codes.csv")
+rm(uni_scopus_codes)
+
 # %>% 
 #   mutate(row=row_number())
 

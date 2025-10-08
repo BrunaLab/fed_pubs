@@ -50,6 +50,8 @@ An overview of the data and associated metadata will be archived in the Dryad Di
 
 ## Workflow
 
+_Coming shortly - I am in the process of streamlining the workflow to allow working from a single MakeFile._
+
 
 ## Improvements, Suggestions, & Questions
 
