@@ -2,13 +2,26 @@
 
 ## Repository Overview
 
-This repository is for the cleanup, organization, and archiving of data collected as part of the _FedPubs_ Project. These procedures are carried out by executing two R scripts (see _Workflow_, below). 
+This repository is for the cleanup, organization, and archiving of data 
+collected as part of the _FedPubs_ Project. These procedures are carried out by 
+executing two R scripts (see _Workflow_, below). 
 
-An overview of the data and associated metadata will be archived in the Dryad Digital Repository upon acceptance of the resulting publications.
+An overview of the data and associated metadata will be archived in the 
+Dryad Digital Repository upon acceptance of the resulting publications.
 
 **This repository includes the following:**
 
-1. **R Code** used to:
+1. **Data used in analyses/publications:** 
+    - Data will be archived at Dryad upon manuscript acceptance (files are too 
+    large to store on Github). However, the list of Scopus Affiliation ID codes 
+    used for searches of university and US federal agency productivity 
+    (Supplementary Tables 2 & 3) are available for download as `.csv` files.
+    
+    > [(`fed_scopus_codes.csv`)](data_archive/fed_scopus_codes.csv)  
+    > [(`uni_scopus_codes.csv`)](data_archive/uni_scopus_codes.csv)  
+    
+    
+2. **R Code** used to:
     - download bibliographic records from Scopus using the API
       
       > [(`02_scopus_API_search.R`)](02_scopus_API_search.R)  
@@ -40,12 +53,9 @@ An overview of the data and associated metadata will be archived in the Dryad Di
       > [(`code/bootstrap_npubs.R`)](code/bootstrap_npubs.R)  
       > [(`code/bootstrap_npubs_uni.R`)](code/bootstrap_npubs_uni.R)  
     
-2. Rmd files used to prepare the manuscript:   
+3. Rmd files used to prepare the manuscript:   
     - [(`docs/`)](docs/) folder  
     
-3. **Data:** will be available upon manuscript acceptance (files are too large to store on Github)
-    
-  
 4. [**A log of updates and corrections**](NEWS.md).
 
 ## Workflow
