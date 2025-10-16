@@ -219,7 +219,7 @@ scopus_id_initial<-bind_rows(scopus_id_2,scopus_id_1) %>% select(affil_id) %>% d
 rm(scopus_id_1,scopus_id_2)
 scopus_id_initial
 # total number of scopus IDs in the follow-up search
-scopus_id_followup<-read_csv("./data_clean/api_affils_searched_2025-09-01.csv") %>% 
+scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv") %>% 
 select(affil_id) %>% 
   distinct() %>% 
   summarize(n=n_distinct(affil_id))

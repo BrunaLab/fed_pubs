@@ -3,7 +3,9 @@
 library(tidyverse)
 library(rscopus)
 # Define the folder path
-folder_path <- "data_raw/uni_affils"
+folder_path <- "./data_raw/affiliations_to_search/uni_affils"
+api<-"----"
+
 
 # List all files in the folder
 file_list <- list.files(folder_path, full.names = TRUE)
@@ -36,7 +38,7 @@ for (h in term){
   scopus_data_raw <- tryCatch({
     get_affiliation_info(
       affil_id = query_string,
-      api_key = "e72ca4ba01261a08226d7ea9775ace33",
+      api_key = api,
       verbose = TRUE
     )
   }, error = function(e) {
@@ -100,10 +102,14 @@ affil_id==60138951~"Nationwide Center for Advanced Customer Insights",
 rename(uni=file_name)
 # 
 # 
-# uni_affils_clean %>% group_by(uni,country) %>% tally() %>% arrange(desc(n))
+# uni_affils_clean %>% group_by(uni,country) %>% tally() %>% arrange(desc(n)) %>% filter(country!="United States")
 
-write_csv(scopus_info_uni_affils,  "./data_raw/scopus_info_uni_affils.csv")
 
-write_csv(uni_affils_clean,  "./data_clean/uni_affils_clean.csv")
+# uni_affils_clean
+
+# write_csv(scopus_info_uni_affils,  "./data_raw/scopus_info_uni_affils.csv")
+
+write_csv(uni_affils_clean,paste("./data_clean/api_uni_affils_searched_",Sys.Date(),".csv",sep=""))
+
 
 

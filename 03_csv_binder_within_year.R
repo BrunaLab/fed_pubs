@@ -11,11 +11,14 @@ library(progress)
 library(fs)
 library(data.table)
 
-# 
+cat<-"fed"
+data<-"fed_20250901"
 
 
-# data_dir<-"./data_raw/scopus_api/unis_files"
-data_dir<-"./data_raw/feds_20250901"
+# cat<-"uni"
+# data<-"uni_20250901"
+
+
 
 folder<-c(
   "2019", # 1
@@ -24,7 +27,7 @@ folder<-c(
   "2022", # 4
   "2023", # 5
   "2024", # 6
-  "2025")# 7
+  "2025") # 7
   
 
 
@@ -33,13 +36,15 @@ folder<-c(
 
 # create folders  ---------------------------------------------------------
 
+data_dir<-paste("./data_raw/",data,sep="")
+
 
 # setting up the main directory
 main_dir <- "./data_raw/affils/"
 main_dir <- "./data_raw/papers/"
 main_dir <- "./data_raw/authors/"
 # setting up the sub directory
-sub_dir <- "year_files_fed"
+sub_dir <- paste("year_files_",cat,sep="")
 
 # check if sub directory exists 
 if (file.exists(sub_dir)){
@@ -82,7 +87,7 @@ if (file.exists(sub_dir)){
 main_dir <- "./data_raw/incomplete_records_removed/"
 
 # setting up the sub directory
-sub_dir <- "fed"
+sub_dir <- cat
 
 # check if sub directory exists 
 if (file.exists(sub_dir)){
@@ -422,14 +427,12 @@ authors_df<-authors_df %>%
 # save --------------------------------------------------------------------
 
   # # FOR WITHIN YEAR BINDING - FEDS
-  # data_dir<-"./data_raw/feds_20250901"
-  write_csv(affils_df,paste("./data_raw/affils/year_files_fed/affils_df_",folder[k],".csv",sep=""))
-  write_csv(authors_df,paste("./data_raw/authors/year_files_fed/authors_df_",folder[k],".csv",sep=""))
-  write_csv(papers_df,paste("./data_raw/papers/year_files_fed/papers_df_",folder[k],".csv",sep=""))
-
-  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/fed/incompletes_removed_",folder[k],".csv",sep=""))
-
-
   
+  write_csv(affils_df,paste("./data_raw/affils/year_files_",cat,"/affils_df_",folder[k],".csv",sep=""))
+  write_csv(authors_df,paste("./data_raw/authors/year_files_",cat,"/authors_df_",folder[k],".csv",sep=""))
+  write_csv(papers_df,paste("./data_raw/papers/year_files_",cat,"/papers_df_",folder[k],".csv",sep=""))
+
+  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/",cat,"/incompletes_removed_",folder[k],".csv",sep=""))
+
     }
-  
+

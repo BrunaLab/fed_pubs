@@ -52,7 +52,10 @@ papers_df_trim<-papers_df_trim %>%
   distinct(SO,PY,DI,TI,.keep_all = TRUE) %>% 
   mutate(PM=
          case_when(
-           is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
+           # those without a PM early online. one option is to randomly allocate:
+           # is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
+           # the other option is to put all in 12
+           is.na(PM) ~ 12,
            .default = as.numeric(PM)
          )
 ) %>% 

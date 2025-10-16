@@ -3,21 +3,20 @@
 library(rscopus)
 library(tidyverse)
 
-# # source("./code/generate_fed_affils_to_search.R")
-# # affils_to_search<-generate_fed_affils_to_search()
-# affils_to_search<-read_csv("./data_clean/api_affils_searched_2025-09-01.csv")
-affils_to_search<-affils_to_search %>% select(affil_id)
-affils_to_search<-affils_to_search %>% select(affil_id) %>% filter(affil_id!=60006577)
-search_term<-affils_to_search$affil_id[7176:nrow(affils_to_search)]
+# source("./code/generate_fed_affils_to_search.R")
+# affils_to_search<-generate_fed_affils_to_search()
+affils_to_search<-read_csv("./data_clean/api_affils_searched_2025-09-01.csv")
+# affils_to_search<-affils_to_search %>% select(affil_id)
+affils_to_search<-affils_to_search %>% select(affil_id) %>% filter(affil_id!=60006577) # needs to be searched by month below
+# search_term<-affils_to_search$affil_id[4033:nrow(affils_to_search)]
 # search_term<-affils_to_search$affil_id[837:nrow(affils_to_search)]
-search_term<-
-# Need to split:
-# 60006577 (2019-2024), 60014232 (2019-2022)
 
-yr1=2019
-yr2=2022
+yr1=2024
+yr2=2024
 
-date_folder_for_files<-"feds_20250901"
+# date_folder_for_files<-"feds_20250901"
+date_folder_for_files<-"feds_20251010"
+api<-"38c1ea28aed25f40f11034d20557ccde"
 
 
 
@@ -25,64 +24,47 @@ date_folder_for_files<-"feds_20250901"
 
 
 # setting up the main directory
-main_dir <- paste("./data_raw/",date_folder_for_files,sep="")
+main_dir <- paste("data_raw/",date_folder_for_files,sep="")
+sub_dir <- paste(main_dir,"/papers/",yr1,sep="")
+if (!dir.exists(sub_dir)){
+  dir.create(main_dir, recursive = TRUE)
+} 
 
-# setting up the sub directory
-sub_dir <- paste("papers/",yr1,sep="")
+# setting up the sub directories
+# papers
+
+sub_dir <- paste(main_dir,"/papers/",yr1,sep="")
 # check if sub directory exists 
-if (file.exists(sub_dir)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir, sub_dir))
+
+# Check if subdirectory exists
+if (dir.exists(sub_dir)) {
+  print("The folder exists!")
 } else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir, sub_dir))
-  
+  # Create a new subdirectory inside the main path
+  dir.create(sub_dir, recursive = TRUE)
+  print("Subdirectory created.")
 }
 
-
-sub_dir <- paste("affils/",yr1,sep="")
-# check if sub directory exists 
-if (file.exists(sub_dir)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir, sub_dir))
+# Authors
+sub_dir <- paste(main_dir,"/authors/",yr1,sep="")
+# Check if subdirectory exists
+if (dir.exists(sub_dir)) {
+  print("The folder exists!")
 } else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir, sub_dir))
-  
+  # Create a new subdirectory inside the main path
+  dir.create(sub_dir, recursive = TRUE)
+  print("Subdirectory created.")
+}
+sub_dir <- paste(main_dir,"/affils/",yr1,sep="")
+# Check if subdirectory exists
+if (dir.exists(sub_dir)) {
+  print("The folder exists!")
+} else {
+  # Create a new subdirectory inside the main path
+  dir.create(sub_dir, recursive = TRUE)
+  print("Subdirectory created.")
 }
 
-sub_dir <- paste("authors/",yr1,sep="")
-# check if sub directory exists 
-if (file.exists(sub_dir)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir, sub_dir))
-} else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir, sub_dir))
-  
-}
-
-# check if sub directory exists 
-if (file.exists(sub_dir)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir, sub_dir))
-} else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir, sub_dir))
-  
-}
 
 
 #  initialize searches ----------------------------------------------------
@@ -95,11 +77,11 @@ term <- seq_along(search_term)
 
 
 
-    for (h in term){
+    
       
       for (j in year) {
         
-        
+        for (h in term){    
         
         
         a<-paste("(AF-ID('",search_term[h],"')"," AND (DOCTYPE(ar) OR DOCTYPE(re) OR DOCTYPE(ch) OR DOCTYPE(ed) OR DOCTYPE(le) OR DOCTYPE(dp) OR DOCTYPE(no))",sep="")
@@ -113,7 +95,7 @@ term <- seq_along(search_term)
         scopus_data <- rscopus::scopus_search(query_string,
                                               max_count=8000,
                                               view = "COMPLETE",
-                                              api_key = "---")
+                                              api_key = api)
         
         
         
@@ -156,7 +138,7 @@ term <- seq_along(search_term)
 search_term<-c(60006577)
   # Need to split:
   # 60006577 (2019-2024), 60014232 (2019-2022)
-yr1=2019
+yr1=2024
 yr2=2024
 months <- month.name
 
@@ -187,7 +169,7 @@ for (h in term) {
                                             max_count=8000,
                                             # start = 0,
                                             view = "COMPLETE",
-                                            api_key = "-----")
+                                            api_key = api)
       
       
       
