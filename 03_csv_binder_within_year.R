@@ -10,97 +10,225 @@ library(tidyverse)
 library(progress)
 library(fs)
 library(data.table)
+library(here)
 
-cat<-"fed"
-data<-"fed_20250901"
 
+
+# choose date and cat -----------------------------------------------------
+
+
+
+# cat<-"fed"
+# date<-"20250901"
+
+# cat<-"fed"
+# date<-"20251010"
 
 # cat<-"uni"
-# data<-"uni_20250901"
+# date<-"20250901"
+
+cat<-"uni"
+date<-"20251010"
+
+
+data<-paste("scopus_downloads/",cat,"_",date,sep="")
+
+if (cat =="fed"){
+  folder<-c(
+    "usgs",
+    "2019", # 1
+    "2020", # 2
+    "2021", # 3
+    "2022", # 4
+    "2023", # 5
+    "2024", # 6
+    "2025") # 7
+} else {
+  folder<-c(
+    "2019", # 1
+    "2020", # 2
+    "2021", # 3
+    "2022", # 4
+    "2023", # 5
+    "2024", # 6
+    "2025") # 7
+}
 
 
 
-folder<-c(
-  "2019", # 1
-  "2020", # 2
-  "2021", # 3
-  "2022", # 4
-  "2023", # 5
-  "2024", # 6
-  "2025") # 7
-  
-
-
-
-
-
-# create folders  ---------------------------------------------------------
-
-data_dir<-paste("./data_raw/",data,sep="")
+# create folders - subfolder for cats --------------------------------------
 
 
 # setting up the main directory
-main_dir <- "./data_raw/affils/"
-main_dir <- "./data_raw/papers/"
-main_dir <- "./data_raw/authors/"
+main_dir1 <- "./data_raw"
+
 # setting up the sub directory
-sub_dir <- paste("year_files_",cat,sep="")
+sub_dir1 <- paste(cat,"_",date,sep="")
 
 # check if sub directory exists 
-if (file.exists(sub_dir)){
+if (file.exists(sub_dir1)){
   
   # specifying the working directory
-  setwd(file.path(main_dir, sub_dir))
+  setwd(file.path(main_dir1, sub_dir1))
 } else {
   
   # create a new sub directory inside
   # the main path
-  dir.create(file.path(main_dir, sub_dir))
+  dir.create(file.path(main_dir1, sub_dir1))
+  
+}
+
+# create folders - papers records --------------------------------------
+
+
+# setting up the main directory
+main_dir2 <- paste(main_dir1,"/",sub_dir1,sep="")
+
+# setting up the sub directory
+sub_dir2 <- "papers"
+
+# check if sub directory exists 
+if (file.exists(sub_dir2)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir2, sub_dir2))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir2, sub_dir2))
+  
+}
+
+main_dir3 <- paste(main_dir2,"/papers",sep="")
+main_dir4 <- paste(main_dir2,"/authors",sep="")
+main_dir5 <- paste(main_dir2,"/affils",sep="")
+# 
+# # setting up the main directory
+# main_dir3 <- paste(main_dir2,"/papers",sep="")
+# 
+# # setting up the sub directory
+# sub_dir3 <- paste("year_files_",cat,sep="")
+# 
+# # check if sub directory exists 
+# if (file.exists(sub_dir3)){
+#   
+#   # specifying the working directory
+#   setwd(file.path(main_dir3, sub_dir3))
+# } else {
+#   
+#   # create a new sub directory inside
+#   # the main path
+#   dir.create(file.path(main_dir3, sub_dir3))
+#   
+# }
+
+
+# create folders - authors records --------------------------------------
+
+
+
+# setting up the sub directory
+sub_dir4 <- "authors"
+
+# check if sub directory exists 
+if (file.exists(sub_dir4)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir2, sub_dir4))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir2, sub_dir4))
   
 }
 
 
+
+# 
+# # setting up the main directory
+# main_dir4 <- paste(main_dir2,"/authors",sep="")
+# # setting up the sub directory
+# 
+# 
+# # check if sub directory exists 
+# if (file.exists(sub_dir3)){
+#   
+#   # specifying the working directory
+#   setwd(file.path(main_dir4, sub_dir3))
+# } else {
+#   
+#   # create a new sub directory inside
+#   # the main path
+#   dir.create(file.path(main_dir4, sub_dir3))
+#   
+# }
+# create folders - affils records --------------------------------------
+
+
+# setting up the sub directory
+sub_dir5 <- "affils"
+
+# check if sub directory exists 
+if (file.exists(sub_dir5)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir2, sub_dir5))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir2, sub_dir5))
+  
+}
+
+
+
+# 
+# # setting up the main directory
+# main_dir5 <- paste(main_dir2,"/affils",sep="")
+# # setting up the sub directory
+# 
+# # check if sub directory exists 
+# if (file.exists(sub_dir3)){
+#   
+#   # specifying the working directory
+#   setwd(file.path(main_dir5, sub_dir3))
+# } else {
+#   
+#   # create a new sub directory inside
+#   # the main path
+#   dir.create(file.path(main_dir5, sub_dir3))
+#   
+# }
 # create folders - incomplete records --------------------------------------
 
 
 # setting up the main directory
-main_dir <- "./data_raw/"
+
+
 
 # setting up the sub directory
-sub_dir <- "incomplete_records_removed"
+sub_dir6 <- "incomplete_records_removed"
 
 # check if sub directory exists 
-if (file.exists(sub_dir)){
+if (file.exists(sub_dir6)){
   
   # specifying the working directory
-  setwd(file.path(main_dir, sub_dir))
+  setwd(file.path(main_dir2, sub_dir6))
 } else {
   
   # create a new sub directory inside
   # the main path
-  dir.create(file.path(main_dir, sub_dir))
+  dir.create(file.path(main_dir2, sub_dir6))
   
 }
 
 
-# setting up the main directory
-main_dir <- "./data_raw/incomplete_records_removed/"
 
-# setting up the sub directory
-sub_dir <- cat
 
-# check if sub directory exists 
-if (file.exists(sub_dir)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir, sub_dir))
-} else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir, sub_dir))
-  
-}
+
 
 # begin binding csv files for diff affils ---------------------------------
 
@@ -114,7 +242,11 @@ folder_id <- seq_along(folder)
 # FILE CHECK AND VALIDATION -----------------------------------------------
 
 # Define folder paths
-
+      
+      # setting up the main directory
+  data_dir <- paste("./data_raw/",data,sep="")
+      
+      
 folder_path_papers  <- file.path(data_dir, "papers",folder[k])
 folder_path_authors <- file.path(data_dir, "authors",folder[k])
 folder_path_affils  <- file.path(data_dir, "affils",folder[k])
@@ -143,6 +275,7 @@ validate_csv_structure <- function(...) {
       rename(file=".") %>% 
       mutate(file=str_remove(file,"scopus_affil_")) %>% 
       mutate(file=str_remove(file,"_author.csv")) %>% 
+      mutate(file=str_remove(file,"_authors.csv")) %>% 
       mutate(file=str_remove(file,"_author ")) %>% 
       mutate(folder="authors")
     
@@ -180,7 +313,6 @@ validate_csv_structure(folder_path_papers, folder_path_authors, folder_path_affi
 
 
 # BIND THE CSVs FOR A GIVEN YEAR ------------------------------------------
-
 
 
 # fs::dir_ls(data_dir)
@@ -426,13 +558,13 @@ authors_df<-authors_df %>%
   
 # save --------------------------------------------------------------------
 
-  # # FOR WITHIN YEAR BINDING - FEDS
+  # # FOR WITHIN YEAR BINDING - 
+  write_csv(papers_df,paste(main_dir3,"/","papers_df_",folder[k],".csv",sep=""))
+  write_csv(authors_df,paste(main_dir4,"/","authors_df_",folder[k],".csv",sep=""))
+  write_csv(affils_df,paste(main_dir5,"/","affils_df_",folder[k],".csv",sep=""))
   
-  write_csv(affils_df,paste("./data_raw/affils/year_files_",cat,"/affils_df_",folder[k],".csv",sep=""))
-  write_csv(authors_df,paste("./data_raw/authors/year_files_",cat,"/authors_df_",folder[k],".csv",sep=""))
-  write_csv(papers_df,paste("./data_raw/papers/year_files_",cat,"/papers_df_",folder[k],".csv",sep=""))
 
-  write_csv(incompletes_to_remove,paste("./data_raw/incomplete_records_removed/",cat,"/incompletes_removed_",folder[k],".csv",sep=""))
+  write_csv(incompletes_to_remove,paste(main_dir2,"/",sub_dir6,"/","incompletes_removed_",folder[k],".csv",sep=""))
 
     }
 

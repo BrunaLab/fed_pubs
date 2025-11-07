@@ -3,8 +3,11 @@
 library(tidyverse)
 library(rscopus)
 # Define the folder path
-folder_path <- "./data_raw/affiliations_to_search/uni_affils"
-api<-"----"
+folder_path <- "./data_raw/affiliations_to_search/uni_affils/original_search"
+follow_up<-read_csv("./data_raw/affiliations_to_search/uni_affils/uni_affils_follow_up.csv") %>% 
+  rename(uni=uni_check) %>% 
+  mutate(cat="followup")
+api<-"8e204bc721cb41c0251c8846351342b0"
 
 
 # List all files in the folder
@@ -27,7 +30,7 @@ uni_affils <- file_list %>%
 
 
 search_term <- uni_affils$affil_id
-search_term <- "109556305"
+# search_term <- "109556305"
 term <- seq_along(search_term)
 all_affils<-data.frame()
 for (h in term){
@@ -66,7 +69,16 @@ scopus_info_uni_affils<-all_affils %>%
   distinct() %>% 
   mutate(affil_id=as.numeric(affil_id))
 
+
 uni_affils_clean<-left_join(uni_affils,scopus_info_uni_affils,by="affil_id") %>% 
+  mutate(uni=gsub(".csv","", file_name)) %>% 
+  select(-file_name,-pub_count,-document_count) %>% 
+  relocate(uni,.after=1) %>% 
+  mutate(affil_id=as.numeric(affil_id)) %>% 
+  mutate(cat="original") %>% 
+  bind_rows(follow_up)
+
+uni_affils_clean<-uni_affils_clean %>% 
   mutate(affiliation=case_when(
     affil_id==60121481~"Department of Philosophy", 
 affil_id==60121482~"School of Arts and Humanities" , 
@@ -99,15 +111,11 @@ affil_id==60016830~"Harvard HMS and PHS Center for Physiological Genomics",
 affil_id==60138951~"Nationwide Center for Advanced Customer Insights",
 .default = as.character(affiliation))
 ) %>% 
-rename(uni=file_name)
-# 
+  mutate_all(tolower) %>% 
+  distinct(affil_id, .keep_all=TRUE) %>% 
+  mutate_all(tolower)
 # 
 # uni_affils_clean %>% group_by(uni,country) %>% tally() %>% arrange(desc(n)) %>% filter(country!="United States")
-
-
-# uni_affils_clean
-
-# write_csv(scopus_info_uni_affils,  "./data_raw/scopus_info_uni_affils.csv")
 
 write_csv(uni_affils_clean,paste("./data_clean/api_uni_affils_searched_",Sys.Date(),".csv",sep=""))
 

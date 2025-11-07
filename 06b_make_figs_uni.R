@@ -6,14 +6,23 @@ library(data.table)
 
 
 
+cat<-"uni"
+# date<-"20250901"
+# date<-"20251010"
+
+
+
 # max month to plot -------------------------------------------------------
 
 
 # load data  --------------------------------------------------------------
 
+affil_info<-read_csv("./data_clean/api_uni_affils_searched_2025-10-18.csv") %>% 
+  mutate_all(tolower) %>% 
+  mutate(affil_id=as.integer(affil_id))
 
-papers_df  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) 
-
+# papers_df  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) 
+papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds")))
 # %>% 
 #   mutate(PM=
 #            case_when(
@@ -25,7 +34,8 @@ papers_df  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds"))
 
 # papers_df %>% filter(is.na(PM))
 
-authors_df <- setDT(read_rds("./data_clean/authors_df_uni_clean.rds")) %>% 
+# authors_df <- setDT(read_rds("./data_clean/authors_df_uni_clean.rds")) %>% 
+  authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds"))) %>% 
   mutate(uni=case_when(
     # uni == "unc_ch"~"other",
     # uni == "ohio_state"~"other",
@@ -105,7 +115,7 @@ authors_df<-read_rds("./data_clean/authors_df_analysis_uni.rds")
 
 # PM_max<-6 # june
 # PM_max<-8 # july
-PM_max<-7 # aug
+PM_max<-8 # aug
 
 PY_max<-2025
 
@@ -170,51 +180,73 @@ auth_per_pub_means<-auth_per_pub %>%
 auth_per_pub_means
 
 
-# remove any papers with no feds that snuck through -----------------------
+# remove any papers with no uni that snuck through -----------------------
+# 
+# dataDir <- "./data_raw/affiliations_to_search/uni_affils/original_search"
+# 
+# dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
+# dataFls<-dataFls[ !dataFls == "./data_raw/affiliations_to_search/uni_affils/scopus_info_uni_affils.csv"]
+# 
+# # Read and tag each file
+# dt_list <- lapply(dataFls, function(file) {
+#   dt <- fread(file, fill = TRUE)
+#   dt[, source_file := basename(file)]  # Add column with filename
+#   return(dt)
+# })
+# 
+# 
+# # Combine all tagged data tables
+# affils_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
+# affils_df<-affils_df %>%
+# pivot_longer(
+#   cols = starts_with("V"),
+#   names_to = "col",
+#   values_to = "affil_id",
+#   values_drop_na = TRUE) %>%
+#   separate_wider_delim(source_file,delim = ".", names = c("uni", "csv")) %>%
+#   distinct() %>%
+#   select(-col,-csv)
+# 
+# affil_info<-read_csv("./data_raw/affiliations_to_search/uni_affils/scopus_info_uni_affils.csv")
+# 
+# scopus_id_initial<-left_join(affils_df,affil_info,by="affil_id") %>%
+#   select(-document_count,-pub_count) %>%
+#   filter(!is.na(affiliation)) %>%
+#   distinct(affil_id,.keep_all = TRUE) %>% 
+#   select(affil_id) %>% 
+#   distinct() %>% 
+#   summarize(n=n_distinct(affil_id))
 
-dataDir <- "./data_raw/affiliations_to_search/uni_affils"
-
-dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
-dataFls<-dataFls[ !dataFls == "./data_raw/affiliations_to_search/uni_affils/scopus_info_uni_affils.csv"]
-
-# Read and tag each file
-dt_list <- lapply(dataFls, function(file) {
-  dt <- fread(file, fill = TRUE)
-  dt[, source_file := basename(file)]  # Add column with filename
-  return(dt)
-})
-
-
-# Combine all tagged data tables
-affils_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
-affils_df<-affils_df %>%
-pivot_longer(
-  cols = starts_with("V"),
-  names_to = "col",
-  values_to = "affil_id",
-  values_drop_na = TRUE) %>%
-  separate_wider_delim(source_file,delim = ".", names = c("uni", "csv")) %>%
-  distinct() %>%
-  select(-col,-csv)
-
-affil_info<-read_csv("./data_raw/affiliations_to_search/uni_affils/scopus_info_uni_affils.csv")
-
-scopus_id_initial<-left_join(affils_df,affil_info,by="affil_id") %>%
-  select(-document_count,-pub_count) %>%
-  filter(!is.na(affiliation)) %>%
-  distinct(affil_id,.keep_all = TRUE) %>% 
-  select(affil_id) %>% 
-  distinct() %>% 
-  summarize(n=n_distinct(affil_id))
+scopus_id_initial<-affil_info %>% 
+  filter(cat=="original") %>% 
+    distinct(affil_id,.keep_all = TRUE) %>%
+    select(affil_id) %>%
+    distinct() %>%
+    summarize(n=n_distinct(affil_id))
+  
 scopus_id_initial
 
 
 # total number of scopus IDs in the follow-up search
-scopus_id_followup<-read_csv("./data_raw/affiliations_to_search/uni_affils/follow_up/all_uni_affils_searched.csv") %>% 
-  select(affil_id) %>% 
-  distinct() %>% 
+# scopus_id_followup<-read_csv("./data_raw/affiliations_to_search/uni_affils/follow_up/all_uni_affils_searched.csv") %>% 
+#   select(affil_id) %>% 
+#   distinct() %>% 
+#   summarize(n=n_distinct(affil_id))
+
+
+scopus_id_followup<-affil_info %>% 
+  filter(cat=="followup") %>% 
+  distinct(affil_id,.keep_all = TRUE) %>%
+  select(affil_id) %>%
+  distinct() %>%
   summarize(n=n_distinct(affil_id))
 scopus_id_followup
+
+affils_df<-full_join(affil_info, affils_df,by="affil_id") %>% 
+  mutate(uni=coalesce(uni.x,uni.y)) %>% 
+  select(-uni.x,-uni.y) %>% 
+  distinct(affil_id,uni,.keep_all = TRUE) 
+
 
 # Total number of publications in the final data set 
 # # internal check to see if same when using different df to calclulate
@@ -227,6 +259,8 @@ scopus_id_followup
 
 total_pubs<-papers_df %>% 
   summarize(n=n_distinct(refID))
+
+
 
 
 # Total_authors (fed+non)

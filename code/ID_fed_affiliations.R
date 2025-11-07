@@ -209,7 +209,10 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
       agency_short == "usgs" ~ "interior",
       agency_short == "usaid funded" ~ "usaid",
       agency_short == "nphs" ~ "usphs",
+      affil_id == "128201823" ~ "us institute of peace",
       affil_id == "122988512" ~ "ahrq",
+      affil_id == "121019436" ~ "ahrq",
+      
       affil_id == "125170239" ~ "fema",
       affil_id == "127329180" ~ "nist",
       affil_id == "123502999" ~ "epa",
@@ -287,6 +290,14 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
         "127674722",
         "129074829",
         "129310471",
+        "128564043",
+        "128564024",
+        "100749359",
+        "130035090",
+        "123102118",
+        "127334881",
+        "60013070",
+        "108340273",
         "120168305"
       ) ~ "cdc",
       affil_id %in% c(
@@ -336,6 +347,13 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
         "125763856",
         "125364545",
         "105516842",
+        "132954973",
+        "132955235",
+        "132557218",
+        "132445225",
+        "132557218",
+        "132954973",
+        "132955235",
         "130337909"
       ) ~ "usda",
       affil_id %in% c(
@@ -505,6 +523,9 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
         "101758431",
         "105637985",
         "100432695",
+        "122601675",
+        "112455736",
+        "123789553",
         "112456278"
       ) ~ "dod",
       
@@ -515,6 +536,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
         "128533828",
         "118825741",
         "126537159",
+        "105918434",
         "122605840"
       ) ~ "hhs",
       affil_id %in% c(
@@ -545,6 +567,9 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
         "123678203",
         "109696971",
         "130637348",
+        "125422953",
+        "118209220",
+        "121362202",
         "123865204"
       ) ~ "nasa",
       affil_id %in% c(
@@ -567,6 +592,20 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
         "131354905",
         "122564665",
         "122564665",
+        "113990498",
+        "131757712",
+        "126908603",
+        "108342168",
+        "60282097",
+        "127328899",
+        "126387720",
+        "128858664",
+        "127864131",
+        "129753222",
+        "130210855",
+        "129617260",
+        "127813203",
+        "128431709",
         "60078461"
       ) ~ "nih",
       affil_id %in% c(
@@ -1705,6 +1744,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
       affiliation =
         case_when(
           affil_id == "117974904" ~ "national institute for childrens health quality",
+          affil_id == "119279477" ~ "southeast clinical oncology research consortium",
           affil_id == "127692548" ~ "us presidents malaria initiative",
           affil_id == "115588479" ~ "us presidents malaria initiative",
           affil_id == "129477382" ~ "us presidents malaria initiative",
@@ -1965,7 +2005,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     mutate(federal = if_else(affil_id %in% search_affil_ids$affil_id, TRUE, federal)) %>%
     mutate(federal = if_else(affil_id %in% not_feds$affil_id, FALSE, federal))
 
-  rm(scopus_id_1, scopus_id_2, search_affil_ids, not_feds)
+  rm(not_feds)
 
 
   affils_df <- affils_df %>%
@@ -2751,6 +2791,9 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     select(affil_id, affiliation, agency, agency_primary, federal) %>%
     distinct() %>%
     mutate(affil_id = as.numeric(affil_id))
+
+
+# merge -------------------------------------------------------------------
 
 
 

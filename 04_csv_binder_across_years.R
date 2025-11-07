@@ -9,23 +9,31 @@ library(progress)
 library(fs)
 library(data.table)
 
-cat<-"fed"
+# 
+# cat<-"fed"
+# date<-"20250901"
+
+# cat<-"fed"
+# date<-"20251010"
+# 
 # cat<-"uni"
+# date<-"20250901"
 
-data_dir<-"./data_raw"
-
-
-
-
-folder_count<-paste("year_files_",cat,sep="")
+cat<-"uni"
+date<-"20251010"
 
 
+data_dir<-paste("./data_raw/",cat,"_",date,sep="")
+
+# data<-paste(data_dir,"/",cat,"_",date,sep="")
+
+# folder_count<-paste("year_files_",cat,sep="")
 
 # Define folder paths -----------------------------------------------------
 
-folder_path_papers  <- file.path(data_dir, "papers",folder_count)
-folder_path_authors <- file.path(data_dir, "authors",folder_count)
-folder_path_affils  <- file.path(data_dir, "affils",folder_count)
+folder_path_papers  <- file.path(data_dir, "papers")
+folder_path_authors <- file.path(data_dir, "authors")
+folder_path_affils  <- file.path(data_dir, "affils")
 
 
 # bind the csv's together -------------------------------------------------
@@ -179,7 +187,11 @@ rm(dt_list)
 
   # FOR CROSS YEAR BINDING
   
-  write_csv(affils_df,paste("./data_raw/affils/all_affils_df_",cat,".csv",sep=""))
-  write_csv(authors_df,paste("./data_raw/authors/all_authors_df_",cat,".csv",sep=""))
-  write_csv(papers_df,paste("./data_raw/papers/all_papers_df_",cat,".csv",sep=""))
+  # write_csv(affils_df,paste("./data_raw/affils/all_affils_df_",cat,".csv",sep=""))
+  write_csv(affils_df,paste(data_dir,"/all_affils_df_",cat,".csv",sep=""))
   
+  # write_csv(authors_df,paste("./data_raw/authors/all_authors_df_",cat,".csv",sep=""))
+  write_csv(authors_df,paste(data_dir,"/all_authors_df_",cat,".csv",sep=""))
+  
+  # write_csv(papers_df,paste("./data_raw/papers/all_papers_df_",cat,".csv",sep=""))
+  write_csv(papers_df,paste(data_dir,"/all_papers_df_",cat,".csv",sep=""))

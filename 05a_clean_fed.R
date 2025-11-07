@@ -13,24 +13,34 @@ library(data.table)
 
 
 
+# cat<-"fed"
+# date<-"20250901"
+# scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv")
+
+cat<-"fed"
+date<-"20251010"
+scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") %>% 
+  mutate(city=NA)
 
 
 # IDENTIFY FEDERAL AFFILIATIONS -------------------------------------------
 
 
-affils_df<-read_csv("./data_raw/affils/all_affils_df_fed.csv")
-scopus_ids_searched<-read_csv("./data_clean/api_affils_searched_2025-09-01.csv")
+affils_df<-read_csv(paste("./data_raw/fed_",date,"/","all_affils_df_fed.csv",sep=""))
+
+
 source("./code/ID_fed_affiliations.R")
 affils_df<-ID_fed_affiliations(affils_df,scopus_ids_searched)
  
 
 # ADD FEDERAL AFFILIATIONS TO AUTHORS_DF ----------------------------------
 
-authors_df<-read_csv("./data_raw/authors/all_authors_df_fed.csv")
-papers_df<-read_csv("./data_raw/papers/all_papers_df_fed.csv")
+
+authors_df<-read_csv(paste("./data_raw/fed_",date,"/","all_authors_df_fed.csv",sep=""))
+
+papers_df<-read_csv(paste("./data_raw/fed_",date,"/","all_papers_df_fed.csv",sep=""))
 
 source("./code/ID_fed_authors.R")
-
 authors_df<-ID_fed_authors(authors_df,affils_df)
 
 # edits ---------------------------------------
@@ -254,8 +264,9 @@ papers_df_trim<-papers_df_trim %>% filter(!refID%in%NA_only_pubs$refID)
 
 
 
-write_rds(papers_df_trim,"./data_clean/papers_df_clean.rds")
-write_rds(authors_df_trim,"./data_clean/authors_df_clean.rds")
-write_rds(affils_df_trim,"./data_clean/affils_df_clean.rds")
+write_rds(papers_df_trim,paste("./data_clean/papers_df_clean","_",cat,"_",date,".rds",sep=""))
+          
+write_rds(authors_df_trim,paste("./data_clean/authors_df_clean","_",cat,"_",date,".rds",sep=""))
 
+write_rds(affils_df_trim,paste("./data_clean/affils_df_clean","_",cat,"_",date,".rds",sep=""))
 

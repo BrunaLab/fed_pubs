@@ -179,7 +179,7 @@ fed_scopus_codes<-pull %>%
 rm(fed_scopus_codes)
 
 pull<-pull %>%
-  arrange(agency_primary, affiliation, affil_id) 
+  arrange(agency_primary, affiliation, affil_id) %>% 
   group_by(affiliation) %>%
   mutate(affil_id=paste(affil_id,collapse=", ")) %>%
   distinct(affiliation, .keep_all = TRUE) %>%

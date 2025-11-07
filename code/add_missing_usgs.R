@@ -1,15 +1,12 @@
-add_missing_usgs<-function(papers_df,authors_df){
+add_missing_usgs<-function(papers_df_trim,authors_df_trim){
   
-  # 
-  papers_df<-papers_df_trim
-  authors_df<-authors_df_trim
   # See if any of the usgs pubs are aleready in the file and check author status 
   
   # by DOI
   
-  usgs_papers<-read_rds("./data_intermediate/usgs_papers_clean.rds")
+  usgs_papers<-read_rds("./data_clean/usgs_papers_clean.rds")
   usgs_with_DI<-usgs_papers %>% filter(!is.na(DI))
-  usgs_already_in_papers_df<-papers_df %>% 
+  usgs_already_in_papers_df<-papers_df_trim %>% 
     filter(DI%in%usgs_with_DI$DI) %>% 
     select(refID,DI)
   
@@ -18,13 +15,13 @@ add_missing_usgs<-function(papers_df,authors_df){
     mutate(source="usgs_database")
   
   # and these are the authors of those papers
-  usgs_authors<-read_rds("./data_intermediate/usgs_authors_clean.rds") 
+  usgs_authors<-read_rds("./data_clean/usgs_authors_clean.rds") 
   
   usgs_authors_for_papers_NOT<- usgs_authors %>% 
     filter(usgs_refID %in%usgs_NOT_in_papers_df$usgs_refID)
   
   names(usgs_NOT_in_papers_df)
-  names(papers_df)
+  names(papers_df_trim)
   
   
   
@@ -87,36 +84,36 @@ add_missing_usgs<-function(papers_df,authors_df){
     mutate(affil_id=if_else(federal=="FALSE",NA,affil_id)) %>%
     mutate(federal=as.logical(federal))
   
-  authors_df$SID<-as.character(authors_df$SID)
+  authors_df_trim$SID<-as.character(authors_df_trim$SID)
   
   # add these: usgs_NOT_in_papers_df
   # to these: papers_df
   
   names(usgs_NOT_in_papers_df)
-  names(papers_df)
+  names(papers_df_trim)
   
   usgs_NOT_in_papers_df$scopus_article_id<-as.integer(usgs_NOT_in_papers_df$scopus_article_id)
   usgs_NOT_in_papers_df$BP<-as.double(usgs_NOT_in_papers_df$BP)
   usgs_NOT_in_papers_df$EP<-as.double(usgs_NOT_in_papers_df$EP)
   usgs_NOT_in_papers_df$PY<-as.integer(usgs_NOT_in_papers_df$PY)
-  papers_df$BP<-as.numeric(papers_df$BP)
+  papers_df_trim$BP<-as.numeric(papers_df_trim$BP)
   usgs_NOT_in_papers_df$BP<-as.numeric(usgs_NOT_in_papers_df$BP)
-  papers_df<-bind_rows(papers_df,usgs_NOT_in_papers_df)
+  papers_df_trim<-bind_rows(papers_df_trim,usgs_NOT_in_papers_df)
   
-  papers_df<-papers_df %>% distinct()
+  papers_df_trim<-papers_df_trim %>% distinct()
   
   
   # add these: usgs_NOT_in_papers_df
-  # to these: papers_df
+  # to these: papers_df_trim
   
   names(usgs_authors_for_papers_NOT)
-  names(authors_df)
+  names(authors_df_trim)
   usgs_authors_for_papers_NOT$SID<-as.character(usgs_authors_for_papers_NOT$SID)
-  authors_df<-bind_rows(authors_df,usgs_authors_for_papers_NOT)
+  authors_df_trim<-bind_rows(authors_df_trim,usgs_authors_for_papers_NOT)
   
-  authors_df<-authors_df %>% distinct()
+  authors_df_trim<-authors_df_trim %>% distinct()
 
-  return(list(papers=papers_df,authors=authors_df))
+  return(list(papers=papers_df_trim,authors=authors_df_trim))
 }
   
   

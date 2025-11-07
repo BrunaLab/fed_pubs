@@ -5,27 +5,55 @@ library(tidyverse)
 
 # source("./code/generate_fed_affils_to_search.R")
 # affils_to_search<-generate_fed_affils_to_search()
-affils_to_search<-read_csv("./data_clean/api_affils_searched_2025-09-01.csv")
+
+affils_to_search<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv")
+
+
 # affils_to_search<-affils_to_search %>% select(affil_id)
-affils_to_search<-affils_to_search %>% select(affil_id) %>% filter(affil_id!=60006577) # needs to be searched by month below
-# search_term<-affils_to_search$affil_id[4033:nrow(affils_to_search)]
-# search_term<-affils_to_search$affil_id[837:nrow(affils_to_search)]
 
-yr1=2024
-yr2=2024
+# this removes the two that are searched by month below
+affils_to_search<-affils_to_search %>% 
+  select(affil_id) %>% 
+  filter(affil_id!=60006577) %>% 
+  filter(affil_id!=60014232) 
+search_term<-affils_to_search$affil_id[1:nrow(affils_to_search)]
+# search_term<-affils_to_search$affil_id[3444:nrow(affils_to_search)]
 
-# date_folder_for_files<-"feds_20250901"
-date_folder_for_files<-"feds_20251010"
-api<-"38c1ea28aed25f40f11034d20557ccde"
+# THIS IS TO DO THE "ADDITIONAL ONES DIUSCOVERED AFTER FIRST REVIEW
+# affils_to_search_rd2<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") %>% 
+#   anti_join(affils_to_search,by="affil_id")
+# search_term<-affils_to_search_rd2$affil_id[248:nrow(affils_to_search_rd2)]
+
+yr1=2019
+yr2=2025
+date_range <- seq(yr1,yr2)
+
+
+year <- seq_along(date_range)
+term <- seq_along(search_term)
+# term <- seq(3444,nrow(affils_to_search),by=1)
+# search_term<-affils_to_search$affil_id[5997:nrow(affils_to_search)]
+
+
+
+
+# date_folder_for_files<-"scopus_downloads/fed_20250901"
+date_folder_for_files<-"scopus_downloads/fed_20251010"
+api<-"---"
 
 
 
 # create folders  ---------------------------------------------------------
 
 
+
+
+for (j in year) {
+
+
 # setting up the main directory
 main_dir <- paste("data_raw/",date_folder_for_files,sep="")
-sub_dir <- paste(main_dir,"/papers/",yr1,sep="")
+sub_dir <- paste(main_dir,"/papers/",date_range[j],sep="")
 if (!dir.exists(sub_dir)){
   dir.create(main_dir, recursive = TRUE)
 } 
@@ -33,7 +61,7 @@ if (!dir.exists(sub_dir)){
 # setting up the sub directories
 # papers
 
-sub_dir <- paste(main_dir,"/papers/",yr1,sep="")
+sub_dir <- paste(main_dir,"/papers/",date_range[j],sep="")
 # check if sub directory exists 
 
 # Check if subdirectory exists
@@ -46,7 +74,7 @@ if (dir.exists(sub_dir)) {
 }
 
 # Authors
-sub_dir <- paste(main_dir,"/authors/",yr1,sep="")
+sub_dir <- paste(main_dir,"/authors/",date_range[j],sep="")
 # Check if subdirectory exists
 if (dir.exists(sub_dir)) {
   print("The folder exists!")
@@ -55,7 +83,7 @@ if (dir.exists(sub_dir)) {
   dir.create(sub_dir, recursive = TRUE)
   print("Subdirectory created.")
 }
-sub_dir <- paste(main_dir,"/affils/",yr1,sep="")
+sub_dir <- paste(main_dir,"/affils/",date_range[j],sep="")
 # Check if subdirectory exists
 if (dir.exists(sub_dir)) {
   print("The folder exists!")
@@ -64,24 +92,17 @@ if (dir.exists(sub_dir)) {
   dir.create(sub_dir, recursive = TRUE)
   print("Subdirectory created.")
 }
-
+}
 
 
 #  initialize searches ----------------------------------------------------
 
 
-date_range <- seq(yr1,yr2)
-
-year <- seq_along(date_range)
-term <- seq_along(search_term)
-
-
-
     
-      
+for (h in term){
       for (j in year) {
         
-        for (h in term){    
+            
         
         
         a<-paste("(AF-ID('",search_term[h],"')"," AND (DOCTYPE(ar) OR DOCTYPE(re) OR DOCTYPE(ch) OR DOCTYPE(ed) OR DOCTYPE(le) OR DOCTYPE(dp) OR DOCTYPE(no))",sep="")
@@ -135,15 +156,14 @@ term <- seq_along(search_term)
 
 # search by month ---------------------------------------------------------
 
-search_term<-c(60006577)
+search_term<-c(60006577,60014232) 
+months <- month.name
   # Need to split:
   # 60006577 (2019-2024), 60014232 (2019-2022)
-yr1=2024
-yr2=2024
-months <- month.name
+# yr1=2025
+# yr2=2025
 
-
-date_range <- seq(yr1,yr2)
+# date_range <- seq(yr1,yr2)
 # str(search_term)
 
 term <- seq_along(search_term)

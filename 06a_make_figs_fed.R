@@ -12,27 +12,84 @@ library(fs)
 library(data.table)
 library(forcats)
 
+
+
+
+
+cat<-"fed"
+date<-"20250901"
+
+# cat<-"fed"
+# date<-"20251010"
+
+
+# create folders for output -----------------------------------------------
+
+
+# setting up the main directory
+main_dir1 <- "./docs"
+
+# setting up the sub directory
+sub_dir1 <- "summary_info"
+
+# check if sub directory exists 
+if (file.exists(sub_dir1)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir1, sub_dir1))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir1, sub_dir1))
+  
+}
+
+
+
+
+# setting up the main directory
+main_dir2 <- paste(main_dir1,"/",sub_dir1,sep="")
+
+# setting up the sub directory
+sub_dir2 <- paste(cat,date,sep="_")
+
+# check if sub directory exists 
+if (file.exists(sub_dir2)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir2, sub_dir2))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir2, sub_dir2))
+  
+}
+
+save_dir<-paste(main_dir2,sub_dir2,sep="/")
+
 # select max month to analyze & plot --------------------------------------
 
 # PM_max<-6 # june
-PM_max<-7 # july
-# PM_max<-8 # aug
+# PM_max<-7 # july
+PM_max<-8 # aug
 PY_max<-2025
 
 # load data  --------------------------------------------------------------
 
 # Affiliations
-affils_df  <- setDT(read_rds("./data_clean/affils_df_clean.rds"))
+affils_df  <- setDT(read_rds(paste("./data_clean/affils_df_clean_",cat,"_",date,".rds",sep="")))
 
 # unique(affils_df_complete$agency_primary)
 
 # Publications
-papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
-  
+# papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
+papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep="")))
   
 # Authors
-authors_df <- setDT(read_rds("./data_clean/authors_df_clean.rds")) 
-
+# authors_df <- setDT(read_rds("./data_clean/authors_df_clean.rds")) 
+authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep="")))
 
 # chose publication types or titles to remove -----------------------------
 
@@ -111,7 +168,8 @@ counts<-single_agency_counter %>%
   pivot_longer(everything(),names_to="agency_primary", values_to = "total_papers") %>% 
   arrange(desc(total_papers))
 
-write_csv(counts,"./docs/summary_info/total_papers_by_agency.csv")
+# write_csv(counts,"./docs/summary_info/total_papers_by_agency.csv")
+write_csv(counts,paste(save_dir,"/","total_papers_by_agency.csv",sep=""))
 
 
 # and also count how many papers by article category
@@ -122,8 +180,8 @@ papers_by_cat_agency<-
   mutate(perc=n/sum(n)*100) %>% 
   arrange(desc(n))
 
-write_csv(papers_by_cat_agency,"./docs/summary_info/papers_by_cat_agency.csv")
-
+# write_csv(papers_by_cat_agency,"./docs/summary_info/papers_by_cat_agency.csv")
+write_csv(papers_by_cat_agency,paste(save_dir,"/","papers_by_cat_agency.csv",sep=""))
 # data summaries ----------------------------------------------------------
 
 # N and % of articles in each category after cleanup
@@ -162,7 +220,7 @@ p <- auth_per_pub %>%
     plot.title = element_text(size=15)
   )+
   facet_grid(rows = vars(author_no_cat))
-
+p
 # dfs based on author number  ---------------------------------------------
 
 
@@ -304,8 +362,8 @@ all_author_positions <- authors_df %>%
   distinct(refID,agency,.keep_all=TRUE) %>% 
   arrange(refID)
 
-write_csv(auth_per_pub_means,"./docs/summary_info/auth_per_pub_means.csv")
-
+# write_csv(auth_per_pub_means,"./docs/summary_info/auth_per_pub_means.csv")
+write_csv(auth_per_pub_means,paste(save_dir,"/","auth_per_pub_means.csv",sep=""))
 
 
 # make df of papers with only fed_authors --------------------------------
@@ -358,7 +416,8 @@ summary_data<-data.frame(value=c("scopus_id_initial",
                              prop_papers_fed_1st$n,
                              prop_papers_fed_last$n))
 
-write_csv(summary_data,"./docs/summary_info/summary_data.csv")
+# write_csv(summary_data,"./docs/summary_info/summary_data.csv")
+write_csv(summary_data,paste(save_dir,"/","summary_data.csv",sep=""))
 summary_data
 
 
@@ -536,7 +595,45 @@ total_pubs_per_agency_first <- first_authors %>%
   select(-total)
 
 # 
-write_csv(total_pubs_per_agency_first,"./docs/summary_info/total_pubs_per_agency_first.csv")
+# write_csv(total_pubs_per_agency_first,"./docs/summary_info/total_pubs_per_agency_first.csv")
+write_csv(total_pubs_per_agency_first,paste(save_dir,"/","total_pubs_per_agency_first.csv",sep=""))
+
+# most common affil_id ----------------------------------------------------
+
+# go back and change affils_to_search so that original reduc are as common as original
+affils_to_search<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv") %>% 
+  select(search,affil_id) %>% 
+  mutate(affil_id=as.character(affil_id))
+
+pubs_by_affil<-first_authors %>% 
+  group_by(affil_id,agency,agency_primary) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  ungroup() %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  left_join(affils_to_search,by="affil_id") %>% 
+  replace_na(list(search = "final_cleanup"))
+
+pubs_by_affil_all<-
+all_authors_df %>% 
+  filter(federal==TRUE) %>% 
+  group_by(affil_id,agency,agency_primary) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  ungroup() %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  left_join(affils_to_search,by="affil_id") %>% 
+  replace_na(list(search = "final_cleanup"))
+
+pubs_by_affil_all %>% 
+  group_by(search) %>% 
+  summarize(n=sum(n)) %>% 
+  mutate(perc=n/sum(n)*100) 
+
+pubs_by_affil %>% 
+  group_by(search) %>% 
+  summarize(n=sum(n)) %>% 
+  mutate(perc=n/sum(n)*100) 
 
 
 # CHOOSE FOCAL DATASETS ---------------------------------------------------
@@ -667,6 +764,11 @@ final_yr<-pubs_mo_cum %>%
 prior_yrs<-pubs_mo_cum %>% 
   filter(PY<PY_max) 
 
+prior_yrs %>% 
+  filter(PM==12) %>% 
+  ungroup() %>% 
+  mutate(perc=(cumul_pubs-lag(cumul_pubs))/lag(cumul_pubs)*100)
+
 counter<-pubs_mo_cum %>% 
   ungroup() %>% 
   select(PM,month_name) %>% 
@@ -726,10 +828,13 @@ pubs_mo_fig_cumulative<-pubs_per_month_cumulative_multipanel(papers_with_fed_fir
                                                              PY_max)
 pubs_mo_fig_cumulative
 
+ggsave(paste(save_dir,"/","pubs_mo_cum_fig_multipanel.png",sep=""),
+          width = 6, height = 8, units = "in",
+          device='png', dpi=700)  
 
-ggsave(file="./docs/images/pubs_mo_cum_fig_multipanel.png", pubs_mo_fig_cumulative,
-       width = 6, height = 8, units = "in",
-       device='png', dpi=700)  
+# ggsave(file="./docs/images/pubs_mo_cum_fig_multipanel.png", pubs_mo_fig_cumulative,
+#        width = 6, height = 8, units = "in",
+#        device='png', dpi=700)  
 
 
 # ggsave("./docs/images/pubs_mo_cum_fig.png",
@@ -743,6 +848,7 @@ ggsave(file="./docs/images/pubs_mo_cum_fig_multipanel.png", pubs_mo_fig_cumulati
 
 source("code/figs/pubs_per_quarter.R")
 pubs_per_quarter_fig<-pubs_per_quarter(pubs_mo,2024)
+pubs_per_quarter_fig
 # SAVE FIGURE
 # ggsave("./docs/images/pubs_per_quarter.png", 
 #        width = 6, height = 4, units = "in", 
@@ -854,10 +960,14 @@ agency_n_decline_sum<- agency_n_decline %>%
 source("code/figs/pubs_per_month_cumulative_agency.R")
 pubs_per_month_cumulative_agency<-pubs_per_month_cumulative_agency(papers_dataset,authors_dataset,PY_max,PM_max)
 pubs_per_month_cumulative_agency
-ggsave("./docs/images/pubs_mo_cum_agency_lines.png",
+# ggsave("./docs/images/pubs_mo_cum_agency_lines.png",
+#        width = 11, height = 8, units = "in",
+#        device='png', dpi=700)
+
+
+ggsave(paste(save_dir,"/","pubs_mo_cum_agency_lines.png",sep=""),
        width = 11, height = 8, units = "in",
        device='png', dpi=700)
-
 
 # non_feds<-affils_df_complete %>% 
 #   filter(federal==FALSE) %>% 
@@ -881,8 +991,8 @@ agency_n_decline_first <-
   mutate(perc_previous = ((decline_n) / lag(n)) * 100) %>%
   mutate(author_position="first") 
 
-write_csv(agency_n_decline_first,"./docs/summary_info/agency_n_decline_first.csv")
-
+# write_csv(agency_n_decline_first,"./docs/summary_info/agency_n_decline_first.csv")
+write_csv(agency_n_decline_first,paste(save_dir,"/","agency_n_decline_first.csv",sep=""))
 
 total_pubs_per_agency_first<-total_pubs_per_agency_first %>% 
   mutate(agency_primary=if_else(agency=='federal reserve system',
@@ -943,8 +1053,8 @@ agency_table<-  total_pubs_per_agency_first %>%
   mutate(perc=round(perc,2)) %>%
   mutate(perc_first=round(perc_first,2)) 
   
-  write_csv(agency_table,"./docs/summary_info/agency_table.csv") 
-
+  # write_csv(agency_table,"./docs/summary_info/agency_table.csv") 
+  write_csv(agency_table,paste(save_dir,"/","agency_table.csv",sep=""))
 other_affils<-authors_dataset %>% filter(federal==TRUE) %>%
   filter(agency_primary=="other") %>% 
   select(agency) %>% 
@@ -952,8 +1062,8 @@ other_affils<-authors_dataset %>% filter(federal==TRUE) %>%
   arrange(agency) %>% 
   mutate(agency=if_else(nchar(agency)<6,str_to_upper(agency),str_to_title(agency))) 
   
-write_csv(other_affils,"./docs/summary_info/other_affils.csv") 
-  
+# write_csv(other_affils,"./docs/summary_info/other_affils.csv") 
+write_csv(other_affils,paste(save_dir,"/","other_affils.csv",sep=""))
 
 
 
@@ -972,7 +1082,8 @@ journals_first <- papers_with_fed_first %>%
   distinct() %>% 
   arrange(SO)
 # 
-write_csv(journals_first,"./docs/summary_info/journals_first.csv")
+# write_csv(journals_first,"./docs/summary_info/journals_first.csv")
+write_csv(journals_first,paste(save_dir,"/","journals_first.csv",sep=""))
 
 jrnls_overall_first <- 
   papers_with_fed_first %>%
@@ -986,8 +1097,8 @@ jrnls_overall_first <-
   mutate(perc=n/total*100) %>% 
   arrange(desc(n))%>%
   select(-total)
-write_csv(jrnls_overall_first,"./docs/summary_info/jrnls_overall_first.csv")
-
+# write_csv(jrnls_overall_first,"./docs/summary_info/jrnls_overall_first.csv")
+write_csv(jrnls_overall_first,paste(save_dir,"/","jrnls_overall_first.csv",sep=""))
 
 # 
 jrnls_yr_first <- 
@@ -1030,8 +1141,8 @@ journals_n_perc_annual_first <- jrnls_yr_first %>%
 
 
 
-write_csv(journals_n_perc_annual_first,"./docs/summary_info/journals_n_perc_annual_first.csv")
-
+# write_csv(journals_n_perc_annual_first,"./docs/summary_info/journals_n_perc_annual_first.csv")
+write_csv(journals_n_perc_annual_first,paste(save_dir,"/","journals_n_perc_annual_first.csv",sep=""))
 
 
 

@@ -1,5 +1,4 @@
 
-
 # Universities ------------------------------------------------------------
 
 library(rscopus)
@@ -8,7 +7,7 @@ library(data.table)
 
 # date_folder_for_files<-"uni_20250901"
 date_folder_for_files<-"uni_20251010"
-api<-"----"
+api<-"---"
 
 
 yr1=2019
@@ -18,7 +17,7 @@ yr2=2022
 
 
 # setting up the main directory
-main_dir <- paste("data_raw/",date_folder_for_files,sep="")
+main_dir <- paste("data_raw/scopus_downloads",date_folder_for_files,sep="")
 sub_dir <- paste(main_dir,"/papers/",yr1,sep="")
 if (!dir.exists(sub_dir)){
   dir.create(main_dir, recursive = TRUE)
@@ -56,9 +55,9 @@ search_by_month<-
 
 
 affils_to_search<-affils_df %>% select(affil_id) %>% filter(!affil_id%in%search_by_month)
-# affils_to_search<-affils_to_search %>% select(affil_id) %>% filter(affil_id!=60006577)
-# search_term<-affils_to_search$affil_id[1:nrow(affils_to_search)]
-search_term<-affils_to_search$affil_id[338:nrow(affils_to_search)]
+
+search_term<-affils_to_search$affil_id[1:nrow(affils_to_search)]
+# search_term<-affils_to_search$affil_id[444:nrow(affils_to_search)]
 
 # 
 # affil_ids<- read_csv("./data_raw/affiliations_to_search/uni_affils/follow_up/uni_affils_follow_up.csv") %>%
@@ -66,49 +65,50 @@ search_term<-affils_to_search$affil_id[338:nrow(affils_to_search)]
 # 
 # search_term<-affil_ids$affil_id[22:nrow(affil_ids)]
 #  search by year ----------------------------------------------------------
-
-
+# yr1=2021
+# yr2=2022
+# search_term<-"129430709"
 date_range <- seq(yr1,yr2)
 year <- seq_along(date_range)
 term <- seq_along(search_term)
 
           for (j in year) {
-        
+            
+            # setting up the sub directories
+            
+            # papers
+            # check if sub directory exists 
+            sub_dir <- paste(main_dir,"/papers/",date_range[j],sep="")
+            # Check if subdirectory exists
+            if (dir.exists(sub_dir)) {
+              print("The folder exists!")
+            } else {
+              # Create a new subdirectory inside the main path
+              dir.create(sub_dir, recursive = TRUE)
+              print("Subdirectory created.")
+            }
+            
+            # Authors
+            sub_dir <- paste(main_dir,"/authors/",date_range[j],sep="")
+            # Check if subdirectory exists
+            if (dir.exists(sub_dir)) {
+              print("The folder exists!")
+            } else {
+              # Create a new subdirectory inside the main path
+              dir.create(sub_dir, recursive = TRUE)
+              print("Subdirectory created.")
+            }
+            sub_dir <- paste(main_dir,"/affils/",date_range[j],sep="")
+            # Check if subdirectory exists
+            if (dir.exists(sub_dir)) {
+              print("The folder exists!")
+            } else {
+              # Create a new subdirectory inside the main path
+              dir.create(sub_dir, recursive = TRUE)
+              print("Subdirectory created.")
+            }
+            
             for (h in term){    
-        
-        # setting up the sub directories
-        
-        # papers
-        # check if sub directory exists 
-        sub_dir <- paste(main_dir,"/papers/",date_range[j],sep="")
-        # Check if subdirectory exists
-        if (dir.exists(sub_dir)) {
-          print("The folder exists!")
-        } else {
-          # Create a new subdirectory inside the main path
-          dir.create(sub_dir, recursive = TRUE)
-          print("Subdirectory created.")
-        }
-        
-        # Authors
-        sub_dir <- paste(main_dir,"/authors/",date_range[j],sep="")
-        # Check if subdirectory exists
-        if (dir.exists(sub_dir)) {
-          print("The folder exists!")
-        } else {
-          # Create a new subdirectory inside the main path
-          dir.create(sub_dir, recursive = TRUE)
-          print("Subdirectory created.")
-        }
-        sub_dir <- paste(main_dir,"/affils/",date_range[j],sep="")
-        # Check if subdirectory exists
-        if (dir.exists(sub_dir)) {
-          print("The folder exists!")
-        } else {
-          # Create a new subdirectory inside the main path
-          dir.create(sub_dir, recursive = TRUE)
-          print("Subdirectory created.")
-        }
         
         
         
@@ -168,18 +168,22 @@ term <- seq_along(search_term)
 # search by month and year --------------------------------------------------
 # START HERE WHEN CURRENT RUN ENDS
 
+
+
+yr1=2022
+yr2=2022
 date_range <- seq(yr1,yr2)
 year <- seq_along(date_range)
-search_term<-search_by_month
 
+search_term<-search_by_month
 term <- seq_along(search_term)
 
 month_name<- month.name
 # month_name<-month_name[11:12]
 month<-seq_along(month_name)
 
-for (h in term) {
   for (j in year) {
+    for (h in term) {
     for  (k in month) {
       
       
