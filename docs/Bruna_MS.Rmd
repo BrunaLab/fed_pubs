@@ -145,29 +145,70 @@ knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
 
 ```{r data, cache=FALSE }
 
+
+
+# date<-"20250901"
+date<-"20251010"
+
+
+fed_dir<-paste("./docs/summary_info/fed_",date,sep="")
+uni_dir<-paste("./docs/summary_info/uni_",date,sep="")
+
+
 # Read data
-summary_data<-read_csv("./docs/summary_info/summary_data.csv")
-# jrnls_overall_first<-read_csv("./docs/summary_info/jrnls_overall_first.csv")
+# summary_data<-read_csv("./docs/summary_info/summary_data.csv")
+summary_data<-read_csv(paste(fed_dir,"summary_data.csv",sep="/"))
 
-journals_n_perc_annual_first.csv<-read_csv("./docs/summary_info/journals_n_perc_annual_first.csv")
+# journals_n_perc_annual_first.csv<-read_csv("./docs/summary_info/journals_n_perc_annual_first.csv")
+journals_n_perc_annual_first.csv<-read_csv(paste(fed_dir,"journals_n_perc_annual_first.csv",sep="/"))
 
-auth_per_pub_means<-read_csv("./docs/summary_info/auth_per_pub_means.csv")
-total_pubs_per_agency_first<-read_csv("./docs/summary_info/total_pubs_per_agency_first.csv")
+# auth_per_pub_means<-read_csv("./docs/summary_info/auth_per_pub_means.csv")
+auth_per_pub_means<-read_csv(paste(fed_dir,"auth_per_pub_means.csv",sep="/"))
+
+# total_pubs_per_agency_first<-read_csv("./docs/summary_info/total_pubs_per_agency_first.csv")
+total_pubs_per_agency_first<-read_csv(paste(fed_dir,"total_pubs_per_agency_first.csv",sep="/"))
 
 
 perc_papers_fed_first<-((summary_data %>% filter(value=="total_federals") %>% select(n))/
   (summary_data %>% filter(value=="total_unique_authors") %>% select(n))*100)
  
 
+# FIX THIS
+# perc_change_fed<-read_csv("./docs/summary_info/perc_change_fed.csv")
+perc_change_fed<-read_csv(paste(fed_dir,"perc_change_agency_fed.csv",sep="/"))
 
-perc_change_fed<-read_csv("./docs/summary_info/perc_change_fed.csv")
-perc_change_fed_last_yr<-perc_change_fed %>% slice_tail(n=1) %>% select(perc_previous)
-n2025<-perc_change_fed %>% filter(PY==2025) %>% select(cumul_pubs)
+perc_change_fed_annual<-perc_change_fed %>% 
+  select(-n,-month,-month_name,-change_n, -perc_previous) %>% 
+  ungroup() %>% 
+  group_by(PY) %>% 
+  mutate(cumul_pubs=sum(cumul_pubs)) %>% 
+  arrange(PY) %>% 
+  select(-agency_primary) %>% 
+  slice_head(n=1) %>% 
+  ungroup() %>% 
+  mutate(change_n = (cumul_pubs - lag(cumul_pubs))) %>%
+    mutate(perc_previous = ((change_n) / lag(cumul_pubs)) * 100) %>% 
+    mutate(perc_previous=round(perc_previous,1))
 
-perc_change_avg<-perc_change_fed %>% filter(PY<2025) %>% summarize(avg=mean(cumul_pubs))
+perc_change_fed_last_yr<-perc_change_fed_annual %>% 
+  filter(PY==2025) %>% 
+  select(perc_previous)
+
+n2025<-perc_change_fed_annual %>% 
+  filter(PY==2025) %>% 
+   select(cumul_pubs)
+
+perc_change_avg<-perc_change_fed_annual %>% filter(PY<2025) %>% summarize(avg=mean(cumul_pubs))
 drop_from_avg<-(n2025-perc_change_avg)/perc_change_avg*100
 
-lost_articles<-perc_change_fed %>% filter(PY<2025) %>% select(cumul_pubs) %>% range() %>% tibble() %>% rename(c_pubs=".") %>% mutate(c_pubs2=c_pubs-n2025$cumul_pubs) %>% select(c_pubs2)
+lost_articles<-perc_change_fed_annual %>% 
+  filter(PY<2025) %>% 
+  select(cumul_pubs) %>% 
+  range() %>% 
+  tibble() %>% 
+  rename(c_pubs=".") %>% 
+  mutate(c_pubs2=c_pubs-n2025$cumul_pubs) %>% 
+  select(c_pubs2)
 
 original_affils<-as.numeric(summary_data %>% filter(value=="scopus_id_initial") %>% select(n))
 followup_affils<-as.numeric(summary_data %>% filter(value=="scopus_id_followup") %>% select(n))
@@ -187,25 +228,32 @@ sd_nonfed_authors<-as.numeric(auth_per_pub_means %>% filter(author_category=="No
 
 perc_pubs_fed1st<-as.numeric(summary_data %>% filter(value=="prop_papers_fed_1st") %>% select(n))
 
-perc_change_agency_all<-read_csv("./docs/summary_info/perc_hange_agency_fed.csv") 
 
-perc_change_agency<-perc_change_agency_all %>% 
+#TODO: TO DO WHAT IS THIS???
+# perc_change_agency_all<-read_csv("./docs/summary_info/perc_hange_agency_fed.csv") 
+# perc_change_agency_all<-read_csv(paste(fed_dir,"perc_hange_agency_fed.csv",sep="/"))
+
+declines_agency_1st<-read_csv(paste(fed_dir,"agency_n_decline_first.csv",sep="/"))
+perc_change_agency<-declines_agency_1st %>% 
   filter(PY==2025) %>% 
   select(agency_primary,perc_previous) %>% 
   arrange(perc_previous)
 
 
-papers_by_cat_agency<-read_csv("./docs/summary_info/papers_by_cat_agency.csv")
+# papers_by_cat_agency<-read_csv("./docs/summary_info/papers_by_cat_agency.csv")
+papers_by_cat_agency<-read_csv(paste(fed_dir,"papers_by_cat_agency.csv",sep="/"))
 ```
 
 
 ``` {r uni-names}
 
-uni_summary_data<-read_csv("./docs/summary_info/summary_data_uni.csv")
-papers_by_cat_uni<-read_csv("./docs/summary_info/papers_by_cat_uni.csv")
+# uni_summary_data<-read_csv("./docs/summary_info/summary_data_uni.csv")
+uni_summary_data<-read_csv(paste(uni_dir,"summary_data_uni.csv",sep="/"))
+# papers_by_cat_uni<-read_csv("./docs/summary_info/papers_by_cat_uni.csv")
+papers_by_cat_uni<-read_csv(paste(uni_dir,"papers_by_cat_uni.csv",sep="/"))
 
-
-uni_names<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv") %>% 
+# uni_names<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv") %>% 
+  uni_names<-read_csv(paste(uni_dir,"uni_total_pubs_per_uni_first.csv",sep="/")) %>% 
     # mutate(uni=if_else(nchar(uni)<5,str_to_upper(uni),str_to_title(uni))) %>% 
     mutate(uni=case_when(
       uni == "unc_ch"~"the University of North Carolina, Chapel Hill",
@@ -225,12 +273,15 @@ uni_names<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv") %>%
   )) 
 uni_names_flat<-paste(uni_names$uni, collapse=', ' )
 
-
-uni_auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
-
-total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv")
-
-perc_change_uni<-read_csv("./docs/summary_info/perc_change_uni.csv")
+# FIX
+# uni_auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
+ uni_auth_per_pub_means<-read_csv(paste(uni_dir,"auth_per_pub_means_uni.csv",sep="/")) 
+ 
+ 
+# total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv")
+total_pubs_per_uni_first<-read_csv(paste(uni_dir,"uni_total_pubs_per_uni_first.csv",sep="/")) 
+# perc_change_uni<-read_csv("./docs/summary_info/perc_change_uni.csv")
+perc_change_uni<-read_csv(paste(uni_dir,"perc_change_uni.csv",sep="/")) 
 
 n2025_uni<-perc_change_uni %>% filter(PY==2025) %>% select(cumul_pubs)
 perc2025_uni<-perc_change_uni %>% filter(PY==2025) %>% select(perc_previous)
@@ -341,7 +392,8 @@ The data used in this study are archived at Dryad [*url to be added*], while the
 # https://tex.stackexchange.com/questions/338435/how-to-reduce-space-between-end-of-table-and-footnote-using-parnote
 
 
-other_affils<-read_csv("./docs/summary_info/other_affils.csv") %>% 
+# other_affils<-read_csv("./docs/summary_info/other_affils.csv") %>% 
+ other_affils <-read_csv(paste(fed_dir,"other_affils.csv",sep="/")) %>% 
   filter(agency!="OTHER") %>% 
   filter(agency!="USUHS") %>% 
   filter(agency!="Interior") %>% 
@@ -391,7 +443,8 @@ agency=="Woodrow Wilson International Center For Scholars"~"Woodrow Wilson Inter
 other_affils<-str_c(other_affils$agency, collapse = ", ")
 
 
-agency_counts<-read_csv("./docs/summary_info/agency_table.csv") %>% 
+# agency_counts<-read_csv("./docs/summary_info/agency_table.csv") %>% 
+agency_counts <-read_csv(paste(fed_dir,"agency_table.csv",sep="/")) %>% 
   replace_na(list(n24=0)) %>% 
   select(-perc)
 
@@ -526,7 +579,9 @@ knitr::asis_output(tmp)
 
 ```{r  label = cumulative-fig-fed, echo = FALSE, fig.cap = "Cumulative number of articles published per month (2019-2025). (A) Articles whose first-authors are affiliated with the US federal government. (B) Articles with all authors having US federal government affiliations. Solid lines represent the cumulative counts for 2019-2025; the dashed line is the 2019-2024 average. Also shown is the percent change in cumulative publications through July 2025 vs. the same period in 2024. Note the different scales of the y-axes in (A) and (B).", out.width = '85%',out.height = '85%',fig.align='center'}
 
-knitr::include_graphics('../docs/images/pubs_mo_cum_fig_multipanel.png', error=FALSE)
+# knitr::include_graphics('../docs/images/pubs_mo_cum_fig_multipanel.png', error=FALSE)
+knitr::include_graphics(paste('.',fed_dir,"pubs_mo_cum_fig_multipanel.png",sep="/"),error=FALSE)
+
 
 ```
 
@@ -534,14 +589,16 @@ knitr::include_graphics('../docs/images/pubs_mo_cum_fig_multipanel.png', error=F
 
 ```{r  label = cumulative-fig-uni, echo = FALSE, fig.cap = "Cumulative number of articles published per month (2019-2025) whose first authors were affiliated with one of twelve focal universities. Solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average. The percentage indicates the change in cumulative publications through July 2025 vs. the same time period in 2024.", out.width = '90%', fig.align='center'}
 
-knitr::include_graphics("../docs/images/pubs_mo_cum_fig_uni.png", error=FALSE)
+# knitr::include_graphics("../docs/images/pubs_mo_cum_fig_uni.png", error=FALSE)
+knitr::include_graphics(paste('.',uni_dir,"pubs_mo_cum_fig_uni.png",sep="/"),error=FALSE)
 ```
 
 
 
 ```{r  label = agency-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through July (2019-2025) for nine US federal departments or agencies based on first author affiliation. These federal units had the most articles indexed in Scopus from January 2019 through July 2025 (Table 1). The solid lines are each year’s cumulative counts; the dashed line is the 2019-2024 average.", out.width = '105%',fig.align='center'}
 # ,out.extra='angle=270'
-knitr::include_graphics("images/pubs_mo_cum_agency_lines.png", error=FALSE)
+# knitr::include_graphics("images/pubs_mo_cum_agency_lines.png", error=FALSE)
+knitr::include_graphics(paste('.',fed_dir,"pubs_mo_cum_agency_lines.png",sep="/"),error=FALSE)
 
 ```
 

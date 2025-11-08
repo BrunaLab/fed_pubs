@@ -18,7 +18,7 @@ library(forcats)
 
 cat<-"fed"
 date<-"20250901"
-
+# 
 # cat<-"fed"
 # date<-"20251010"
 
@@ -273,17 +273,36 @@ affils_df<-affils_df %>%
 # total number of scopus IDs in the initial search
 scopus_id_1<-read_csv("./data_raw/affiliations_to_search/fed_affils/agencies_redux_clean.csv")
 scopus_id_2<-read_csv("./data_raw/affiliations_to_search/fed_affils/agencies_orig_clean.csv")
-scopus_id_initial<-bind_rows(scopus_id_2,scopus_id_1) %>% select(affil_id) %>% distinct() %>% summarize(n=n_distinct(affil_id))
+scopus_id_initial_search<-bind_rows(scopus_id_2,scopus_id_1) %>% select(affil_id) %>% distinct() 
 rm(scopus_id_1,scopus_id_2)
-scopus_id_initial
-# total number of scopus IDs in the follow-up search
-scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv") %>% 
-select(affil_id) %>% 
-  distinct() %>% 
+
+scopus_id_initial<- scopus_id_initial_search %>% 
   summarize(n=n_distinct(affil_id))
-scopus_id_followup
 
 
+# scopus_id_initial
+# total number of scopus IDs in the follow-up search
+
+if (date<-"20250901"){
+  
+  scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv") %>%
+    distinct(affil_id) %>% 
+    anti_join(scopus_id_initial_search) %>% 
+    tally()  
+    
+  
+}else{
+  
+
+scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") %>%
+  group_by(search_cat) %>% 
+  tally() %>% 
+  filter(search_cat=="returned_affil") %>% 
+  select(n)
+
+# note search_cat==original_affil is how many of the ones origianlly 
+# searched actually pinged a paper back socketAccept(it is less than number searched)
+}
 # Total number of federal affiliations in the final data set 
 # no_fed_affils<-authors_df %>% 
 #   filter(federal==TRUE) %>% 
@@ -959,11 +978,14 @@ agency_n_decline_sum<- agency_n_decline %>%
 
 source("code/figs/pubs_per_month_cumulative_agency.R")
 pubs_per_month_cumulative_agency<-pubs_per_month_cumulative_agency(papers_dataset,authors_dataset,PY_max,PM_max)
-pubs_per_month_cumulative_agency
+
+perc_change<-as.data.frame( pubs_per_month_cumulative_agency[[1]])
+write_csv(perc_change,paste(save_dir,"/","perc_change_agency_fed.csv",sep="")) 
 # ggsave("./docs/images/pubs_mo_cum_agency_lines.png",
 #        width = 11, height = 8, units = "in",
 #        device='png', dpi=700)
 
+pubs_mo_cum_agency_lines<-pubs_per_month_cumulative_agency[[2]]
 
 ggsave(paste(save_dir,"/","pubs_mo_cum_agency_lines.png",sep=""),
        width = 11, height = 8, units = "in",

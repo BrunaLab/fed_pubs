@@ -35,7 +35,7 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     mutate(PY=as.character(PY)) %>% 
     bind_rows(prior_yrs_avg)
   
-  write_csv(plot_data,"./data_clean/cumulative_pubs_monthly_uni.csv")
+  
   
   # perc_change<-pubs_mo_cum %>% 
   #   filter(PM==PM_max)%>% 
@@ -70,7 +70,7 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     mutate(perc_previous = ((change_n) / lag(cumul_pubs)) * 100) %>% 
     mutate(perc_previous=round(perc_previous,2))
   
-  write_csv(perc_change,"./docs/summary_info/perc_change_uni.csv")
+  
   # data_cumulative<-pubs_mo_cum %>% left_join(perc_change,by=c("PY","PM","month"))
   
   # label<-plot_data %>% group_by(PY) %>% filter(PM==max(PM)) %>% select(PM)
@@ -164,10 +164,6 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
   #                              l = 20)  # Left margin
   # )
   # 
-  
-  ggsave("./docs/images/pubs_mo_cum_fig_uni.png", width = 6, height = 5, units = "in", device='png', dpi=700)
-  
-  
    
-  return(pubs_mo_cum_fig)
+  return(list(plot_data,perc_change,pubs_mo_cum_fig))
 }

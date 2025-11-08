@@ -6,9 +6,60 @@ library(data.table)
 
 
 
-cat<-"uni"
+
+# 
+# cat<-"uni"
 # date<-"20250901"
-# date<-"20251010"
+
+cat<-"uni"
+date<-"20251010"
+
+
+# create folders for output -----------------------------------------------
+
+
+# setting up the main directory
+main_dir1 <- "./docs"
+
+# setting up the sub directory
+sub_dir1 <- "summary_info"
+
+# check if sub directory exists 
+if (file.exists(sub_dir1)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir1, sub_dir1))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir1, sub_dir1))
+  
+}
+
+
+
+
+# setting up the main directory
+main_dir2 <- paste(main_dir1,"/",sub_dir1,sep="")
+
+# setting up the sub directory
+sub_dir2 <- paste(cat,date,sep="_")
+
+# check if sub directory exists 
+if (file.exists(sub_dir2)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir2, sub_dir2))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir2, sub_dir2))
+  
+}
+
+save_dir<-paste(main_dir2,sub_dir2,sep="/")
 
 
 
@@ -17,12 +68,16 @@ cat<-"uni"
 
 # load data  --------------------------------------------------------------
 
-affil_info<-read_csv("./data_clean/api_uni_affils_searched_2025-10-18.csv") %>% 
-  mutate_all(tolower) %>% 
-  mutate(affil_id=as.integer(affil_id))
+# affil_info<-read_csv("./data_clean/api_uni_affils_searched_2025-10-18.csv") %>% 
+#   mutate_all(tolower) %>% 
+#   mutate(affil_id=as.integer(affil_id))
+
+# Affiliations
+affils_df  <- setDT(read_rds(paste("./data_clean/affils_df_clean_",cat,"_",date,".rds",sep="")))
+
 
 # papers_df  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) 
-papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds")))
+papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep="")))
 # %>% 
 #   mutate(PM=
 #            case_when(
@@ -35,7 +90,7 @@ papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,
 # papers_df %>% filter(is.na(PM))
 
 # authors_df <- setDT(read_rds("./data_clean/authors_df_uni_clean.rds")) %>% 
-  authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds"))) %>% 
+  authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
   mutate(uni=case_when(
     # uni == "unc_ch"~"other",
     # uni == "ohio_state"~"other",
@@ -67,11 +122,11 @@ papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,
 #   group_by(DT) %>% 
 #   tally() %>% 
 #   mutate(perc=n/sum(n)*100)
-
-# remove letters and editorials
-papers_df <- papers_df %>% 
-  filter(DT!="editorial") %>% 
-  filter(DT!="letter") 
+# 
+# # remove letters and editorials
+# papers_df <- papers_df %>% 
+#   filter(DT!="editorial") %>% 
+#   filter(DT!="letter") 
 
 # removes the letters and editorials from authors_df
 authors_df<-authors_df %>% 
@@ -95,22 +150,23 @@ counts<-papers_by_uni %>%
   summarise(across(everything(), ~ sum(. > 0))) %>% 
   pivot_longer(everything(),names_to="uni", values_to = "total_papers")
 
-write_csv(counts,"./docs/summary_info/total_papers_by_uni.csv")
-
+# write_csv(counts,"./docs/summary_info/total_papers_by_uni.csv")
+write_csv(counts,paste(save_dir,"/","total_papers_by_uni.csv",sep=""))
 
 
 
 # save analysis dfs -------------------------------------------------------
-
-write_rds(papers_df,"./data_clean/papers_df_analysis_uni.rds")
-write_rds(authors_df,"./data_clean/authors_df_analysis_uni.rds")
+# 
+# write_rds(papers_df,"./data_clean/papers_df_analysis_uni.rds")
+# 
+# write_rds(authors_df,"./data_clean/authors_df_analysis_uni.rds")
 
 
 
 # START HERE IF REMAKING FIGURES ------------------------------------------
-
-papers_df<-read_rds("./data_clean/papers_df_analysis_uni.rds")
-authors_df<-read_rds("./data_clean/authors_df_analysis_uni.rds")
+# 
+# papers_df<-read_rds("./data_clean/papers_df_analysis_uni.rds")
+# authors_df<-read_rds("./data_clean/authors_df_analysis_uni.rds")
 
 
 # PM_max<-6 # june
@@ -128,8 +184,8 @@ papers_by_cat_uni<-
   mutate(perc=n/sum(n)*100) %>% 
   arrange(desc(n))
 
-write_csv(papers_by_cat_uni,"./docs/summary_info/papers_by_cat_uni.csv")
-
+# write_csv(papers_by_cat_uni,"./docs/summary_info/papers_by_cat_uni.csv")
+write_csv(papers_by_cat_uni,paste(save_dir,"/","papers_by_cat_uni.csv",sep=""))
 
 
 # data summaries ----------------------------------------------------------
@@ -217,7 +273,7 @@ auth_per_pub_means
 #   distinct() %>% 
 #   summarize(n=n_distinct(affil_id))
 
-scopus_id_initial<-affil_info %>% 
+scopus_id_initial<-affils_df %>% 
   filter(cat=="original") %>% 
     distinct(affil_id,.keep_all = TRUE) %>%
     select(affil_id) %>%
@@ -234,7 +290,7 @@ scopus_id_initial
 #   summarize(n=n_distinct(affil_id))
 
 
-scopus_id_followup<-affil_info %>% 
+scopus_id_followup<-affils_df %>% 
   filter(cat=="followup") %>% 
   distinct(affil_id,.keep_all = TRUE) %>%
   select(affil_id) %>%
@@ -242,7 +298,7 @@ scopus_id_followup<-affil_info %>%
   summarize(n=n_distinct(affil_id))
 scopus_id_followup
 
-affils_df<-full_join(affil_info, affils_df,by="affil_id") %>% 
+affils_df<-full_join(affils_df, affils_df,by="affil_id") %>% 
   mutate(uni=coalesce(uni.x,uni.y)) %>% 
   select(-uni.x,-uni.y) %>% 
   distinct(affil_id,uni,.keep_all = TRUE) 
@@ -324,7 +380,9 @@ all_author_positions <- authors_df %>%
 
 
 
-write_csv(auth_per_pub_means,"./docs/summary_info/auth_per_pub_means_uni.csv")
+# write_csv(auth_per_pub_means,"./docs/summary_info/auth_per_pub_means_uni.csv")
+write_csv(auth_per_pub_means,paste(save_dir,"/","auth_per_pub_means_uni.csv",sep=""))
+
 
 summary_data<-data.frame(value=c("scopus_id_initial",
                                  "scopus_id_followup",
@@ -347,7 +405,8 @@ summary_data<-data.frame(value=c("scopus_id_initial",
                              prop_papers_focal_1st$n,
                              prop_papers_focal_last$n))
 
-write_csv(summary_data,"./docs/summary_info/summary_data_uni.csv")
+# write_csv(summary_data,"./docs/summary_info/summary_data_uni.csv")
+write_csv(summary_data,paste(save_dir,"/","summary_data_uni.csv",sep=""))
 summary_data
 
 
@@ -367,37 +426,6 @@ rm(summary_data,
    total_focal,
    total_NOTfocals)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 
-# 
 # 
 # # total pubs by uni (all positions, no fractional) ------------------------
 # 
@@ -493,12 +521,18 @@ pubs_uni <- focal_first_authors %>%
 pubs_uni
 
 
-write_csv(pubs_uni,"./docs/summary_info/uni_total_pubs_per_uni_first.csv")
+# write_csv(pubs_uni,"./docs/summary_info/uni_total_pubs_per_uni_first.csv")
+write_csv(pubs_uni,paste(save_dir,"/","uni_total_pubs_per_uni_first.csv",sep=""))
 
 
 
 source("code/figs_uni/total_pubs_per_year.R")
 pubs_yr_fig<-total_pubs_per_year(pubs_yr,2024)
+
+ggsave(paste(save_dir,"/","total_pubs_per_yr_uni.png",sep=""),
+       width = 6, height = 8, units = "in",
+       device='png', dpi=700)  
+
 
 # publications per month --------------------------------------------------
 
@@ -526,6 +560,11 @@ pubs_mo %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
 source("code/figs_uni/pubs_per_month.R")
 pubs_mo_fig<-pubs_per_month(pubs_mo,2025)
+
+ggsave(paste(save_dir,"/","pubs_per_month_uni.png",sep=""),
+       width = 6, height = 4, units = "in",
+       device='png', dpi=700)  
+
 
 
 # pubs per month_cumulative -----------------------------------------------
@@ -555,6 +594,14 @@ pubs_mo_cumulative %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
 
 source("code/figs_uni/pubs_per_month_cumulative.R")
 pubs_mo_fig_cumulative_all_uni<-pubs_per_month_cumulative(pubs_mo,PY_max,PM_max)
+write_csv(as.data.frame(pubs_mo_fig_cumulative_all_uni[1]),paste(save_dir,"/","cumulative_pubs_monthly_uni.csv",sep=""))
+write_csv(as.data.frame(pubs_mo_fig_cumulative_all_uni[2]),paste(save_dir,"/","perc_change_uni.csv",sep=""))
+pubs_mo_cum_fig_uni<-pubs_mo_fig_cumulative_all_uni[3]
+
+ggsave(paste(save_dir,"/","pubs_mo_cum_fig_uni.png",sep=""),
+       width = 6, height = 5, units = "in",
+       device='png', dpi=700)  
+
 
 
 
@@ -562,35 +609,41 @@ pubs_mo_fig_cumulative_all_uni<-pubs_per_month_cumulative(pubs_mo,PY_max,PM_max)
 source("code/figs_uni/pubs_per_month_cumulative_by_uni.R")
 pubs_mo_fig_cumulative_by_uni<-pubs_per_month_cumulative_by_uni(papers_dataset,authors_data_set,2025,PM_max)
 
+write_csv(as.data.frame(pubs_mo_fig_cumulative_by_uni[1]),paste(save_dir,"/","perc_change_uni_uni.csv",sep=""))
+pubs_mo_cum_uni_lines<-pubs_mo_fig_cumulative_by_uni[2]
+
+ggsave(paste(save_dir,"/","pubs_mo_cum_uni_lines.png",sep=""),
+       width = 12, height = 8, units = "in",
+       device='png', dpi=700)  
 
 # publications per quarter ------------------------------------------------
-
-
-source("code/figs_uni/pubs_per_quarter.R")
-pubs_per_quarter_fig<-pubs_per_quarter(pubs_mo,2024)
+# 
+# 
+# source("code/figs_uni/pubs_per_quarter.R")
+# pubs_per_quarter_fig<-pubs_per_quarter(pubs_mo,2024)
 
 
 
 # pubs january to month X -------------------------------------------------
-
-source("code/figs_uni/pubs_jan_to_month_x.R")
-
-# number is max month you want to visualize (i.e., 6 = june, 7 = july)
-# pubs_per_quarter(pubs_mo,8)
-
-monthly_pubs_1<-pubs_jan_to_month_x(pubs_mo, PM_max)
-
-
-
-# total pubs to month X  --------------------------------------------------
-
-
-source("code/figs_uni/total_pubs_to_month_x.R")
-
-# number is max month you want to visualize (i.e., 6 = june, 7 = july)
-# pubs_per_quarter(pubs_mo,8)
-
-total_pubs_to_month_x_fig<-total_pubs_to_month_x(pubs_mo, PM_max)
+# 
+# source("code/figs_uni/pubs_jan_to_month_x.R")
+# 
+# # number is max month you want to visualize (i.e., 6 = june, 7 = july)
+# # pubs_per_quarter(pubs_mo,8)
+# 
+# monthly_pubs_1<-pubs_jan_to_month_x(pubs_mo, PM_max)
+# 
+# 
+# 
+# # total pubs to month X  --------------------------------------------------
+# 
+# 
+# source("code/figs_uni/total_pubs_to_month_x.R")
+# 
+# # number is max month you want to visualize (i.e., 6 = june, 7 = july)
+# # pubs_per_quarter(pubs_mo,8)
+# 
+# total_pubs_to_month_x_fig<-total_pubs_to_month_x(pubs_mo, PM_max)
 
 
 # total pubs per uni ---------------------------------------------------
@@ -669,8 +722,8 @@ uni_n_decline_sum<- uni_n_decline %>%
 
 
 # bar chart of decline for top unis -----------------------------------
-source("code/figs/uni_n_decline_bar.R")
-uni_n_decline_bar_fig <- uni_n_decline_bar(uni_n_decline_sum, PY_max) 
+# source("code/figs_uni/uni_n_decline_bar.R")
+# uni_n_decline_bar_fig <- uni_n_decline_bar(uni_n_decline_sum, PY_max) 
 
 
 
@@ -698,8 +751,13 @@ drop_na() %>%
 filter(PY > 2023)
 
 
-source("code/figs/uni_n_decline_2.R")
+source("code/figs_uni/uni_n_decline_2.R")
 uni_n_decline_2_fig <- uni_n_decline_2(uni_n_decline)
+
+
+ggsave(paste(save_dir,"/","uni_n_decline_2.png",sep=""),
+       width = 6, height = 8, units = "in",
+       device='png', dpi=700)  
 
 
 
@@ -717,7 +775,8 @@ journals_first <- papers_with_focaluni_first %>%
   distinct() %>% 
   arrange(SO)
 # 
-write_csv(journals_first,"./docs/summary_info/uni_journals_first.csv")
+# write_csv(journals_first,"./docs/summary_info/uni_journals_first.csv")
+write_csv(journals_first,paste(save_dir,"/","uni_journals_first.csv",sep=""))
 
 jrnls_overall_first <- 
   papers_with_focaluni_first %>%
@@ -731,8 +790,8 @@ jrnls_overall_first <-
   mutate(perc=n/total*100) %>% 
   arrange(desc(n))%>%
   select(-total)
-write_csv(jrnls_overall_first,"./docs/summary_info/uni_jrnls_overall_first.csv")
-
+# write_csv(jrnls_overall_first,"./docs/summary_info/uni_jrnls_overall_first.csv")
+write_csv(jrnls_overall_first,paste(save_dir,"/","uni_jrnls_overall_first.csv",sep=""))
 
 # 
 jrnls_yr_first <- 
@@ -775,4 +834,5 @@ journals_n_perc_annual_first <- jrnls_yr_first %>%
 
 
 
-write_csv(journals_n_perc_annual_first,"./docs/summary_info/uni_journals_n_perc_annual_first.csv")
+# write_csv(journals_n_perc_annual_first,"./docs/summary_info/uni_journals_n_perc_annual_first.csv")
+write_csv(journals_n_perc_annual_first,paste(save_dir,"/","uni_journals_n_perc_annual_first.csv",sep=""))

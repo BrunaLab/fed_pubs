@@ -1,4 +1,4 @@
-pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY_max,PM_max) {
+pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_max,PM_max) {
 
   
   papers_df_info<-papers_dataset %>% 
@@ -16,7 +16,7 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
     tibble() %>% 
     rename(agency_primary=".")
   
-  authors_df_info<- authors_data_set %>% 
+  authors_df_info<- authors_dataset %>% 
     select(refID,agency_primary,agency,author_order) %>% 
     filter(agency_primary%in%agencies$agency_primary)
   
@@ -116,7 +116,7 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
   # perc_change_avg<-perc_change_avg %>% 
   #   mutate(perc_change=((cumul_pubs.x-cumul_pubs.y)/cumul_pubs.y*100))
   # 
-  perc_change<-pubs_mo_cum %>% 
+  perc_change_full<-pubs_mo_cum %>% 
     filter(PM==PM_max)%>% 
     ungroup() %>% 
     arrange(agency_primary,PY) %>% 
@@ -129,8 +129,8 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
   # label<-plot_data %>% group_by(PY) %>% filter(PM==max(PM)) %>% select(PM)
   library(forcats)
   
-  write_csv(perc_change,"./docs/summary_info/perc_change_agency_fed.csv")
-  perc_change<-perc_change %>% 
+  
+  perc_change<-perc_change_full %>% 
   mutate(agency_primary=if_else(nchar(agency_primary)<5,str_to_upper(agency_primary),str_to_title(agency_primary)))
   perc_change<-perc_change %>% 
     mutate(PY=as.character(PY)) %>% 
@@ -231,6 +231,6 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_data_set, PY
                                b = 20,  # Bottom margin
                                l = 20))  # Left margin
   
-  return(pubs_mo_cum_fig)
+  return(list(perc_change_full,pubs_mo_cum_fig))
 
   }

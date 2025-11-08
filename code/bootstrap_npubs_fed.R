@@ -10,49 +10,79 @@ library(progress)
 library(fs)
 library(data.table)
 
-PM_max<-7
-
-papers_df_analysis  <- setDT(read_rds("./data_clean/papers_df_analysis.rds")) %>% 
-  mutate(PM=
-           case_when(
-             is.na(PM) ~ sample(c(1:12), 1, replace = TRUE),
-             .default = as.numeric(PM)
-           )
-  ) %>% 
-  mutate(PT=if_else(PT=="j","journal",PT))
-
-
-# make rds of papers with fed 1st author ----------------------------------
+PM_max<-8
 
 
 
-# papers_df %>% filter(is.na(PM))
+# 
+# cat<-"fed"
+# date<-"20250901"
 
-authors_df_analysis <- setDT(readRDS("./data_clean/authors_df_analysis.rds")) %>% 
+cat<-"fed"
+date<-"20251010"
+
+
+# create folders for output -----------------------------------------------
+
+
+# setting up the main directory
+main_dir1 <- "./docs"
+
+# setting up the sub directory
+sub_dir1 <- "summary_info"
+
+# check if sub directory exists 
+if (file.exists(sub_dir1)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir1, sub_dir1))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir1, sub_dir1))
+  
+}
+
+
+
+
+# setting up the main directory
+main_dir2 <- paste(main_dir1,"/",sub_dir1,sep="")
+
+# setting up the sub directory
+sub_dir2 <- paste(cat,date,sep="_")
+
+# check if sub directory exists 
+if (file.exists(sub_dir2)){
+  
+  # specifying the working directory
+  setwd(file.path(main_dir2, sub_dir2))
+} else {
+  
+  # create a new sub directory inside
+  # the main path
+  dir.create(file.path(main_dir2, sub_dir2))
+  
+}
+
+save_dir<-paste(main_dir2,sub_dir2,sep="/")
+
+
+# Affiliations
+affils_df  <- setDT(read_rds(paste("./data_clean/affils_df_clean_",cat,"_",date,".rds",sep="")))
+
+# unique(affils_df_complete$agency_primary)
+
+# Publications
+# papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
+papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep="")))
+
+# Authors
+# authors_df <- setDT(read_rds("./data_clean/authors_df_clean.rds")) 
+authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
   mutate(federal=if_else(is.na(federal),FALSE,federal))
 
-
-
-# chose any publication types or titles to remove -------------------------
-# TITLE WORDS
-# editor's
-# preface
-# foreward
-#  - reply
-
-# ARTICLE TYPE
-# unique(papers_df$DT)
-# "book chapter"
-# "article"
-# "letter"
-# "review"
-# "note"
-# "data paper"
-# "editorial" 
-
-papers_df <- papers_df_analysis %>% 
-  filter(DT!="editorial") %>% 
-  filter(DT!="letter") 
 
 authors_df<-authors_df_analysis %>% 
   filter(refID%in%papers_df$refID)
@@ -197,7 +227,10 @@ bs_output<-bs_data %>%
   # mutate(overall_cumul_pubs=cumsum(n)) %>% 
   arrange(run,yr,PM) 
 
-write_csv(bs_output, "./data_clean/bootstrap_output.csv")
+# write_csv(bs_output, "./data_clean/bootstrap_output.csv")
+write_csv(bs_output,paste("./data_clean/bootstrap_output_fed_",date,".csv",sep=""))
+
+
 # bs_output<-read_csv("./data_clean/bootstrap_output.csv")
 # bs_stats<-bs_output %>% 
 #   arrange(run,yr) %>% 
@@ -322,8 +355,13 @@ ggplot(aes(cumul_pubs)) +
 
 final_bs_n
 
-ggsave("./docs/images/final_bs_n.png", width = 8, height = 8, units = "in", device='png', dpi=700)
-# 
+# ggsave("./docs/images/final_bs_n.png", width = 8, height = 8, units = "in", device='png', dpi=700)
+
+
+ggsave(paste(save_dir,"/","final_bs_n.png",sep=""),
+       width = 8, height = 8, units = "in",
+       device='png', dpi=700)  
+
 
 # Percent < 2025
 
@@ -400,8 +438,9 @@ bs_output_less_conservative<-bs_data %>%
   select(run,PM_bs,PY_selected,PM_selected,agency_primary,n,cum_agency)
   
 
-write_csv(bs_output_less_conservative, "./data_clean/bootstrap_output_less_conservative.csv")
-bs_output_less_conservative<-read_csv("./data_clean/bootstrap_output_less_conservative.csv")
+# write_csv(bs_output_less_conservative, "./data_clean/bootstrap_output_less_conservative.csv")
+write_csv(bs_output_less_conservative,paste("./data_clean/bs_output_less_conservative_fed_",date,".csv",sep=""))
+# bs_output_less_conservative<-read_csv("./data_clean/bootstrap_output_less_conservative.csv")
 
 
 
@@ -503,7 +542,12 @@ final_bs_n_less_conservative<-bs_output_run_cml_less_conservative %>%
 final_bs_n_less_conservative
 
 
-ggsave("./docs/images/final_bs_n_less_conservative.png", width = 8, height = 8, units = "in", device='png', dpi=700)
+# ggsave("./docs/images/final_bs_n_less_conservative.png", width = 8, height = 8, units = "in", device='png', dpi=700)
+
+ggsave(paste(save_dir,"/","final_bs_n_less_conservative.png",sep=""),
+       width = 8, height = 8, units = "in",
+       device='png', dpi=700)  
+
 # 
 
 # Percent < 2025
@@ -546,8 +590,8 @@ bs_stats_2<-bs_stats_2%>%
 
 bs_stats_all<-bind_rows(bs_stats,bs_stats_2)
 
-write_csv(bs_stats_all,"./docs/summary_info/bs_stats_all.csv")
-
+# write_csv(bs_stats_all,"./docs/summary_info/bs_stats_all.csv")
+write_csv(bs_stats_all,paste(save_dir,"/","bs_stats_all_fed.csv",sep=""))
 
 
 
@@ -555,5 +599,8 @@ write_csv(bs_stats_all,"./docs/summary_info/bs_stats_all.csv")
 bs_composite_fig<-plot_grid(final_bs_n, final_bs_n_less_conservative, labels=c("A", "B"), ncol = 1, nrow = 2)
 
 
-ggsave("./docs/images/bs_composite_fig.png", width = 4, height = 6, units = "in", device='png', dpi=700)
+# ggsave("./docs/images/bs_composite_fig.png", width = 4, height = 6, units = "in", device='png', dpi=700)
 
+ggsave(paste(save_dir,"/","bs_composite_fig.png",sep=""),
+       width = 4, height = 6, units = "in",
+       device='png', dpi=700)  

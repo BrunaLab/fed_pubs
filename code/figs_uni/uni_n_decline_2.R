@@ -28,9 +28,6 @@ uni_n_decline_2 <- function(uni_n_decline) {
     # +
     #   gghighlight(PY==2025)
     
-    ggsave("./docs/images/uni_n_decline_2.png", width = 6, height = 8, units = "in", device='png', dpi=700)
-  
-  
   return(uni_n_decline_2_fig)
   
 }

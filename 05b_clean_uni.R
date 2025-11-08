@@ -5,26 +5,23 @@ library(fs)
 
 
 
+ 
+# cat<-"uni"
+# date<-"20250901"
+
 
 cat<-"uni"
-date<-"20250901"
-
-
-# cat<-"uni"
-# date<-"20251010"
+date<-"20251010"
 
 
 
 # read the files   --------------------------------------
 
-# papers_df<-read_csv("./data_raw/papers/all_papers_df_uni.csv")
+
 papers_df<-read_csv(paste("./data_raw/uni_",date,"/","all_papers_df_uni.csv",sep=""))
 
-# affils_df<-read_csv("./data_raw/affils/all_affils_df_uni.csv")
 affils_df<-read_csv(paste("./data_raw/uni_",date,"/","all_affils_df_uni.csv",sep=""))
 
-
-# authors_df<-read_csv("./data_raw/authors/all_authors_df_uni.csv")
 authors_df<-read_csv(paste("./data_raw/uni_",date,"/","all_authors_df_uni.csv",sep=""))
 
 
@@ -322,19 +319,10 @@ affils_df_uni<-affils_df_trim %>%
     arrange(uni)
   
 
-  
-  
-  
-  
-  
-  
-  # write_rds(papers_df_trim,"./data_clean/papers_df_uni_clean.rds")
   write_rds(papers_df_trim,paste("./data_clean/papers_df_clean","_",cat,"_",date,".rds",sep=""))
   
-  # write_rds(authors_df_trim,"./data_clean/authors_df_uni_clean.rds")
   write_rds(authors_df_trim,paste("./data_clean/authors_df_clean","_",cat,"_",date,".rds",sep=""))
   
-  # write_rds(affils_df_uni,"./data_clean/affils_df_uni_clean.rds")
   write_rds(affils_df_uni,paste("./data_clean/affils_df_clean","_",cat,"_",date,".rds",sep=""))
   
 

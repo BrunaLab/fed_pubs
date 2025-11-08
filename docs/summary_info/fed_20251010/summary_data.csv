@@ -1,0 +1,12 @@
+value,n
+scopus_id_initial,5360
+scopus_id_followup,2427
+no_fed_affils,7440
+total_pubs,467080
+total_authors,4501248
+total_unique_authors,1227306
+total_federals,221257
+total_NOTfederals,1006049
+papers_w_allfed_authors,102750
+prop_papers_fed_1st,49.55596471696497
+prop_papers_fed_last,51.63012760126745

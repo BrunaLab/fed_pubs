@@ -24,28 +24,52 @@ knitr::asis_output("\0430")
 
 
 ```{r bs-results} 
-bs_stats<-read_csv("./docs/summary_info/bs_stats_all.csv")
+
+# date<-"20250901"
+date<-"20251010"
+
+
+fed_dir<-paste("./docs/summary_info/fed_",date,sep="")
+uni_dir<-paste("./docs/summary_info/uni_",date,sep="")
+
+bs_stats<-read_csv(paste(fed_dir,"bs_stats_all.csv",sep="/"))
+
+# bs_stats<-read_csv("./docs/summary_info/bs_stats_all.csv")
 ```
 
 
 ```{r uni-data, cache=FALSE, echo=FALSE}
 
 # Read data
-uni_summary_data<-read_csv("./docs/summary_info/summary_data_uni.csv")
+# uni_summary_data<-read_csv("./docs/summary_info/summary_data_uni.csv")
+
+uni_summary_data<-read_csv(paste(uni_dir,"summary_data_uni.csv",sep="/"))
+
 # jrnls_overall_first<-read_csv("./docs/summary_info/uni_jrnls_overall_first.csv")
 
 # journals_n_perc_annual_first<-read_csv("./docs/summary_info/uni_journals_n_perc_annual_first.csv")
 
-uni_auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
-total_papers_by_uni<-read_csv("./docs/summary_info/total_papers_by_uni.csv")
-total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv") %>% 
+# uni_auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
+uni_auth_per_pub_means<-read_csv(paste(uni_dir,"uni_auth_per_pub_means.csv",sep="/"))
+
+# total_papers_by_uni<-read_csv("./docs/summary_info/total_papers_by_uni.csv")
+total_papers_by_uni<-read_csv(paste(uni_dir,"total_papers_by_uni.csv",sep="/"))
+
+
+# total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv") %>% 
+  total_pubs_per_uni_first<-read_csv(paste(uni_dir,"uni_total_pubs_per_uni_first.csv",sep="/")) %>% 
   rename(first_author=n)
+
+
 uni_pubs<-full_join(total_papers_by_uni,total_pubs_per_uni_first) %>% 
   filter(uni!="other") %>% 
   arrange(desc(total_papers))
 
-papers_by_cat_uni<-read_csv("./docs/summary_info/papers_by_cat_uni.csv")
-papers_by_cat_agency<-read_csv("./docs/summary_info/papers_by_cat_agency.csv")
+# papers_by_cat_uni<-read_csv("./docs/summary_info/papers_by_cat_uni.csv")
+papers_by_cat_uni<-read_csv(paste(uni_dir,"papers_by_cat_uni.csv",sep="/"))
+
+# papers_by_cat_agency<-read_csv("./docs/summary_info/papers_by_cat_agency.csv")
+papers_by_cat_agency<-read_csv(paste(uni_dir,"papers_by_cat_agency.csv",sep="/"))
 
 
 
@@ -175,21 +199,23 @@ It is important to note that our estimates of institutional productivity must ac
 \newpage
 
 ```{r  label = pubs-monthly-fed, echo = FALSE, fig.cap = "Articles by US federal government agency affiliates indexed monthly in Scopus (2019-2024).", out.width = '50%',out.width = '70%', fig.align='center'}
-knitr::include_graphics("../docs/images/pubs_per_month.png", error=FALSE)
+knitr::include_graphics(paste('.',fed_dir,"pubs_per_month.png",sep="/"),error=FALSE)
+# knitr::include_graphics("../docs/images/pubs_per_month.png", error=FALSE)
 ```
 \newpage
 
 
 ```{r  label = bs-fig, echo = FALSE, fig.cap = "Total publications produced from June-July by federal agencies and departments of the US Federal government in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the these agencies and departments in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '90%', out.height= '90%', fig.align='center'}
-knitr::include_graphics("../docs/images/bs_composite_fig.png", error=FALSE)
-
+knitr::include_graphics(paste('.',fed_dir,"bs_composite_fig.png",sep="/"),error=FALSE)
+# knitr::include_graphics("../docs/images/bs_composite_fig.png", error=FALSE)
 ```
 
 \newpage
 
 
 ```{r  label = bs-fig-uni, echo = FALSE, fig.cap = "Total publications produced from June-July by focal universities in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the focal universities in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '90%', out.height= '90%', fig.align='center'}
-knitr::include_graphics("../docs/images/bs_composite_fig_uni.png", error=FALSE)
+# knitr::include_graphics("../docs/images/bs_composite_fig_uni.png", error=FALSE)
+knitr::include_graphics(paste('.',uni_dir,"bs_composite_fig_uni.png",sep="/"),error=FALSE)
 
 ```
 
@@ -198,7 +224,8 @@ knitr::include_graphics("../docs/images/bs_composite_fig_uni.png", error=FALSE)
 
 
 ```{r  label = uni-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through July of 2019-2025 whose 1st author was affiliated with one of 12 focal universities. The solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average.", out.height = '90%', out.width = '90%',fig.align='center'}
-knitr::include_graphics("images/pubs_mo_cum_uni_lines.png", error=FALSE)
+# knitr::include_graphics("images/pubs_mo_cum_uni_lines.png", error=FALSE)
+knitr::include_graphics(paste('.',uni_dir,"pubs_mo_cum_uni_lines.png",sep="/"),error=FALSE)
 ```
 
 \elandscape

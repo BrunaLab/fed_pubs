@@ -121,8 +121,6 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
   
   # label<-plot_data %>% group_by(PY) %>% filter(PM==max(PM)) %>% select(PM)
   
-  write_csv(perc_change,"./docs/summary_info/perc_change_uni_uni.csv")
-  
   perc_change<-perc_change %>% 
     mutate(PY=as.character(PY)) %>% 
     rename(perc_change=perc_previous) %>% 
@@ -226,7 +224,7 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
   #                              b = 20,  # Bottom margin
   #                              l = 20))  # Left margin
   # 
-  ggsave("./docs/images/pubs_mo_cum_uni_lines.png", width = 12, height = 8, units = "in", device='png', dpi=700)
   
-  return(pubs_mo_cum_fig)
+  
+  return(list(perc_change,pubs_mo_cum_fig))
 }
