@@ -1,4 +1,6 @@
-
+bootstrap_npubs_uni <- function(cat, date,PM_max) {
+  
+  
 library(tidyverse)
 library(janitor)
 library(gghighlight)
@@ -10,12 +12,12 @@ library(progress)
 library(fs)
 library(data.table)
 
-PM_max<-8
+# PM_max<-8
 
 
 # 
-cat<-"uni"
-date<-"20250901"
+# cat<-"uni"
+# date<-"20250901"
 
 # cat<-"uni"
 # date<-"20251010"
@@ -678,3 +680,5 @@ ggsave(paste(save_dir,"/","bs_composite_fig_uni.png",sep=""),
        width = 4, height = 6, units = "in",
        device='png', dpi=700)  
 
+
+}

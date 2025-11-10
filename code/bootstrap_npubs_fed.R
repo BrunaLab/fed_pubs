@@ -1,4 +1,4 @@
-
+bootstrap_npubs_uni <- function(cat, date,PM_max) {
 library(tidyverse)
 library(janitor)
 library(gghighlight)
@@ -10,16 +10,16 @@ library(progress)
 library(fs)
 library(data.table)
 
-PM_max<-8
+# PM_max<-8
 
 
 
-# 
+ 
 # cat<-"fed"
 # date<-"20250901"
 
-cat<-"fed"
-date<-"20251010"
+# cat<-"fed"
+# date<-"20251010"
 
 
 # create folders for output -----------------------------------------------
@@ -83,11 +83,13 @@ papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,
 authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
   mutate(federal=if_else(is.na(federal),FALSE,federal))
 
+# 
+# authors_df<-authors_df_analysis %>% 
+#   filter(refID%in%papers_df$refID)
+# 
 
-authors_df<-authors_df_analysis %>% 
+authors_df<-authors_df %>% 
   filter(refID%in%papers_df$refID)
-
-
 
 
 # make rds of papers with fed 1st author ----------------------------------
@@ -258,7 +260,7 @@ c_pubs_25<-mo_data %>%
   rename(n25=n)
 
 
-# averegae cumulative publications by month 2019-2024
+# average cumulative publications by month 2019-2024
 avg_cum_obs<-mo_data %>% 
   filter(PY!=2025) %>% 
   group_by(PY,PM) %>% 
@@ -604,3 +606,6 @@ bs_composite_fig<-plot_grid(final_bs_n, final_bs_n_less_conservative, labels=c("
 ggsave(paste(save_dir,"/","bs_composite_fig.png",sep=""),
        width = 4, height = 6, units = "in",
        device='png', dpi=700)  
+
+
+}

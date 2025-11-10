@@ -199,14 +199,14 @@ It is important to note that our estimates of institutional productivity must ac
 \newpage
 
 ```{r  label = pubs-monthly-fed, echo = FALSE, fig.cap = "Articles by US federal government agency affiliates indexed monthly in Scopus (2019-2024).", out.width = '50%',out.width = '70%', fig.align='center'}
-knitr::include_graphics(paste('.',fed_dir,"pubs_per_month.png",sep="/"),error=FALSE)
+knitr::include_graphics(paste('.',fed_dir,"/pubs_per_month.png",sep=""),error=FALSE)
 # knitr::include_graphics("../docs/images/pubs_per_month.png", error=FALSE)
 ```
 \newpage
 
 
 ```{r  label = bs-fig, echo = FALSE, fig.cap = "Total publications produced from June-July by federal agencies and departments of the US Federal government in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the these agencies and departments in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '90%', out.height= '90%', fig.align='center'}
-knitr::include_graphics(paste('.',fed_dir,"bs_composite_fig.png",sep="/"),error=FALSE)
+knitr::include_graphics(paste('.',fed_dir,"/bs_composite_fig.png",sep=""),error=FALSE)
 # knitr::include_graphics("../docs/images/bs_composite_fig.png", error=FALSE)
 ```
 
@@ -215,7 +215,7 @@ knitr::include_graphics(paste('.',fed_dir,"bs_composite_fig.png",sep="/"),error=
 
 ```{r  label = bs-fig-uni, echo = FALSE, fig.cap = "Total publications produced from June-July by focal universities in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the focal universities in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '90%', out.height= '90%', fig.align='center'}
 # knitr::include_graphics("../docs/images/bs_composite_fig_uni.png", error=FALSE)
-knitr::include_graphics(paste('.',uni_dir,"bs_composite_fig_uni.png",sep="/"),error=FALSE)
+knitr::include_graphics(paste('.',uni_dir,"/bs_composite_fig_uni.png",sep=""),error=FALSE)
 
 ```
 
@@ -225,7 +225,7 @@ knitr::include_graphics(paste('.',uni_dir,"bs_composite_fig_uni.png",sep="/"),er
 
 ```{r  label = uni-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through July of 2019-2025 whose 1st author was affiliated with one of 12 focal universities. The solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average.", out.height = '90%', out.width = '90%',fig.align='center'}
 # knitr::include_graphics("images/pubs_mo_cum_uni_lines.png", error=FALSE)
-knitr::include_graphics(paste('.',uni_dir,"pubs_mo_cum_uni_lines.png",sep="/"),error=FALSE)
+knitr::include_graphics(paste('.',uni_dir,"/pubs_mo_cum_uni_lines.png",sep=""),error=FALSE)
 ```
 
 \elandscape

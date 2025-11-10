@@ -110,8 +110,25 @@ uni_affils<-read_csv("./data_clean/api_uni_affils_searched_2025-09-01.csv") %>%
     60006951,
     60029194,
     60028785,
+    60138958,
     60093602,
-    60018474
+    60272417,
+    60073077,
+    60292186,
+    60018474,
+    60006602,
+    60016643,
+    60020284,
+    60274218,
+    60274219,
+    60002860,
+    60013177,
+    60018833,
+    60030273,
+    60104690,
+    60120583,
+    60028457,
+    60019829
   )
   
    
@@ -131,6 +148,28 @@ uni_affils<-read_csv("./data_clean/api_uni_affils_searched_2025-09-01.csv") %>%
            -cat.y)
   
   
+  
+  # # THESE ARE PARTNERSHIPS WITH UNI MED SCHOOL, not included in analyses or other campuses
+  # # UW
+  # 60006602 university of washington, tacoma
+  # 60016643 university of washington-bothell
+  # # PENN
+  # 60020284 lancaster general hospital
+  # 60274218 chester county hospital
+  # 60274219 princeton health
+  # # UCSF
+  # 60002860 children’s hospital oakland research institute
+  # #OSU
+  # 60013177 the ohio state university at newark
+  # 60018833 the ohio state university at mansfield
+  # 60030273 the ohio state university at lima
+  # 
+  # #harvard
+  # 
+  # 60104690 harvard pilgrim health care institute
+  # 60120583 ariadne labs
+  # 60028457 partners healthcare personalized medicine
+  # 60019829 jdrf center for immunological tolerance in type 1 diabetes
   
   # mutate(uni=if_else(str_detect(affiliation,"beth israel deaconess medical center"),"harvard",uni)) %>% 
   # these are the harvard hispitals, not counting as harvbard unless changed here

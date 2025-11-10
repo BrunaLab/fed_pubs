@@ -580,7 +580,8 @@ knitr::asis_output(tmp)
 ```{r  label = cumulative-fig-fed, echo = FALSE, fig.cap = "Cumulative number of articles published per month (2019-2025). (A) Articles whose first-authors are affiliated with the US federal government. (B) Articles with all authors having US federal government affiliations. Solid lines represent the cumulative counts for 2019-2025; the dashed line is the 2019-2024 average. Also shown is the percent change in cumulative publications through July 2025 vs. the same period in 2024. Note the different scales of the y-axes in (A) and (B).", out.width = '85%',out.height = '85%',fig.align='center'}
 
 # knitr::include_graphics('../docs/images/pubs_mo_cum_fig_multipanel.png', error=FALSE)
-knitr::include_graphics(paste('.',fed_dir,"pubs_mo_cum_fig_multipanel.png",sep="/"),error=FALSE)
+knitr::include_graphics(paste(".",fed_dir,"/pubs_mo_cum_fig_multipanel.png",sep=""),error=FALSE)
+
 
 
 ```
@@ -590,7 +591,7 @@ knitr::include_graphics(paste('.',fed_dir,"pubs_mo_cum_fig_multipanel.png",sep="
 ```{r  label = cumulative-fig-uni, echo = FALSE, fig.cap = "Cumulative number of articles published per month (2019-2025) whose first authors were affiliated with one of twelve focal universities. Solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average. The percentage indicates the change in cumulative publications through July 2025 vs. the same time period in 2024.", out.width = '90%', fig.align='center'}
 
 # knitr::include_graphics("../docs/images/pubs_mo_cum_fig_uni.png", error=FALSE)
-knitr::include_graphics(paste('.',uni_dir,"pubs_mo_cum_fig_uni.png",sep="/"),error=FALSE)
+knitr::include_graphics(paste('.',uni_dir,"/pubs_mo_cum_fig_uni.png",sep=""),error=FALSE)
 ```
 
 
@@ -598,7 +599,7 @@ knitr::include_graphics(paste('.',uni_dir,"pubs_mo_cum_fig_uni.png",sep="/"),err
 ```{r  label = agency-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through July (2019-2025) for nine US federal departments or agencies based on first author affiliation. These federal units had the most articles indexed in Scopus from January 2019 through July 2025 (Table 1). The solid lines are each year’s cumulative counts; the dashed line is the 2019-2024 average.", out.width = '105%',fig.align='center'}
 # ,out.extra='angle=270'
 # knitr::include_graphics("images/pubs_mo_cum_agency_lines.png", error=FALSE)
-knitr::include_graphics(paste('.',fed_dir,"pubs_mo_cum_agency_lines.png",sep="/"),error=FALSE)
+knitr::include_graphics(paste('.',fed_dir,"/pubs_mo_cum_agency_lines.png",sep=""),error=FALSE)
 
 ```
 
