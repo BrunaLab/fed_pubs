@@ -91,7 +91,7 @@ knitr::opts_chunk$set(dpi=300,fig.width=6)
 ```{r unicodes}
 
 
-scopus_id<-read_csv("./data_clean/uni_affils_clean.csv") %>% 
+scopus_id<-read_rds("./data_clean/affils_df_clean_uni_20251010.rds") %>% 
   mutate(uni=case_when(
     is.na(uni) ~ "other",
     .default = as.character(uni)
@@ -101,7 +101,8 @@ scopus_id<-read_csv("./data_clean/uni_affils_clean.csv") %>%
   # filter(uni=="florida") %>%
   # slice_head(n=30) %>% 
   distinct(affil_id,.keep_all=TRUE) %>% 
-  arrange(uni,desc(pub_count)) %>% 
+  # arrange(uni,desc(pub_count)) %>% 
+  arrange(uni) %>% 
   select(uni,affil_id,affiliation) %>% 
   mutate(affiliation=tolower(affiliation)) %>% 
   mutate(uni=case_when(
@@ -133,6 +134,19 @@ uni_scopus_codes<-scopus_id %>%
   write_csv("./data_archive/uni_scopus_codes.csv")
 rm(uni_scopus_codes)
 
+
+
+
+scopus_id<-scopus_id %>%
+  arrange(uni, affiliation, affil_id) %>% 
+  group_by(affiliation) %>%
+  mutate(affil_id=paste(affil_id,collapse=", ")) %>%
+  distinct(affiliation, .keep_all = TRUE) %>%
+  ungroup() %>%
+  mutate(row = row_number()) %>% 
+  arrange(uni,affiliation)
+
+
 # %>% 
 #   mutate(row=row_number())
 
@@ -140,8 +154,10 @@ rm(uni_scopus_codes)
 
 first<-scopus_id %>% 
     mutate(first=row_number()) %>% 
-  group_by(uni) %>% slice_head(n=1) %>%
-select(uni,first)
+  group_by(uni) %>% 
+  slice_head(n=1) %>%
+  select(uni,first)
+
 last<-scopus_id %>% 
   mutate(last=row_number()) %>% 
   group_by(uni) %>% 

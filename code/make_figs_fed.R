@@ -1,4 +1,4 @@
-make_figs_fed <- function(cat, date,,PM_max) {
+make_figs_fed <- function(cat, date,PM_max) {
 
 # load libraries ----------------------------------------------------------
 
@@ -91,6 +91,28 @@ papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,
 # authors_df <- setDT(read_rds("./data_clean/authors_df_clean.rds")) 
 authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep="")))
 
+
+
+
+
+# all downloads together --------------------------------------------------
+# 
+# p1<-read_rds("./data_clean/papers_df_clean_fed_20250901.rds")
+# p2<-read_rds("./data_clean/papers_df_clean_fed_20251010.rds")
+# papers_df<-bind_rows(p1,p2) %>% 
+#   distinct(scopus_article_id,.keep_all = TRUE)
+# 
+# au1<-read_rds("./data_clean/authors_df_clean_fed_20250901.rds")
+# au2<-read_rds("./data_clean/authors_df_clean_fed_20251010.rds")
+# authors_df<-bind_rows(au1,au2) %>% 
+#   distinct(SID,.keep_all = TRUE)
+# 
+# 
+# af1<-read_rds("./data_clean/affils_df_clean_fed_20250901.rds")
+# af2<-read_rds("./data_clean/affils_df_clean_fed_20251010.rds")
+# affils_df<-bind_rows(af1,af2) %>% 
+#   distinct(affil_id,.keep_all = TRUE)
+
 # chose publication types or titles to remove -----------------------------
 
 # remove with these TITLE WORDS
@@ -114,62 +136,62 @@ authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",dat
 #     sum = sum(c_across(where(is.integer)))
 #   ) %>% 
 #   relocate(sum,.after=1)
-
-single_agency_counter <- authors_df %>%
-  count(refID, agency_primary) %>%
-  pivot_wider(names_from = agency_primary, values_from = n, values_fill = 0) %>%
-  mutate(sum = rowSums(select(., where(is.integer)))) %>%
-  relocate(sum, .after = refID)
-
-single_agency_publications<-single_agency_counter %>% 
-  mutate(agency=case_when(
-         sum==hhs~"hhs",
-         sum==dod~"dod",
-         sum==commerce~"commerce",
-         sum==epa~"epa",
-         sum==other~"other",
-         sum==doe~"doe",
-         sum==labor~"labor",
-         sum==nsf~"nsf",
-         sum==va~"va",
-         sum==usda~"usda",
-         sum==interior~"interior",
-         sum==smithsonian~"smithsonian",
-         sum==nasa~"nasa",
-         sum==education~"education",
-         sum==doj~"doj",
-         sum==state~"state",
-         sum==dhs~"dhs",
-         sum==dot~"dot",
-         # sum==`federal reserve system`~"federal reserve system",
-         sum==treasury~"treasury",
-         sum==hud~"hud",
-         .default = NA))%>% 
-  relocate(agency,.after=1) %>% 
-  filter(!is.na(agency)) %>% 
-select(refID,agency)
-
-# single_agency_publications        
-# papers by agency --------------------------------------------------------
-
-
-# NA_only_pubs2<-papers_by_agency2 %>%
-#   ungroup() %>%
-#   rowwise() %>%
-#   mutate(flag = `NA` > 0 && all(c_across(-c(refID, `NA`)) == 0)) %>%
-#   ungroup() %>%
-#   filter(flag==TRUE)
-
-# can now count how many papers by agency (note - no fractional authorship)
-counts<-single_agency_counter %>% 
-  ungroup() %>% 
-  select(-refID,-sum) %>% 
-  summarise(across(everything(), ~ sum(. > 0))) %>% 
-  pivot_longer(everything(),names_to="agency_primary", values_to = "total_papers") %>% 
-  arrange(desc(total_papers))
-
-# write_csv(counts,"./docs/summary_info/total_papers_by_agency.csv")
-write_csv(counts,paste(save_dir,"/","total_papers_by_agency.csv",sep=""))
+# 
+# single_agency_counter <- authors_df %>%
+#   count(refID, agency_primary) %>%
+#   pivot_wider(names_from = agency_primary, values_from = n, values_fill = 0) %>%
+#   mutate(sum = rowSums(select(., where(is.integer)))) %>%
+#   relocate(sum, .after = refID)
+# 
+# single_agency_publications<-single_agency_counter %>% 
+#   mutate(agency=case_when(
+#          sum==hhs~"hhs",
+#          sum==dod~"dod",
+#          sum==commerce~"commerce",
+#          sum==epa~"epa",
+#          sum==other~"other",
+#          sum==doe~"doe",
+#          sum==labor~"labor",
+#          sum==nsf~"nsf",
+#          sum==va~"va",
+#          sum==usda~"usda",
+#          sum==interior~"interior",
+#          sum==smithsonian~"smithsonian",
+#          sum==nasa~"nasa",
+#          sum==education~"education",
+#          sum==doj~"doj",
+#          sum==state~"state",
+#          sum==dhs~"dhs",
+#          sum==dot~"dot",
+#          # sum==`federal reserve system`~"federal reserve system",
+#          sum==treasury~"treasury",
+#          sum==hud~"hud",
+#          .default = NA))%>% 
+#   relocate(agency,.after=1) %>% 
+#   filter(!is.na(agency)) %>% 
+# select(refID,agency)
+# 
+# # single_agency_publications        
+# # papers by agency --------------------------------------------------------
+# 
+# 
+# # NA_only_pubs2<-papers_by_agency2 %>%
+# #   ungroup() %>%
+# #   rowwise() %>%
+# #   mutate(flag = `NA` > 0 && all(c_across(-c(refID, `NA`)) == 0)) %>%
+# #   ungroup() %>%
+# #   filter(flag==TRUE)
+# 
+# # can now count how many papers by agency (note - no fractional authorship)
+# counts<-single_agency_counter %>% 
+#   ungroup() %>% 
+#   select(-refID,-sum) %>% 
+#   summarise(across(everything(), ~ sum(. > 0))) %>% 
+#   pivot_longer(everything(),names_to="agency_primary", values_to = "total_papers") %>% 
+#   arrange(desc(total_papers))
+# 
+# # write_csv(counts,"./docs/summary_info/total_papers_by_agency.csv")
+# write_csv(counts,paste(save_dir,"/","total_papers_by_agency.csv",sep=""))
 
 
 # and also count how many papers by article category
@@ -283,26 +305,23 @@ scopus_id_initial<- scopus_id_initial_search %>%
 # scopus_id_initial
 # total number of scopus IDs in the follow-up search
 
-if (date<-"20250901"){
+if (date=="20250901"){
   
   scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv") %>%
     distinct(affil_id) %>% 
     anti_join(scopus_id_initial_search) %>% 
-    tally()  
-    
+    tally() }
   
-}else{
-  
-
+if (date=="20251010"){
 scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") %>%
   group_by(search_cat) %>% 
   tally() %>% 
   filter(search_cat=="returned_affil") %>% 
   select(n)
-
+}
 # note search_cat==original_affil is how many of the ones origianlly 
 # searched actually pinged a paper back socketAccept(it is less than number searched)
-}
+
 # Total number of federal affiliations in the final data set 
 # no_fed_affils<-authors_df %>% 
 #   filter(federal==TRUE) %>% 
@@ -742,10 +761,10 @@ source("code/figs_fed/pubs_per_month.R")
 pubs_mo_fig<-pubs_per_month(pubs_mo,2024)
 pubs_mo_fig
 # SAVE IMAGE
-# ggsave("./docs/images/pubs_per_month.png",
-#        width = 6, height = 4, units = "in",
-#        device='png', dpi=700)
 
+ggsave(paste(save_dir,"/","pubs_per_month.png",sep=""),
+       width = 6, height = 4, units = "in",
+       device='png', dpi=700)  
 
 # pubs per month_cumulative -----------------------------------------------
 
@@ -865,9 +884,11 @@ ggsave(paste(save_dir,"/","pubs_mo_cum_fig_multipanel.png",sep=""),
 # publications per quarter ------------------------------------------------
 
 
-source("code/figs_fed/pubs_per_quarter.R")
-pubs_per_quarter_fig<-pubs_per_quarter(pubs_mo,2024)
-pubs_per_quarter_fig
+# source("code/figs_fed/pubs_per_quarter.R")
+# pubs_per_quarter_fig<-pubs_per_quarter(pubs_mo,2024)
+# pubs_per_quarter_fig
+# 
+
 # SAVE FIGURE
 # ggsave("./docs/images/pubs_per_quarter.png", 
 #        width = 6, height = 4, units = "in", 

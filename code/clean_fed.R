@@ -1,4 +1,4 @@
-clean_fed <- function(cat, date,scopus_ids_searched) {
+clean_fed <- function(cat, date) {
   
   # into --------------------------------------------------------------------
   # 
@@ -14,6 +14,51 @@ clean_fed <- function(cat, date,scopus_ids_searched) {
   library(data.table)
   
   
+  # create folders for output -----------------------------------------------
+  
+  
+  # setting up the main directory
+  main_dir1 <- "./docs"
+  
+  # setting up the sub directory
+  sub_dir1 <- "summary_info"
+  
+  # check if sub directory exists 
+  if (file.exists(sub_dir1)){
+    
+    # specifying the working directory
+    setwd(file.path(main_dir1, sub_dir1))
+  } else {
+    
+    # create a new sub directory inside
+    # the main path
+    dir.create(file.path(main_dir1, sub_dir1))
+    
+  }
+  
+  
+  
+  
+  # setting up the main directory
+  main_dir2 <- paste(main_dir1,"/",sub_dir1,sep="")
+  
+  # setting up the sub directory
+  sub_dir2 <- paste(cat,date,sep="_")
+  
+  # check if sub directory exists 
+  if (file.exists(sub_dir2)){
+    
+    # specifying the working directory
+    setwd(file.path(main_dir2, sub_dir2))
+  } else {
+    
+    # create a new sub directory inside
+    # the main path
+    dir.create(file.path(main_dir2, sub_dir2))
+    
+  }
+  
+  save_dir<-paste(main_dir2,sub_dir2,sep="/")
   
   # cat<-"fed"
   # date<-"20250901"
@@ -21,6 +66,20 @@ clean_fed <- function(cat, date,scopus_ids_searched) {
   
   # cat<-"fed"
   # date<-"20251010"
+  
+  
+  
+  if (date=="20250901"){
+    
+    scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv") 
+      
+      }
+  
+  if (date=="20251010"){
+    scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") 
+  }
+  
+  
   scopus_ids_searched<-scopus_ids_searched %>% mutate(city=NA)
   # 
   # scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") %>% 
@@ -33,11 +92,10 @@ clean_fed <- function(cat, date,scopus_ids_searched) {
   
   affils_df<-read_csv(paste("./data_raw/fed_",date,"/","all_affils_df_fed.csv",sep=""))
   
+  message("STEP 2/7: tagging federal affiliations affiliations and authors...this might take a while...")
   
   source("./code/ID_fed_affiliations.R")
   affils_df<-ID_fed_affiliations(affils_df,scopus_ids_searched)
-  
-  
   
   
   
@@ -47,7 +105,7 @@ clean_fed <- function(cat, date,scopus_ids_searched) {
   
   # ADD FEDERAL AFFILIATIONS TO AUTHORS_DF ----------------------------------
   
-  message("STEP 2/7: tagging federal affiliations affiliations...")
+  
   
   source("./code/ID_fed_authors.R")
   authors_df<-ID_fed_authors(authors_df,affils_df)
@@ -251,6 +309,8 @@ clean_fed <- function(cat, date,scopus_ids_searched) {
     pivot_wider(names_from = agency_primary, values_from = n) %>% 
     replace(is.na(.), 0)
   
+  
+  
   # But wait! SCOPUS returned articles that included focal agency 
   # as any affiliation (2nd, 3rd, etc). for instance for refID = 60000650_2021-13,
   # the primary affiliation of all authors is 'Brigham and Women's Hospital' but 
@@ -267,10 +327,25 @@ clean_fed <- function(cat, date,scopus_ids_searched) {
     ungroup() %>% 
     filter(flag==TRUE)
   
-  # Filter out the ones where fed isn't primary affil
-  authors_df_trim<-authors_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
   
-  papers_df_trim<-papers_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+  if(nrow(NA_only_pubs)>0){
+    
+    # Filter out the ones where fed isn't primary affil
+    authors_df_trim<-authors_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+    
+    papers_df_trim<-papers_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+    # 
+    # papers_by_agency<-authors_df_trim %>% 
+    #   select(refID,agency_primary,author_order) %>% 
+    #   group_by(refID) %>% 
+    #   count(agency_primary) %>% 
+    #   pivot_wider(names_from = agency_primary, values_from = n) %>% 
+    #   replace(is.na(.), 0)
+    
+    
+  }
+  
+  
   
   # can 2x they were removed here: 
   # papers_by_agency2<-authors_df_trim %>% 
@@ -286,6 +361,51 @@ clean_fed <- function(cat, date,scopus_ids_searched) {
   #   mutate(flag = `NA` > 0 && all(c_across(-c(refID, `NA`)) == 0)) %>%
   #   ungroup() %>%
   #   filter(flag==TRUE)
+  
+  single_agency_counter <- authors_df_trim %>%
+    count(refID, agency_primary) %>%
+    pivot_wider(names_from = agency_primary, values_from = n, values_fill = 0) %>%
+    mutate(sum = rowSums(select(., where(is.integer)))) %>%
+    relocate(sum, .after = refID)
+  
+  # can now count how many papers by agency (note - no fractional authorship)
+  single_agency_publications<-single_agency_counter %>%
+    mutate(agency=case_when(
+      sum==hhs~"hhs",
+      sum==dod~"dod",
+      sum==commerce~"commerce",
+      sum==epa~"epa",
+      sum==other~"other",
+      sum==doe~"doe",
+      sum==labor~"labor",
+      sum==nsf~"nsf",
+      sum==va~"va",
+      sum==usda~"usda",
+      sum==interior~"interior",
+      sum==smithsonian~"smithsonian",
+      sum==nasa~"nasa",
+      sum==education~"education",
+      sum==doj~"doj",
+      sum==state~"state",
+      sum==dhs~"dhs",
+      sum==dot~"dot",
+      # sum==`federal reserve system`~"federal reserve system",
+      sum==treasury~"treasury",
+      sum==hud~"hud",
+      .default = NA))%>%
+    relocate(agency,.after=1) %>%
+    filter(!is.na(agency)) %>%
+    select(refID,agency)
+  # 
+  
+  counts<-single_agency_publications %>% 
+    group_by(agency) %>% 
+    tally() %>% 
+    arrange(desc(n))
+  
+  # write_csv(counts,"./docs/summary_info/total_papers_by_agency.csv")
+  write_csv(counts,paste(save_dir,"/","total_papers_by_agency.csv",sep=""))
+  
   
   
   # SAVE CLEAN FILES --------------------------------------------------------

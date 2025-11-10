@@ -6,7 +6,16 @@ library(data.table)
 
 
 
-
+  
+  if(date=="20250901"){
+    scopus_ids_searched<-read_csv("./data_clean/api_uni_affils_searched_2025-09-01.csv")
+  }
+  
+  
+  if(date=="20251010"){
+    scopus_ids_searched<-read_csv("./data_clean/api_uni_affils_searched_2025-10-18.csv")
+  }
+  
 
 # 
 # cat<-"uni"
@@ -91,31 +100,33 @@ papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,
 # papers_df %>% filter(is.na(PM))
 
 # authors_df <- setDT(read_rds("./data_clean/authors_df_uni_clean.rds")) %>% 
-  authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
-  mutate(uni=case_when(
-    # uni == "unc_ch"~"other",
-    # uni == "ohio_state"~"other",
-    uni == "mass_general"~"other",
-    uni == "uscd"~"ucsd",
-    uni == "minnesota"~"minn",
-    # uni=="beth israel deaconess medical center"~"harvard",
-    # uni=="boston children’s hospital"~"harvard",
-    # uni=="brigham and women’s hospital"~"harvard",
-    # uni=="cambridge health alliance"~"harvard",
-    # uni=="dana-farber cancer institute"~"harvard",
-    # uni=="harvard pilgrim health care institute"~"harvard",
-    # uni=="hebrew senior life"~"harvard",
-    # uni=="joslin diabetes center"~"harvard",
-    # uni=="judge baker children’s center"~"harvard",
-    # uni=="massachusetts eye and ear | schepens eye research institute"~"harvard",
-    # uni=="massachusetts general hospital"~"harvard",
-    # uni=="mclean hospital"~"harvard",
-    # uni=="mount auburn hospital"~"harvard",
-    # uni=="spaulding rehabilitation hospital"~"harvard",
-    # uni=="va boston healthcare system"~"harvard",
-    is.na(uni) ~ "other",
-    .default = as.character(uni)
-  )) 
+  authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) 
+  
+  # %>% 
+  # mutate(uni=case_when(
+  #   # uni == "unc_ch"~"other",
+  #   # uni == "ohio_state"~"other",
+  #   uni == "mass_general"~"other",
+  #   uni == "uscd"~"ucsd",
+  #   uni == "minnesota"~"minn",
+  #   # uni=="beth israel deaconess medical center"~"harvard",
+  #   # uni=="boston children’s hospital"~"harvard",
+  #   # uni=="brigham and women’s hospital"~"harvard",
+  #   # uni=="cambridge health alliance"~"harvard",
+  #   # uni=="dana-farber cancer institute"~"harvard",
+  #   # uni=="harvard pilgrim health care institute"~"harvard",
+  #   # uni=="hebrew senior life"~"harvard",
+  #   # uni=="joslin diabetes center"~"harvard",
+  #   # uni=="judge baker children’s center"~"harvard",
+  #   # uni=="massachusetts eye and ear | schepens eye research institute"~"harvard",
+  #   # uni=="massachusetts general hospital"~"harvard",
+  #   # uni=="mclean hospital"~"harvard",
+  #   # uni=="mount auburn hospital"~"harvard",
+  #   # uni=="spaulding rehabilitation hospital"~"harvard",
+  #   # uni=="va boston healthcare system"~"harvard",
+  #   is.na(uni) ~ "other",
+  #   .default = as.character(uni)
+  # )) 
 
 # 
 # # number of articles per category BEFORE we remove letters and editorials
@@ -129,30 +140,31 @@ papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,
 #   filter(DT!="editorial") %>% 
 #   filter(DT!="letter") 
 
+  
 # removes the letters and editorials from authors_df
-authors_df<-authors_df %>% 
-  filter(refID%in%papers_df$refID)
+# authors_df<-authors_df %>% 
+#   filter(refID%in%papers_df$refID)
 
-unique(authors_df$uni)
+# unique(authors_df_trim$uni)
 
 # this calclulates how many papers have authors from each institution
-papers_by_uni<-authors_df %>% 
-  select(refID,uni,author_order) %>% 
-  group_by(refID) %>% 
-  count(uni) %>% 
-  pivot_wider(names_from = uni, values_from = n) %>% 
-replace(is.na(.), 0)
-
-
-# can now count how many papers by university (note - no fractional authorship)
-counts<-papers_by_uni %>% 
-  ungroup() %>% 
-  select(-refID) %>% 
-  summarise(across(everything(), ~ sum(. > 0))) %>% 
-  pivot_longer(everything(),names_to="uni", values_to = "total_papers")
-
-# write_csv(counts,"./docs/summary_info/total_papers_by_uni.csv")
-write_csv(counts,paste(save_dir,"/","total_papers_by_uni.csv",sep=""))
+# papers_by_uni<-authors_df %>% 
+#   select(refID,uni,author_order) %>% 
+#   group_by(refID) %>% 
+#   count(uni) %>% 
+#   pivot_wider(names_from = uni, values_from = n) %>% 
+# replace(is.na(.), 0)
+# 
+# 
+# # can now count how many papers by university (note - no fractional authorship)
+# counts<-papers_by_uni %>% 
+#   ungroup() %>% 
+#   select(-refID) %>% 
+#   summarise(across(everything(), ~ sum(. > 0))) %>% 
+#   pivot_longer(everything(),names_to="uni", values_to = "total_papers")
+# 
+# # write_csv(counts,"./docs/summary_info/total_papers_by_uni.csv")
+# write_csv(counts,paste(save_dir,"/","total_papers_by_uni.csv",sep=""))
 
 
 
@@ -274,30 +286,22 @@ auth_per_pub_means
 #   distinct() %>% 
 #   summarize(n=n_distinct(affil_id))
 
-scopus_id_initial<-affils_df %>% 
+scopus_id_initial<-scopus_ids_searched %>% 
   filter(cat=="original") %>% 
     distinct(affil_id,.keep_all = TRUE) %>%
     select(affil_id) %>%
     distinct() %>%
     summarize(n=n_distinct(affil_id))
-  
-scopus_id_initial
 
 
 # total number of scopus IDs in the follow-up search
-# scopus_id_followup<-read_csv("./data_raw/affiliations_to_search/uni_affils/follow_up/all_uni_affils_searched.csv") %>% 
-#   select(affil_id) %>% 
-#   distinct() %>% 
-#   summarize(n=n_distinct(affil_id))
-
-
-scopus_id_followup<-affils_df %>% 
+scopus_id_followup<-scopus_ids_searched %>% 
   filter(cat=="followup") %>% 
   distinct(affil_id,.keep_all = TRUE) %>%
   select(affil_id) %>%
   distinct() %>%
   summarize(n=n_distinct(affil_id))
-scopus_id_followup
+
 
 affils_df<-full_join(affils_df, affils_df,by="affil_id") %>% 
   mutate(uni=coalesce(uni.x,uni.y)) %>% 
@@ -570,27 +574,27 @@ ggsave(paste(save_dir,"/","pubs_per_month_uni.png",sep=""),
 
 # pubs per month_cumulative -----------------------------------------------
 
-
-pubs_mo_cumulative <-
-  papers_dataset %>%
-  group_by(PM, PY) %>%
-  tally() %>%
-  mutate(PM=as.numeric(PM),
-         PY=as.numeric(PY)) %>% 
-  arrange(PY, PM) %>% 
-  ungroup() %>% 
-  mutate(month=row_number()) %>% 
-  group_by(PY) %>% 
-  mutate(cumul_pubs=cumsum(n)) %>% 
-  left_join(month) %>% 
-  mutate(month_name=reorder(month_name,PM))
-
-
-# last number is max month of focal year (ie 2025)
-
-
-pubs_mo_cumulative %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
-
+# 
+# pubs_mo_cumulative <-
+#   papers_dataset %>%
+#   group_by(PM, PY) %>%
+#   tally() %>%
+#   mutate(PM=as.numeric(PM),
+#          PY=as.numeric(PY)) %>% 
+#   arrange(PY, PM) %>% 
+#   ungroup() %>% 
+#   mutate(month=row_number()) %>% 
+#   group_by(PY) %>% 
+#   mutate(cumul_pubs=cumsum(n)) %>% 
+#   left_join(month) %>% 
+#   mutate(month_name=reorder(month_name,PM))
+# 
+# 
+# # last number is max month of focal year (ie 2025)
+# 
+# 
+# pubs_mo_cumulative %>% filter(PM<(PM_max+1)) %>% arrange(PM,desc(PY))
+# 
 
 
 source("code/figs_uni/pubs_per_month_cumulative.R")

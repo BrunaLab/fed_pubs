@@ -32,7 +32,7 @@ date<-"20251010"
 fed_dir<-paste("./docs/summary_info/fed_",date,sep="")
 uni_dir<-paste("./docs/summary_info/uni_",date,sep="")
 
-bs_stats<-read_csv(paste(fed_dir,"bs_stats_all.csv",sep="/"))
+bs_stats<-read_csv(paste(fed_dir,"bs_stats_all_fed.csv",sep="/"))
 
 # bs_stats<-read_csv("./docs/summary_info/bs_stats_all.csv")
 ```
@@ -50,10 +50,11 @@ uni_summary_data<-read_csv(paste(uni_dir,"summary_data_uni.csv",sep="/"))
 # journals_n_perc_annual_first<-read_csv("./docs/summary_info/uni_journals_n_perc_annual_first.csv")
 
 # uni_auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
-uni_auth_per_pub_means<-read_csv(paste(uni_dir,"uni_auth_per_pub_means.csv",sep="/"))
+uni_auth_per_pub_means<-read_csv(paste(uni_dir,"auth_per_pub_means_uni.csv",sep="/"))
 
 # total_papers_by_uni<-read_csv("./docs/summary_info/total_papers_by_uni.csv")
-total_papers_by_uni<-read_csv(paste(uni_dir,"total_papers_by_uni.csv",sep="/"))
+total_papers_by_uni<-read_csv(paste(uni_dir,"total_papers_by_uni.csv",sep="/")) %>% 
+  filter(!is.na(uni))
 
 
 # total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv") %>% 
@@ -67,9 +68,6 @@ uni_pubs<-full_join(total_papers_by_uni,total_pubs_per_uni_first) %>%
 
 # papers_by_cat_uni<-read_csv("./docs/summary_info/papers_by_cat_uni.csv")
 papers_by_cat_uni<-read_csv(paste(uni_dir,"papers_by_cat_uni.csv",sep="/"))
-
-# papers_by_cat_agency<-read_csv("./docs/summary_info/papers_by_cat_agency.csv")
-papers_by_cat_agency<-read_csv(paste(uni_dir,"papers_by_cat_agency.csv",sep="/"))
 
 
 

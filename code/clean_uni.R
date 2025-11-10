@@ -5,9 +5,58 @@ library(tidyverse)
 library(progress)
 library(fs)
 
+  
+  
 
-
- 
+  
+  # create folders for output -----------------------------------------------
+  
+  
+  # setting up the main directory
+  main_dir1 <- "./docs"
+  
+  # setting up the sub directory
+  sub_dir1 <- "summary_info"
+  
+  # check if sub directory exists 
+  if (file.exists(sub_dir1)){
+    
+    # specifying the working directory
+    setwd(file.path(main_dir1, sub_dir1))
+  } else {
+    
+    # create a new sub directory inside
+    # the main path
+    dir.create(file.path(main_dir1, sub_dir1))
+    
+  }
+  
+  
+  
+  
+  # setting up the main directory
+  main_dir2 <- paste(main_dir1,"/",sub_dir1,sep="")
+  
+  # setting up the sub directory
+  sub_dir2 <- paste(cat,date,sep="_")
+  
+  # check if sub directory exists 
+  if (file.exists(sub_dir2)){
+    
+    # specifying the working directory
+    setwd(file.path(main_dir2, sub_dir2))
+  } else {
+    
+    # create a new sub directory inside
+    # the main path
+    dir.create(file.path(main_dir2, sub_dir2))
+    
+  }
+  
+  save_dir<-paste(main_dir2,sub_dir2,sep="/")
+  
+  
+  
 # cat<-"uni"
 # date<-"20250901"
 
@@ -128,7 +177,34 @@ affils_df<-ID_univ_affiliations(affils_df)
   message("STEP 3/6: standardizing author names and addresses...")
 
   source("./code/author_name_cleaner.R")
-  authors_df<-author_name_cleaner(authors_df)
+
+  authors_df<-author_name_cleaner(authors_df) 
+  
+  affils_df<-affils_df %>%  
+    mutate(uni=case_when(
+      # uni == "unc_ch"~"other",
+      # uni == "ohio_state"~"other",
+      uni == "mass_general"~"other",
+      uni == "uscd"~"ucsd",
+      uni == "minnesota"~"minn",
+      # uni=="beth israel deaconess medical center"~"harvard",
+      # uni=="boston children’s hospital"~"harvard",
+      # uni=="brigham and women’s hospital"~"harvard",
+      # uni=="cambridge health alliance"~"harvard",
+      # uni=="dana-farber cancer institute"~"harvard",
+      # uni=="harvard pilgrim health care institute"~"harvard",
+      # uni=="hebrew senior life"~"harvard",
+      # uni=="joslin diabetes center"~"harvard",
+      # uni=="judge baker children’s center"~"harvard",
+      # uni=="massachusetts eye and ear | schepens eye research institute"~"harvard",
+      # uni=="massachusetts general hospital"~"harvard",
+      # uni=="mclean hospital"~"harvard",
+      # uni=="mount auburn hospital"~"harvard",
+      # uni=="spaulding rehabilitation hospital"~"harvard",
+      # uni=="va boston healthcare system"~"harvard",
+      is.na(uni) ~ "other",
+      .default = as.character(uni)
+    )) 
   
   
   
@@ -285,11 +361,33 @@ affils_df<-ID_univ_affiliations(affils_df)
     ungroup() %>% 
     filter(flag==TRUE)
   
-  # Filter out the ones where fed isn't primary affil
-  authors_df_trim<-authors_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
   
-  papers_df_trim<-papers_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+  if(nrow(NA_only_pubs)>0){
+    
+    # Filter out the ones where fed isn't primary affil
+    authors_df_trim<-authors_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+    
+    papers_df_trim<-papers_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+    
+    papers_by_uni<-authors_df_trim %>% 
+      select(refID,uni,author_order) %>% 
+      group_by(refID) %>% 
+      count(uni) %>% 
+      pivot_wider(names_from = uni, values_from = n) %>% 
+      replace(is.na(.), 0)
+    
+  }
   
+  
+  # can now count how many papers by university (note - no fractional authorship)
+  counts<-papers_by_uni %>% 
+    ungroup() %>% 
+    select(-refID) %>% 
+    summarise(across(everything(), ~ sum(. > 0))) %>% 
+    pivot_longer(everything(),names_to="uni", values_to = "total_papers")
+  
+  # write_csv(counts,"./docs/summary_info/total_papers_by_uni.csv")
+  write_csv(counts,paste(save_dir,"/","total_papers_by_uni.csv",sep=""))
   
   
   

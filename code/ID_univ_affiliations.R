@@ -148,7 +148,6 @@ uni_affils<-read_csv("./data_clean/api_uni_affils_searched_2025-09-01.csv") %>%
            -cat.y)
   
   
-  
   # # THESE ARE PARTNERSHIPS WITH UNI MED SCHOOL, not included in analyses or other campuses
   # # UW
   # 60006602 university of washington, tacoma
@@ -187,6 +186,25 @@ uni_affils<-read_csv("./data_clean/api_uni_affils_searched_2025-09-01.csv") %>%
   # mutate(uni=if_else(str_detect(affiliation,"mount auburn hospital"),"harvard",uni)) %>% 
   # mutate(uni=if_else(str_detect(affiliation,"spaulding rehabilitation hospital"),"harvard",uni)) %>% 
   # mutate(uni=if_else(str_detect(affiliation,"va boston healthcare system"),"harvard",uni)) %>% 
+  
+  treat_as_other<-c(
+    60006602,
+    60016643,
+    60020284,
+    60274218,
+    60274219,
+    60002860,
+    60013177,
+    60018833,
+    60030273,
+    60104690,
+    121401745,
+    60120583,
+    60028457,
+    60019829
+  )
+  affils_df<-affils_df %>% 
+  mutate(uni=if_else(affil_id%in%treat_as_other,NA,uni))
   
   return(affils_df)
 }

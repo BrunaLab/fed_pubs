@@ -9,14 +9,11 @@
 
 # cat<-"fed"
 # date<-"20250901"
-# scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-09-01.csv")
 # PM_max<-8
 
-# cat<-"fed"
-# date<-"20251010"
-# scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv")
-# PM_max<-8
-
+cat<-"fed"
+date<-"20251010"
+PM_max<-8
 
 # process the usgs publication file downloaded from their website ---------
 
@@ -37,7 +34,7 @@ csv_binder_across_years(cat,date)
 # clean up the composite files --------------------------------------------
 
 source("./code/clean_fed.R")
-clean_fed(cat, date,scopus_ids_searched)
+clean_fed(cat, date)
 
 # figures and summaries of results ----------------------------------------
 
@@ -56,14 +53,14 @@ bootstrap_npubs_fed(cat, date,PM_max)
 
 ## select the year and category to process --------------------------------
 
-cat<-"uni"
-date<-"20250901"
-PM_max<-8
-
-
 # cat<-"uni"
-# date<-"20251010"
+# date<-"20250901"
 # PM_max<-8
+
+
+cat<-"uni"
+date<-"20251010"
+PM_max<-8
 
 # within year: bind csvs for the scopus IDs -------------------------------
 
@@ -79,16 +76,39 @@ csv_binder_across_years(cat,date)
 
 source("./code/clean_uni.R")
 clean_uni(cat,date)
-gc()
+
 # figures and summaries of results ----------------------------------------
 
 source("./code/make_figs_uni.R")
 make_figs_uni(cat,date,PM_max)
-gc()
+
 # bootstrapping -----------------------------------------------------------
 
 source("./code/bootstrap_npubs_uni.R")
 bootstrap_npubs_uni(cat, date,PM_max)
-gc()
 
+
+
+
+
+
+
+
+
+# lag test ----------------------------------------------------------------
+
+
+
+# lag test ----------------------------------------------------------------
+
+date1<-"20250901"
+date2<-"20251010"
+
+
+source("./code/lag_test_fed.R")
+lag_test_uni(date1, date2,PM_max)
+
+
+source("./code/lag_test_uni.R")
+lag_test_uni(cat, date,PM_max)
 
