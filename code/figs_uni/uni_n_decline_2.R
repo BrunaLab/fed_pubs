@@ -1,6 +1,10 @@
 uni_n_decline_2 <- function(uni_n_decline) {
   
+  
+  
+  
   uni_n_decline_2_fig<- uni_n_decline %>%
+    filter(PY<2026) %>% 
       group_by(PY) %>% 
       mutate(yr_total=sum(n)) %>% 
       mutate(uni = fct_reorder(uni, desc(n))) %>%

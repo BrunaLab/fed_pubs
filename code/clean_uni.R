@@ -84,7 +84,7 @@ authors_df<-read_csv(paste("./data_raw/uni_",date,"/","all_authors_df_uni.csv",s
 message("STEP 2/6: tagging focal university affiliations...")
 
 source("./code/ID_univ_affiliations.R")
-affils_df<-ID_univ_affiliations(affils_df)
+affils_df<-ID_univ_affiliations(affils_df, date)
 
 
 

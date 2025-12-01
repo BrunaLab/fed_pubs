@@ -70,10 +70,40 @@ if (file.exists(sub_dir2)){
 save_dir<-paste(main_dir2,sub_dir2,sep="/")
 
 
-# LOAD THE DATA -----------------------------------------------
 
-papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep="")))
+
+
+# check if sub directory exists 
+if (author_position=="anywhere"){
+  
+  # specifying the working directory
+  
+  papers_dataset<-read_csv("./data_clean/for_pub/papers_df_uni_anywhere.csv") 
+  papers_dataset<-as.data.frame(papers_dataset)
+  authors_dataset<-read_csv("./data_clean/for_pub/authors_df_uni_anywhere.csv")
+  authors_dataset<-as.data.frame(authors_dataset)
+  
+  
+}else if(author_position=="first"){ 
+  
+  papers_dataset<-read_csv("./data_clean/for_pub/papers_df_uni_first.csv") 
+  papers_dataset<-as.data.frame(papers_dataset)
+  
+  authors_dataset<-read_csv("./data_clean/for_pub/authors_df_uni_first.csv") 
+  authors_dataset<-as.data.frame(authors_dataset)
+  
+}else{
+  print("you chose a dataset that doesn't exist")
+}
+
+
+
+# LOAD THE DATA -----------------------------------------------
 # 
+# papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
+#   filter(PY<2026) %>% 
+#   filter(if_else(PY==2025, PM<=PM_max,PM<=12)) 
+# # 
 # papers_df_analysis  <- setDT(read_rds("./data_clean/papers_df_analysis_uni.rds")) %>% 
 #   mutate(PM=
 #            case_when(
@@ -91,103 +121,103 @@ papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,
 
 # make rds of papers with fed 1st author ----------------------------------
 
+# 
+# 
+# # papers_df %>% filter(is.na(PM))
+# authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
+#   mutate(uni=case_when(
+#     # uni == "unc_ch"~"other",
+#     # uni == "ohio_state"~"other",
+#     uni == "mass_general"~"other",
+#     uni == "uscd"~"ucsd",
+#     uni == "minnesota"~"minn",
+#     # uni=="beth israel deaconess medical center"~"harvard",
+#     # uni=="boston children’s hospital"~"harvard",
+#     # uni=="brigham and women’s hospital"~"harvard",
+#     # uni=="cambridge health alliance"~"harvard",
+#     # uni=="dana-farber cancer institute"~"harvard",
+#     # uni=="harvard pilgrim health care institute"~"harvard",
+#     # uni=="hebrew senior life"~"harvard",
+#     # uni=="joslin diabetes center"~"harvard",
+#     # uni=="judge baker children’s center"~"harvard",
+#     # uni=="massachusetts eye and ear | schepens eye research institute"~"harvard",
+#     # uni=="massachusetts general hospital"~"harvard",
+#     # uni=="mclean hospital"~"harvard",
+#     # uni=="mount auburn hospital"~"harvard",
+#     # uni=="spaulding rehabilitation hospital"~"harvard",
+#     # uni=="va boston healthcare system"~"harvard",
+#     is.na(uni) ~ "other",
+#     .default = as.character(uni)
+#   )) 
+# 
+# # authors_df<-authors_df_analysis
+# unique(authors_df$uni)
+# 
+# 
+# 
+# # chose any publication types or titles to remove -------------------------
+# # TITLE WORDS
+# # editor's
+# # preface
+# # foreward
+# #  - reply
+# 
+# # ARTICLE TYPE
+# # unique(papers_df$DT)
+# # "book chapter"
+# # "article"
+# # "letter"
+# # "review"
+# # "note"
+# # "data paper"
+# # "editorial" 
+# 
+# 
 
-
-# papers_df %>% filter(is.na(PM))
-authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
-  mutate(uni=case_when(
-    # uni == "unc_ch"~"other",
-    # uni == "ohio_state"~"other",
-    uni == "mass_general"~"other",
-    uni == "uscd"~"ucsd",
-    uni == "minnesota"~"minn",
-    # uni=="beth israel deaconess medical center"~"harvard",
-    # uni=="boston children’s hospital"~"harvard",
-    # uni=="brigham and women’s hospital"~"harvard",
-    # uni=="cambridge health alliance"~"harvard",
-    # uni=="dana-farber cancer institute"~"harvard",
-    # uni=="harvard pilgrim health care institute"~"harvard",
-    # uni=="hebrew senior life"~"harvard",
-    # uni=="joslin diabetes center"~"harvard",
-    # uni=="judge baker children’s center"~"harvard",
-    # uni=="massachusetts eye and ear | schepens eye research institute"~"harvard",
-    # uni=="massachusetts general hospital"~"harvard",
-    # uni=="mclean hospital"~"harvard",
-    # uni=="mount auburn hospital"~"harvard",
-    # uni=="spaulding rehabilitation hospital"~"harvard",
-    # uni=="va boston healthcare system"~"harvard",
-    is.na(uni) ~ "other",
-    .default = as.character(uni)
-  )) 
-
-# authors_df<-authors_df_analysis
-unique(authors_df$uni)
-
-
-
-# chose any publication types or titles to remove -------------------------
-# TITLE WORDS
-# editor's
-# preface
-# foreward
-#  - reply
-
-# ARTICLE TYPE
-# unique(papers_df$DT)
-# "book chapter"
-# "article"
-# "letter"
-# "review"
-# "note"
-# "data paper"
-# "editorial" 
-
-
-
-focal_first_authors <- authors_df %>%
-  remove_empty(c("rows","cols")) %>% 
+focal_first_authors <- authors_dataset %>%
+  remove_empty(c("rows","cols")) %>%
   filter(uni != "other") %>%
-  # # filter(uni != "unc_ch") %>%  
+  # # filter(uni != "unc_ch") %>%
   # # filter(uni != "ohio_state") %>%
   # filter(uni != "mass_general") %>%
   # filter(!is.na(uni)) %>%
-  filter(author_order == 1) 
-
-unique(focal_first_authors$uni)
-
-papers_with_focaluni_first<-papers_df %>% 
-  filter(refID%in%focal_first_authors$refID) %>% 
-  distinct(scopus_article_id,.keep_all=TRUE) 
-
-
-PY_for_authors_df<-papers_with_focaluni_first %>% 
-  select(refID,PY,PM) 
-focal_first_authors <- focal_first_authors %>% 
-  left_join(PY_for_authors_df)
-
-
+  filter(author_order == 1)
 # 
-# uni_first_authors %>% 
-#   tally()
-
-papers_with_focaluni_first %>% 
-  group_by(PY) %>% 
-  tally()
-
-
-all_authors_df_for_focaluni_1st_papers<-authors_df %>% 
-  filter(refID%in%focal_first_authors$refID) %>% 
+# unique(focal_first_authors$uni)
+# 
+# papers_with_focaluni_first<-papers_df %>% 
+#   filter(refID%in%focal_first_authors$refID) %>% 
+#   distinct(scopus_article_id,.keep_all=TRUE) 
+# 
+# 
+PY_for_authors_df<-papers_dataset %>%
+  select(refID,PY,PM)
+focal_first_authors <- focal_first_authors %>%
   left_join(PY_for_authors_df)
-
-rm(PY_for_authors_df)
-
+# 
+# 
+# # 
+# # uni_first_authors %>% 
+# #   tally()
+# 
+# papers_with_focaluni_first %>% 
+#   group_by(PY) %>% 
+#   tally()
+# 
+# 
+# all_authors_df_for_focaluni_1st_papers<-authors_df %>% 
+#   filter(refID%in%focal_first_authors$refID) %>% 
+#   left_join(PY_for_authors_df)
+# 
+# rm(PY_for_authors_df)
+# 
 
 # set focal datasets ------------------------------------------------------
 
-
-papers_dataset<-papers_with_focaluni_first
-
-authors_data_set<-focal_first_authors
+# 
+# papers_dataset<-papers_with_focaluni_first
+# 
+# authors_dataset<-focal_first_authors
 
 
 # publications per month --------------------------------------------------
@@ -232,7 +262,7 @@ mo_data<-focal_first_authors %>%
 
 rm(
   all_authors_df_for_fed_1st_papers,
-  authors_data_set,
+  authors_dataset,
   authors_df_complete,
   first_authors,
   papers_dataset,

@@ -183,21 +183,23 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
     ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY,  linetype=PY))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
-    geom_line()+
-    # geom_line(linewidth = if_else(plot_data$PY == "avg",1.5,1)) + 
-    geom_point(size=1.5)+
-    scale_color_manual(values=c(rep("darkgray",6),"#8B0000","#36648B"))+
+    geom_line() + 
+    # geom_line(linewidth = if_else(plot_data$PY == "Avg. (all yrs)",1.5,0.75)) + 
+    geom_point(size=1.0)+
+    # scale_color_manual(values=c(rep("lightgray",6),"#8B0000","black"))+
+    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000","black"))+
     scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+
     # facet_wrap(~factor(uni, c(as.vector(order$uni))),ncol = 4, scales = "free",labeller = label_wrap_gen(width=30))+ # label_wrap_gen cnmtrols length of facet strip text
     facet_wrap(~factor(uni, c(as.vector(order$uni))),ncol = 4, scales = "free")+ # label_wrap_gen cnmtrols length of facet strip text
+    scale_y_continuous(breaks = scales::breaks_pretty(n=8))+
     theme(panel.spacing = unit(0.5, "cm", data = NULL))+
     # scale_x_continuous( breaks=seq(1,12,by=1))+
     # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_cumulative %>% select(cumul_pubs))+5000),by=2500))+
     theme(axis.text.y = element_text(size = 10))+
-    theme(axis.text.x =element_text(size = 10))+
+    theme(axis.text.x = element_text(size = 10,angle = -45, vjust = 0.25, hjust=.25))+
     theme(axis.title.y = element_text(size = 16,face = "bold"))+
     theme(axis.title.x =element_text(size = 16,face = "bold"))+
     theme(strip.text.x = element_text(face = "bold",hjust = 0,size=10))+ #hjust makes it flush left in strip instead of default center

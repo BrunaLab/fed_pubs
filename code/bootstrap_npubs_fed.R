@@ -1,4 +1,4 @@
-bootstrap_npubs_uni <- function(cat, date,PM_max) {
+bootstrap_npubs_fed <- function(cat, date,PM_max,author_position) {
 library(tidyverse)
 library(janitor)
 library(gghighlight)
@@ -67,60 +67,92 @@ if (file.exists(sub_dir2)){
 }
 
 save_dir<-paste(main_dir2,sub_dir2,sep="/")
-
-
-# Affiliations
-affils_df  <- setDT(read_rds(paste("./data_clean/affils_df_clean_",cat,"_",date,".rds",sep="")))
-
-# unique(affils_df_complete$agency_primary)
-
-# Publications
-# papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
-papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep="")))
-
-# Authors
-# authors_df <- setDT(read_rds("./data_clean/authors_df_clean.rds")) 
-authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
-  mutate(federal=if_else(is.na(federal),FALSE,federal))
-
 # 
-# authors_df<-authors_df_analysis %>% 
+# 
+# # Affiliations
+# affils_df  <- setDT(read_rds(paste("./data_clean/affils_df_clean_",cat,"_",date,".rds",sep="")))
+# 
+# # unique(affils_df_complete$agency_primary)
+# 
+# # Publications
+# # papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
+# papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
+#   filter(PY<2026) %>% 
+#   filter(if_else(PY==2025, PM<=PM_max,PM<=12)) 
+# 
+# # Authors
+# # authors_df <- setDT(read_rds("./data_clean/authors_df_clean.rds")) 
+# authors_df  <- setDT(read_rds(paste("./data_clean/authors_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
+#   mutate(federal=if_else(is.na(federal),FALSE,federal))
+# 
+# # 
+# # authors_df<-authors_df_analysis %>% 
+# #   filter(refID%in%papers_df$refID)
+# # 
+# 
+# authors_df<-authors_df %>% 
 #   filter(refID%in%papers_df$refID)
 # 
+# 
+# # make rds of papers with fed 1st author ----------------------------------
+# 
+# 
+# first_authors <- authors_df %>%
+#   remove_empty(c("rows","cols")) %>% 
+#   filter(federal == TRUE) %>%
+#   filter(author_order == 1) %>% 
+#   distinct()
+# 
+# papers_with_fed_first<-papers_df %>% 
+#   filter(refID%in%first_authors$refID) %>% 
+#   distinct(scopus_article_id,.keep_all=TRUE) 
+# 
+# 
+# PY_for_authors_df<-papers_with_fed_first %>% 
+#   select(refID,PY,PM) 
+# first_authors <- first_authors %>% 
+#   left_join(PY_for_authors_df)
+# 
+# all_authors_df_for_fed_1st_papers<-authors_df %>% 
+#   filter(refID%in%first_authors$refID) %>% 
+#   left_join(PY_for_authors_df)
+# 
+# 
+# 
+# # set focal datasets ------------------------------------------------------
+# 
+# papers_dataset<-papers_with_fed_first
+# authors_dataset<-first_authors
+# 
+# 
 
-authors_df<-authors_df %>% 
-  filter(refID%in%papers_df$refID)
-
-
-# make rds of papers with fed 1st author ----------------------------------
-
-
-first_authors <- authors_df %>%
-  remove_empty(c("rows","cols")) %>% 
-  filter(federal == TRUE) %>%
-  filter(author_order == 1) %>% 
-  distinct()
-
-papers_with_fed_first<-papers_df %>% 
-  filter(refID%in%first_authors$refID) %>% 
-  distinct(scopus_article_id,.keep_all=TRUE) 
-
-
-PY_for_authors_df<-papers_with_fed_first %>% 
-  select(refID,PY,PM) 
-first_authors <- first_authors %>% 
-  left_join(PY_for_authors_df)
-
-all_authors_df_for_fed_1st_papers<-authors_df %>% 
-  filter(refID%in%first_authors$refID) %>% 
-  left_join(PY_for_authors_df)
+# load focal datasets -----------------------------------------------------
 
 
 
-# set focal datasets ------------------------------------------------------
 
-papers_dataset<-papers_with_fed_first
-authors_data_set<-first_authors
+# check if sub directory exists 
+if (author_position=="anywhere"){
+  
+  # specifying the working directory
+  
+  papers_dataset<-read_csv("./data_clean/for_pub/papers_df_fed_anywhere.csv") 
+  papers_dataset<-as.data.frame(papers_dataset)
+  authors_dataset<-read_csv("./data_clean/for_pub/authors_df_fed_anywhere.csv")
+  authors_dataset<-as.data.frame(authors_dataset)
+  
+  
+}else if(author_position=="first"){ 
+  
+  papers_dataset<-read_csv("./data_clean/for_pub/papers_df_fed_first.csv") 
+  papers_dataset<-as.data.frame(papers_dataset)
+  
+  authors_dataset<-read_csv("./data_clean/for_pub/authors_df_fed_first.csv") 
+  authors_dataset<-as.data.frame(authors_dataset)
+
+}else{
+  print("you chose a dataset that doesn't exist")
+}
 
 
 # publications per month --------------------------------------------------
@@ -151,7 +183,11 @@ pubs_mo <-
 
 
 
-first_authors<-first_authors %>% 
+first_authors <- authors_dataset %>%
+  remove_empty(c("rows","cols")) %>%
+  filter(federal == TRUE) %>%
+  filter(author_order == 1) %>%
+  distinct() %>% 
   drop_na(PY)
 
 
@@ -165,7 +201,7 @@ mo_data<-first_authors %>%
 
 rm(
   all_authors_df_for_fed_1st_papers,
-  authors_data_set,
+  authors_dataset,
   authors_df_complete,
   first_authors,
   papers_dataset,

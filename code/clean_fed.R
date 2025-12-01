@@ -121,7 +121,7 @@ clean_fed <- function(cat, date) {
            # ,-authorID
     )
   
-  papers_df_trim<-
+  papers_df<-
     papers_df %>% 
     filter(PY>2018) %>% 
     # filter(!is.na(DI)) %>% 
@@ -134,7 +134,7 @@ clean_fed <- function(cat, date) {
   
   message("STEP 4/7: checking for duplicates...")
   
-  papers_df_trim<-papers_df_trim %>% 
+  papers_df<-papers_df %>% 
     distinct(SO,PY,DI,TI,.keep_all = TRUE) %>% 
     mutate(PM=
              case_when(
@@ -148,32 +148,36 @@ clean_fed <- function(cat, date) {
     mutate(PT=if_else(PT=="j","journal",PT))
   
   
-  dup_titles<-papers_df_trim %>%
-    group_by(SO,PY,TI) %>% 
-    tally() %>% 
-    filter(n>1) %>% 
-    arrange(desc(n))
-  
-  
-  unique_refid<-papers_df_trim %>% 
-    tibble() %>% 
-    select(refID)
+  papers_df<-papers_df %>% distinct(DI,TI,SO,EI,.keep_all=TRUE)
+  papers_df<-papers_df %>% distinct(TI,SO,PY,PD,.keep_all=TRUE)
+  papers_df<-papers_df %>% distinct(SO,PY,TI,EP,.keep_all=TRUE)
+  # 
+  # dup_titles<-papers_df %>%
+  #   group_by(SO,PY,TI) %>% 
+  #   tally() %>% 
+  #   filter(n>1) %>% 
+  #   arrange(desc(n))
+  # 
+  # 
+  # unique_refid<-papers_df %>% 
+  #   tibble() %>% 
+  #   select(refID)
   
   # filter the authors and affils to the deduplicated refiD
   
-  authors_df_trim<-authors_df %>% 
-    filter(refID %in% unique_refid$refID)
+  authors_df<-authors_df %>% 
+    filter(refID %in% papers_df$refID)
   
-  affils_df_trim<-affils_df %>% 
-    filter(refID %in% unique_refid$refID)
+  affils_df<-affils_df %>% 
+    filter(refID %in% papers_df$refID)
   
   # use ellefsen k.j. to check
   
   
   
-  affil_vector<-authors_df_trim %>% select(affil_id) %>% distinct()
+  affil_vector<-authors_df %>% select(affil_id) %>% distinct()
   
-  affil_vector<-affils_df_trim %>% 
+  affil_vector<-affils_df %>% 
     filter(affil_id%in%affil_vector$affil_id) %>% 
     filter(federal==TRUE) %>% 
     select(affil_id,agency,agency_primary, federal) %>% 
@@ -182,7 +186,7 @@ clean_fed <- function(cat, date) {
   
   affil_vector$affil_id<-as.character(affil_vector$affil_id)
   
-  authors_df_trim <-authors_df_trim  %>% 
+  authors_df <-authors_df  %>% 
     left_join(affil_vector,by="affil_id") %>% 
     
     mutate(federal.y=if_else(federal.x==federal.y,NA,federal.y)) %>% 
@@ -196,7 +200,7 @@ clean_fed <- function(cat, date) {
            -agency_primary.y) %>% 
     relocate(c(federal, agency,agency_primary),.before=1)  
   
-  authors_df_trim<-authors_df_trim %>% distinct()
+  authors_df<-authors_df %>% distinct()
   
   # use ellefsen kj to check
   
@@ -209,11 +213,11 @@ clean_fed <- function(cat, date) {
   message("STEP 5/7: verify USGS articles included...")
   
   source("./code/add_missing_usgs.R")
-  updated_dfs<-add_missing_usgs(papers_df_trim,authors_df_trim)
+  updated_dfs<-add_missing_usgs(papers_df,authors_df)
   
-  papers_df_trim<-updated_dfs$papers
-  authors_df_trim<-updated_dfs$authors
-  authors_df_trim<-authors_df_trim %>% 
+  papers_df<-updated_dfs$papers
+  authors_df<-updated_dfs$authors
+  authors_df<-authors_df %>% 
     select(
       -PY,
       -country,
@@ -223,8 +227,8 @@ clean_fed <- function(cat, date) {
   #  fix usgs affils
   
   source("./code/fix_usgs_affils.R")
-  updated_authors<-fix_usgs_affils(authors_df_trim,papers_df_trim)
-  authors_df_trim<-updated_authors
+  updated_authors<-fix_usgs_affils(authors_df,papers_df)
+  authors_df<-updated_authors
   
   
   
@@ -233,14 +237,14 @@ clean_fed <- function(cat, date) {
   # scopus. This takes those that have records coded as both fed and non-fed and
   # changes them all to fed.
   
-  # tandf<-authors_df_trim %>% select(SID,federal) %>% distinct() %>% group_by(SID) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
+  # tandf<-authors_df %>% select(SID,federal) %>% distinct() %>% group_by(SID) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
   
-  FED<-authors_df_trim %>% 
+  FED<-authors_df %>% 
     filter(federal==TRUE) %>% 
     select(SID,federal,agency,agency_primary) %>% 
     distinct()
   
-  NONFED<-authors_df_trim %>% 
+  NONFED<-authors_df %>% 
     filter(federal!=TRUE|is.na(federal)) %>% 
     select(SID,federal,agency,agency_primary) %>% 
     distinct()
@@ -252,7 +256,7 @@ clean_fed <- function(cat, date) {
            agency=agency.y,
            agency_primary=agency_primary.y)
   
-  authors_df_trim<-authors_df_trim %>% 
+  authors_df<-authors_df %>% 
     left_join(need_to_fix,by="SID") %>% 
     relocate(federal.y,.after=federal.x) %>% 
     relocate(agency.y,.after=agency.x) %>% 
@@ -272,9 +276,9 @@ clean_fed <- function(cat, date) {
   
   # make sure articles have at least 1 fed author ---------------------------
   
-  message("STEP 6/7: making sure articles have at least 1 author from focal university (this takes a while)...")
+  message("STEP 6/7: making sure articles have at least 1 author from a federal agency (this takes a while)...")
   
-  
+  # moved this to make figs to allow greater control
   # chose publication types or titles to remove -----------------------------
   
   # unique(papers_df$DT)
@@ -290,19 +294,49 @@ clean_fed <- function(cat, date) {
   
   # papers_df %>% filter(DT=="editorial") %>% select(TI)
   # authors_df %>% filter(is.na(agency)) %>% group_by(federal) %>% tally()
+  # 
+  # papers_cat<-c("article",
+  #               "book chapter",
+  #               "data paper",
+  #               "note",
+  #               "review")
+  # 
+  # papers_title<-c("editorial comment",
+  #                 "editorial commentary",
+  #                 "a quick glance at selected topics in this issue",
+  #                 "reply by authors",
+  #                 "conclusion",
+  #                 "preface",
+  #                 "a word from olaw and usda",
+  #                 "introduction",
+  #                 "editorial comment",
+  #                 "editorial commentary",
+  #                 "a quick glance at selected topics in this issue",
+  #                 "conclusion",
+  #                 "reply by authors",
+  #                 "preface",
+  #                 "a word from olaw and usda",
+  #                 "author reply",
+  #                 "a word from olaw",
+  #                 "comment",
+  #                 "commentary",
+  #                 "conclusions",
+  #                 "a word from usda and olaw",
+  #                 "overview",
+  #                 "introduction")
+  # 
+  # papers_df <- papers_df %>% 
+  #   filter(DT%in%papers_cat) %>% 
+  #   filter(TI%in%papers_title)
+  # 
+  # authors_df<-authors_df %>% 
+  #   filter(refID%in%papers_df$refID)
+  # 
+  # 
+  # rm(papers_cat,papers_title)
   
-  papers_cat<-c("article","book chapter","data paper","note","review")
-  
-  papers_df_trim <- papers_df_trim %>% 
-    filter(DT%in%papers_cat) 
-  
-  authors_df<-authors_df_trim %>% 
-    filter(refID%in%papers_df_trim$refID)
-  
-  rm(papers_cat)
-  
-  # this calclulates how many papers have authors from each institution
-  papers_by_agency<-authors_df_trim %>% 
+  # this calculates how many papers have authors from each institution
+  papers_by_agency<-authors_df %>% 
     select(refID,agency_primary,author_order) %>% 
     group_by(refID) %>% 
     count(agency_primary) %>% 
@@ -331,11 +365,11 @@ clean_fed <- function(cat, date) {
   if(nrow(NA_only_pubs)>0){
     
     # Filter out the ones where fed isn't primary affil
-    authors_df_trim<-authors_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+    authors_df<-authors_df %>% filter(!refID%in%NA_only_pubs$refID) 
     
-    papers_df_trim<-papers_df_trim %>% filter(!refID%in%NA_only_pubs$refID) 
+    papers_df<-papers_df %>% filter(!refID%in%NA_only_pubs$refID) 
     # 
-    # papers_by_agency<-authors_df_trim %>% 
+    # papers_by_agency<-authors_df %>% 
     #   select(refID,agency_primary,author_order) %>% 
     #   group_by(refID) %>% 
     #   count(agency_primary) %>% 
@@ -348,7 +382,7 @@ clean_fed <- function(cat, date) {
   
   
   # can 2x they were removed here: 
-  # papers_by_agency2<-authors_df_trim %>% 
+  # papers_by_agency2<-authors_df %>% 
   #   select(refID,agency_primary,author_order) %>% 
   #   group_by(refID) %>% 
   #   count(agency_primary) %>% 
@@ -362,7 +396,7 @@ clean_fed <- function(cat, date) {
   #   ungroup() %>%
   #   filter(flag==TRUE)
   
-  single_agency_counter <- authors_df_trim %>%
+  single_agency_counter <- authors_df %>%
     count(refID, agency_primary) %>%
     pivot_wider(names_from = agency_primary, values_from = n, values_fill = 0) %>%
     mutate(sum = rowSums(select(., where(is.integer)))) %>%
@@ -413,10 +447,10 @@ clean_fed <- function(cat, date) {
   message("STEP 7/7: saving cleaned-up files...")
   
   
-  write_rds(papers_df_trim,paste("./data_clean/papers_df_clean","_",cat,"_",date,".rds",sep=""))
+  write_rds(papers_df,paste("./data_clean/papers_df_clean","_",cat,"_",date,".rds",sep=""))
   
-  write_rds(authors_df_trim,paste("./data_clean/authors_df_clean","_",cat,"_",date,".rds",sep=""))
+  write_rds(authors_df,paste("./data_clean/authors_df_clean","_",cat,"_",date,".rds",sep=""))
   
-  write_rds(affils_df_trim,paste("./data_clean/affils_df_clean","_",cat,"_",date,".rds",sep=""))
+  write_rds(affils_df,paste("./data_clean/affils_df_clean","_",cat,"_",date,".rds",sep=""))
   
 }

@@ -1,6 +1,9 @@
 pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_max,PM_max) {
 
   
+  month<-data.frame(month_name=month.abb,PM=seq(1:12)) %>% 
+    mutate(month_name=as.factor(month_name)) 
+  
   papers_df_info<-papers_dataset %>% 
     select(refID,PY,PM)
   
@@ -91,7 +94,7 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
   plot_data<-bind_rows(final_yr,prior_yrs) %>% 
     mutate(PY=as.character(PY)) %>% 
     bind_rows(prior_yrs_avg) %>% 
-    mutate(agency_primary=if_else(nchar(agency_primary)<5,str_to_upper(agency_primary),str_to_title(agency_primary)))
+    mutate(agency_primary=if_else(nchar(agency_primary)<5,str_to_upper(agency_primary),str_to_title(agency_primary))) 
   
   
   # perc_change<-pubs_mo_cum %>% 
@@ -150,7 +153,7 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
       agency_primary == "USDA"~"(E) Dept Agriculture",
       agency_primary == "Commerce"~"(F) Dept Commerce",
       agency_primary == "Interior"~"(G) Dept Interior",
-      agency_primary == "NASA"~" (H) NASA",
+      agency_primary == "NASA"~"(H) NASA",
       agency_primary == "Smithsonian"~"(I) Smithsonian",
       agency_primary == "NSF"~"National Science Foundation",
       agency_primary == "EPA"~"Environmental Protection Agency",
@@ -190,9 +193,10 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY,  linetype=PY))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
-    geom_line() + 
+    # geom_line() + 
     geom_point(size=0.5)+
-    scale_color_manual(values=c(rep("darkgray",6),"#8B0000","#36648B"))+
+    geom_line() + 
+    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000","black"))+
     scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
@@ -200,6 +204,8 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     facet_wrap(~factor(agency_primary, c(as.vector(order$agency_primary))),
                ncol = 3, 
                scales = "free")+
+    scale_y_continuous(breaks = scales::breaks_pretty(n=8))+
+    # scale_y_continuous(expand = c(0, 0),breaks = scales::breaks_pretty(n=8))+ 
     theme(panel.spacing = unit(0.5, "cm", data = NULL))+
     # scale_x_continuous( breaks=seq(1,12,by=1))+
     # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_cumulative %>% select(cumul_pubs))+5000),by=2500))+
@@ -215,7 +221,7 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     geom_label(aes(label = label), 
                # position="jitter",
                nudge_y = 0.8, 
-               nudge_x = 0.5, 
+               nudge_x = 0.55, 
                size =3.5,
                fill=NA,
                border.color = "white"

@@ -1,6 +1,15 @@
 # PY = the max year for which you want pubs per year
 
-total_pubs_per_year <- function(pubs_yr, PY_max) {
+total_pubs_per_year <- function(papers_dataset, PY_max) {
+  
+  
+  pubs_yr <- papers_dataset %>% 
+    distinct(refID,PY) %>% 
+    group_by(PY) %>% 
+    tally()
+  
+  
+  
   pubs_yr_fig<-pubs_yr %>% 
     filter(PY<PY_max+1) %>% 
     ggplot(aes(x=PY, y=n)) +
