@@ -485,17 +485,17 @@ save_dir<-paste(main_dir2,sub_dir2,sep="/")
 #   filter(federal == TRUE) %>%
 #   distinct()
 # 
-# papers_with_all_feds<-papers_df %>% 
+# papers_with_only_feds<-papers_df %>% 
 #   filter(refID%in%all_feds$refID) %>% 
 #   distinct(scopus_article_id,.keep_all=TRUE) 
 # 
 # 
-# papers_w_allfed_authors<-papers_with_all_feds %>% 
+# papers_w_allfed_authors<-papers_with_only_feds %>% 
 #   summarize(n=n_distinct(refID))
 # 
 # 
 # 
-# PY_for_all_fed_authors_df<-papers_with_all_feds %>% 
+# PY_for_all_fed_authors_df<-papers_with_only_feds %>% 
 #   select(refID,PY,PM) 
 # all_fed_authors <- all_fed_authors %>% 
 #   left_join(PY_for_all_fed_authors_df)
@@ -764,7 +764,7 @@ save_dir<-paste(main_dir2,sub_dir2,sep="/")
     # specifying the working directory
     
     papers_dataset<-read_csv("./data_clean/for_pub/papers_df_fed_anywhere.csv") 
-      papers_dataset<-as.data.frame(papers_dataset)
+    papers_dataset<-as.data.frame(papers_dataset)
     authors_dataset<-read_csv("./data_clean/for_pub/authors_df_fed_anywhere.csv")
     authors_dataset<-as.data.frame(authors_dataset)
     
@@ -776,12 +776,22 @@ save_dir<-paste(main_dir2,sub_dir2,sep="/")
     
     authors_dataset<-read_csv("./data_clean/for_pub/authors_df_fed_fed_first.csv") 
     authors_dataset<-as.data.frame(authors_dataset)
-    papers_with_all_feds<-read_csv("./data_clean/for_pub/papers_df_fed_first.csv") 
-    papers_with_all_feds<-as.data.frame(papers_with_all_feds)
+    # 
+    papers_with_only_feds<-read_csv("./data_clean/for_pub/papers_df_only_fed_authors.csv")
+    papers_with_only_feds<-as.data.frame(papers_with_only_feds)
+    
+    
+    
+    authors_df_fed_anywhere<-read_csv("./data_clean/for_pub/authors_df_fed_anywhere.csv") 
+    authors_df_fed_anywhere<-as.data.frame(authors_df_fed_anywhere)
+    
   }else{
     print("you chose a dataset that doesn't exist")
   }
   
+
+
+
 
 
 # message("focal dataset chosen")
@@ -970,7 +980,7 @@ ggsave(paste(save_dir,"/","pubs_per_month.png",sep=""),
 source("code/figs_fed/pubs_per_month_cumulative_multipanel.R")
 # message("error check 8")
 pubs_mo_fig_cumulative<-pubs_per_month_cumulative_multipanel(papers_dataset,
-                                                             papers_with_all_feds,
+                                                             papers_with_only_feds,
                                                              PM_max,
                                                              PY_max)
 # perc_chg_panel1<-pubs_mo_fig_cumulative[[2]]
@@ -1041,8 +1051,10 @@ ggsave(paste(save_dir,"/","pubs_mo_cum_fig_multipanel.png",sep=""),
 
 # message("error check 12")
 # names(authors_dataset)
-total_pubs_per_agency <- authors_dataset %>% 
-  filter(federal==TRUE) %>% 
+
+
+total_pubs_per_agency <- authors_df_fed_anywhere %>% 
+  # filter(federal==TRUE) %>% 
   mutate(agency=if_else(agency=="us department of the interior", "interior",agency)) %>% 
   mutate(agency=if_else(agency=="federal reserve system", "frs",agency)) %>% 
   mutate(agency=if_else(agency=="us department of defense", "dod",agency)) %>% 
@@ -1196,7 +1208,7 @@ perc_data<-agency_n_decline_first %>%
 # message("error check 15")
 
 
-agency_total<-authors_dataset %>% 
+agency_total<-authors_df_fed_anywhere %>% 
   filter(federal==TRUE) %>% 
   group_by(agency_primary) %>% 
   tally() %>% 

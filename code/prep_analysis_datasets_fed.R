@@ -483,20 +483,27 @@ all_fed_authors<-authors_df %>%
   filter(federal == TRUE) %>%
   distinct()
 
-papers_with_all_feds<-papers_df %>% 
+papers_with_only_feds<-papers_df %>% 
   filter(refID%in%all_feds$refID) %>% 
   distinct(scopus_article_id,.keep_all=TRUE) 
 
 
-papers_w_allfed_authors<-papers_with_all_feds %>% 
+papers_w_allfed_authors<-papers_with_only_feds %>% 
   summarize(n=n_distinct(refID))
 
 
 
-PY_for_all_fed_authors_df<-papers_with_all_feds %>% 
+PY_for_all_fed_authors_df<-papers_with_only_feds %>% 
   select(refID,PY,PM) 
 all_fed_authors <- all_fed_authors %>% 
   left_join(PY_for_all_fed_authors_df)
+
+
+
+
+# write_csv(all_fed_authors,"./data_clean/for_pub/all_fed_authors.csv")
+
+
 
 
 summary_data<-data.frame(value=c("scopus_id_initial",
@@ -761,5 +768,7 @@ write_csv(authors_df,"./data_clean/for_pub/authors_df_fed_anywhere.csv")
 
 write_csv(papers_with_fed_first,"./data_clean/for_pub/papers_df_fed_first.csv")
 write_csv(first_authors,"./data_clean/for_pub/authors_df_fed_fed_first.csv")
+
+write_csv(papers_with_only_feds,"./data_clean/for_pub/papers_df_only_fed_authors.csv")
 
 }

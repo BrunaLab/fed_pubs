@@ -387,7 +387,7 @@ The data used in this study are archived at Dryad [*url to be added*], while the
     
     
     
-```{r pubstable, echo = FALSE, fig.cap="Table 1. The number and percentage of publications indexed in Scopus by federal author affiliation and author position. Also shown is the percent difference in first author publications when comparing Jan-September 2025 with the same period in 2024."}
+```{r pubstable, echo = FALSE, fig.cap="Table 1. The number and percentage of publications indexed in Scopus by federal author affiliation and author position. Also shown is the percent difference in first author publications when comparing Jan-Oct 2024 with the same period in 2023 and Jan-Oct 2025 with the same period in 2024."}
 # space btween and table
 # https://tex.stackexchange.com/questions/338435/how-to-reduce-space-between-end-of-table-and-footnote-using-parnote
 
@@ -445,23 +445,29 @@ other_affils<-str_c(other_affils$agency, collapse = ", ")
 
 # agency_counts<-read_csv("./docs/summary_info/agency_table.csv") %>% 
 agency_counts <-read_csv(paste(fed_dir,"agency_table.csv",sep="/")) %>% 
-  replace_na(list(n24=0)) %>% 
-  select(-perc)
+  replace_na(list(n24=0,n25=0)) %>% 
+  select(-perc_first)
 
 agency_counts_total<-agency_counts %>% summarize(
   total=sum(total),
-  n24=sum(n24)
+  n24=sum(n24),
+  n25=sum(n25)
 )
 
 agency_counts<-agency_counts %>% 
-  mutate(perc_decline=as.character(perc_decline)) %>%
-  mutate(perc_first=as.character(perc_first)) %>%
+  mutate(perc_decline24=as.character(perc_decline24),
+         perc_decline25=as.character(perc_decline25)) %>%
+  mutate(perc=as.character(perc)) %>%
   mutate(total=comma(total),
          n24=comma(n24),
+         n25=comma(n25),
          n=comma(n)
          ) %>% 
   # mutate(total=paste(total," (",perc_first,")",sep="")) %>% 
-  replace_na(list(n24 = "-", perc_decline="-")) 
+  replace_na(list(n24 = "-",
+                  perc_decline24="-",
+                  n25 = "-",
+                  perc_decline25="-")) 
 # %>% 
   # mutate(n24=paste(n24," (",perc_decline,")",sep="")) %>% 
   # select(-perc_first,
@@ -469,11 +475,14 @@ agency_counts<-agency_counts %>%
   
 
   agency_counts<-agency_counts %>% 
+  relocate(perc_decline24,.after=n24) %>% 
   rename(`Any author positionSuper1`=n,
          `First author`=total,
-         `First author `=n24,
-         `\\%`=perc_first,
-         `\\% change vs. 2024`=perc_decline
+         `2024`=n24,
+         `2025`=n25,
+         `\\% of total`=perc,
+         `\\% change vs. 2023`=perc_decline24,
+         `\\% change vs. 2024`=perc_decline25
          ) 
 
 
@@ -507,17 +516,21 @@ agency_table<-agency_counts %>%
   
 agency_counts_total<-agency_counts_total %>% 
   mutate(total=comma(total),
-         n24=comma(n24)
+         n24=comma(n24),
+         n25=comma(n25)
          ) %>% 
   rename(`Any author positionSuper1`=total,
-         `First author `=n24
+         `2024`=n24,
+         `2025`=n25
          ) %>% 
   mutate(Unit="Total")
 
 agency_table<-bind_rows(agency_table,agency_counts_total) %>% 
   replace_na(list(`First author`="",
                   `First author `="",
-                  `\\%`="",
+                  `First author`="",
+                  `\\% of total`="",
+                  `\\% change vs. 2023`="",
                   `\\% change vs. 2024`="",
                   `Any author positionSuper1`=""
                   )) 
@@ -533,11 +546,11 @@ tmp <- knitr::kable(agency_table,
   # digits = 2,
   format = "latex",
   # format = "html",
-  align = "lrrcrc",
+  align = "lrrcrcrc",
   escape = FALSE,
   row.names = FALSE,
   booktabs = T,
-  caption = "The number and percentage of publications indexed in Scopus by federal author affiliation and author position. Also shown is the percent difference in first author publications when comparing Jan-Sept 2025 with the same period in 2024.",
+  caption = "The number and percentage of publications indexed in Scopus by federal author affiliation and author position. Also shown is the percent difference in first author publications when comparing Jan-Oct 2024 with the same period in 2025 and Jan-Oct 2025 with the same period in 2024.",
   longtable = F,
   linesep = ""
 ) %>%
@@ -552,8 +565,8 @@ tmp <- knitr::kable(agency_table,
   # sub("\\\\bottomrule", "", .) %>% 
   add_header_above(c(
     " "=1,
-    "2019-2025" = 3,
-    "Jan-Sept 2025" = 2
+    "Publications: 2019-2025" = 3,
+    "First Author Publications 2024 & 2025" = 4
     )) %>%
   footnote(
     # number = c("The sum of publications in this column is greater than the total number of publications in  the dataset because some publications include authors from multiple agencies (i.e., I did not attribute 'fractional authorship').", paste("Other federal author affiliations in the publications data set: ", other_affils, sep="")),
