@@ -1179,6 +1179,20 @@ perc_data<-agency_n_decline_first %>%
   rename(Unit=agency_primary,
          n24=n) 
   
+perc_data<-agency_n_decline_first %>% 
+  filter(PY>2023) %>% 
+  select(agency_primary,PY,n,perc_decline=perc_previous) %>% 
+  pivot_wider(
+    names_from = PY,
+    values_from = c(n, perc_decline)
+  ) %>% 
+  rename(Unit=agency_primary,
+         n24=n_2024,
+         n25=n_2025,
+         perc_decline24=perc_decline_2024,
+         perc_decline25=perc_decline_2025) 
+
+
 # message("error check 15")
 
 
@@ -1215,7 +1229,8 @@ agency_table<-  total_pubs_per_agency_first %>%
   # mutate(perc=as.character(perc)) %>% 
   # mutate(total=as.character(total)) %>% 
   # mutate(n=as.character(n)) %>% 
-  mutate(perc_decline=round(perc_decline,2)) %>%
+  mutate(perc_decline24=round(perc_decline24,2)) %>%
+  mutate(perc_decline25=round(perc_decline25,2)) %>%
   mutate(perc=round(perc,2)) %>%
   mutate(perc_first=round(perc_first,2)) 
   
