@@ -63,7 +63,7 @@ authornote: |
 
 abstract: |
   
-  Departments and agencies of the United States federal government conduct research on topics ranging from nuclear technology to economic policy. Using the Scopus bibliographic database, I quantified the number of publications by US federal government authors from January 2019--September 2025. I found that the number of articles and book chapters published from January-September 2025 was 14%-19% lower than during the same time period of 2024, resulting in publication deficit of 2,638-6,489 articles. Changes in executive branch policy related to the funding and staffing of federal agencies have led to warnings of an imminent and potentially catastrophic decline in the scientific preeminence of the United States. The results presented here suggest that this decline has already been set in motion.
+  Departments and agencies of the United States federal government conduct research on topics ranging from nuclear technology to economic policy. Using the Scopus bibliographic database, I quantified the number of publications by US federal government authors from January 2019--December 2025. I found that the number of articles and book chapters published from January-December 2025 was 14%-19% lower than during the same time period of 2024, resulting in publication deficit of 2,638-6,489 articles. Changes in executive branch policy related to the funding and staffing of federal agencies have led to warnings of an imminent and potentially catastrophic decline in the scientific preeminence of the United States. The results presented here suggest that this decline has already been set in motion.
     
   
 # appendix          : "./docs/SuppInfo_text.Rmd"
@@ -131,7 +131,7 @@ library(gridExtra)
 library(png)
 library(data.table)
 library(english)
-library(here)
+# library(here)
 
 knitr::opts_chunk$set(echo = FALSE, message=FALSE,warning=FALSE)
 
@@ -148,24 +148,23 @@ knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
 
 
 # date<-"20250901"
-date<-"20251010"
+# date_uni<-"20251010"
+date_uni<-"20251210"
+date_fed<-"20251210"
 
 
-fed_dir<-paste("./docs/summary_info/fed_",date,sep="")
-uni_dir<-paste("./docs/summary_info/uni_",date,sep="")
+fed_dir<-paste("summary_info/fed_",date_fed,sep="")
+uni_dir<-paste("summary_info/uni_",date_uni,sep="")
 
 
 # Read data
-# summary_data<-read_csv("./docs/summary_info/summary_data.csv")
+
 summary_data<-read_csv(paste(fed_dir,"summary_data.csv",sep="/"))
 
-# journals_n_perc_annual_first.csv<-read_csv("./docs/summary_info/journals_n_perc_annual_first.csv")
-journals_n_perc_annual_first.csv<-read_csv(paste(fed_dir,"journals_n_perc_annual_first.csv",sep="/"))
+# journals_n_perc_annual_first<-read_csv(paste(fed_dir,"journals_n_perc_annual_first.csv",sep="/"))
 
-# auth_per_pub_means<-read_csv("./docs/summary_info/auth_per_pub_means.csv")
 auth_per_pub_means<-read_csv(paste(fed_dir,"auth_per_pub_means.csv",sep="/"))
 
-# total_pubs_per_agency_first<-read_csv("./docs/summary_info/total_pubs_per_agency_first.csv")
 total_pubs_per_agency_first<-read_csv(paste(fed_dir,"total_pubs_per_agency_first.csv",sep="/"))
 
 
@@ -198,8 +197,8 @@ n2025<-perc_change_fed_annual %>%
   filter(PY==2025) %>% 
    select(cumul_pubs)
 
-perc_change_avg<-perc_change_fed_annual %>% filter(PY<2025) %>% summarize(avg=mean(cumul_pubs))
-drop_from_avg<-(n2025-perc_change_avg)/perc_change_avg*100
+avg_pubs_yr<-perc_change_fed_annual %>% filter(PY<2025) %>% summarize(avg=mean(cumul_pubs))
+drop_from_avg<-(n2025-avg_pubs_yr)/avg_pubs_yr*100
 
 lost_articles<-perc_change_fed_annual %>% 
   filter(PY<2025) %>% 
@@ -239,9 +238,23 @@ perc_change_agency<-declines_agency_1st %>%
   select(agency_primary,perc_previous) %>% 
   arrange(perc_previous)
 
+focal_agencies_1<-c("dod","va","nasa","interior")
+focal_agencies_2<-c("commerce")
+perc_change_focal_1<-perc_change_agency %>% filter(agency_primary%in%focal_agencies_1)
+perc_change_focal_1<-sort(abs(round(range(perc_change_focal_1$perc_previous))))
+
+perc_change_focal_2<-perc_change_agency %>% filter(agency_primary%in%focal_agencies_2)
+perc_change_focal_2<-sort(abs(round(range(perc_change_focal_2$perc_previous))))
 
 # papers_by_cat_agency<-read_csv("./docs/summary_info/papers_by_cat_agency.csv")
 papers_by_cat_agency<-read_csv(paste(fed_dir,"papers_by_cat_agency.csv",sep="/"))
+
+perc_change_only_feds<-read_csv(paste(fed_dir,"perc_change_cumul_only_feds.csv",sep="/"))
+  perc_change_only_feds_25<-perc_change_only_feds %>% 
+    filter(PY==2025) %>% 
+  select(perc_previous) 
+
+
 ```
 
 
@@ -273,22 +286,30 @@ papers_by_cat_uni<-read_csv(paste(uni_dir,"papers_by_cat_uni.csv",sep="/"))
   )) 
 uni_names_flat<-paste(uni_names$uni, collapse=', ' )
 
-# FIX
-# uni_auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
- uni_auth_per_pub_means<-read_csv(paste(uni_dir,"auth_per_pub_means_uni.csv",sep="/")) 
+uni_auth_per_pub_means<-read_csv(paste(uni_dir,"auth_per_pub_means_uni.csv",sep="/")) 
  
- 
-# total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv")
 total_pubs_per_uni_first<-read_csv(paste(uni_dir,"uni_total_pubs_per_uni_first.csv",sep="/")) 
-# perc_change_uni<-read_csv("./docs/summary_info/perc_change_uni.csv")
+
 perc_change_uni<-read_csv(paste(uni_dir,"perc_change_uni.csv",sep="/")) 
 
 n2025_uni<-perc_change_uni %>% filter(PY==2025) %>% select(cumul_pubs)
-perc2025_uni<-perc_change_uni %>% filter(PY==2025) %>% select(perc_previous)
+
+perc_change_uni_last_yr<-perc_change_uni %>% filter(PY==2025) %>% select(perc_previous)
 
 n_all_articles<-round(total_pubs+as.numeric(uni_summary_data %>% filter(value=="total_pubs") %>% select(n)),-4)
 
+
+ratio_fed_uni<-perc_change_fed_last_yr/perc_change_uni_last_yr
+  
+ratio_fed_uni<-english(as.numeric(ratio_fed_uni))
+
+final_month<-perc_change_fed_annual %>% slice_tail(n=1) %>% select(PM)
+final_day<-as.numeric(lubridate::days_in_month(as.numeric(final_month)))
+final_month<-month.name[as.numeric(final_month)]
+
 ```
+
+
 
 <!-- https://www.pnas.org/author-center/submitting-your-manuscript#article-types -->
 
@@ -297,14 +318,14 @@ n_all_articles<-round(total_pubs+as.numeric(uni_summary_data %>% filter(value=="
 # Introduction  
 Departments and agencies of the United States federal government conduct research on topics ranging from nuclear technology to economic policy. This work directly benefits the nation and its citizens in four ways: by providing the information needed by agencies to advance their missions, via the broad advancement of knowledge, through the application of this knowledge in ways that benefit society, and by developing human capital with education and professional experience [@usnationalacademyofsciencesResearchFederalGovernment1999]. Federal research is also a major driver of economic growth --- in addition to the direct economic impacts of the research enterprise (e.g., employment, purchasing, tax revenue), the resulting knowledge is also used by the private sector to develop novel technologies and products [@cunninghamReturnsPubliclyFunded2022]. As such the outputs from federal research and development are considered vital not only for addressing domestic needs, but also for informing international policy, strengthening national security, and enhancing global economic competitiveness [@mandt2020federal].  
 
-Here I show that a key indicator of federal research productivity --- the number of peer-reviewed journal articles and book chapters by US federal government affiliates --- has declined precipitously in the first `r as.english(unique(perc_change_fed$PM))` months of 2025 relative to the same time period in any of the preceding `r as.english(nrow(perc_change_fed)-1)` years (Fig. \@ref(fig:cumulative-fig-fed)). This conclusion is based on an analysis of ~`r round(n_all_articles/1000000,3)` million articles in the Scopus bibliographic database (https://www.scopus.com), which indexes the content of over 200,000 books and 48,000 journals comprising all major fields of scholarship [@baasScopusCuratedHighquality2020]. While the scholarly productivity of `r as.english(nrow(uni_names))` major research universities also declined during this time period (Fig. \@ref(fig:cumulative-fig-uni)), the relative drop in federal productivity was 50% greater.
+Here I show that a key indicator of federal research productivity --- the number of peer-reviewed journal articles and book chapters by US federal government affiliates --- has declined precipitously in the first `r as.english(unique(perc_change_fed$PM))` months of 2025 relative to the same time period in any of the preceding `r as.english(nrow(perc_change_fed)-1)` years (Fig. \@ref(fig:cumulative-fig-fed)). This conclusion is based on an analysis of ~`r round(n_all_articles/1000000,3)` million articles in the Scopus bibliographic database (https://www.scopus.com), which indexes the content of over 200,000 books and 48,000 journals comprising all major fields of scholarship [@baasScopusCuratedHighquality2020]. While the scholarly productivity of `r as.english(nrow(uni_names))` major research universities also declined during this time period, the relative drop in federal productivity was `r ratio_fed_uni`-fold greater (Fig. \@ref(fig:cumulative-fig-uni)).
 
 <!-- https://impactfactorforjournal.com/list-of-scopus-indexed-journals/#:~:text=How%20many%20journals%20are%20indexed,meeting%20the%20strict%20evaluation%20criteria. -->
 <!-- https://www.scopus.com/sources.uri?zone=TopNavBar&origin=searchbasic -->
 
 # Materials and Methods   
 
-Article records are uploaded daily to Scopus from over 25,000 currently active journals, with the metadata for each record including information such as the publication title, abstract, keywords, publication date. An article's record also includes the names and affiliations of all authors, both of which are assigned unique identification numbers. I used the Scopus Affiliation ID numbers assigned to Departments, Agencies, Commissions, and other units of the United States federal government (see _Supporting Information Table S2_) to search Scopus for all peer-reviewed journal articles, book chapters, and other scholarly publications produced between January 2019 and September 2025 by authors using these affiliations. I began by identifying N = `r comma(original_affils)` Scopus affiliation ID numbers nested under the Scopus Institution Codes of all US Cabinet-level Departments and independent federal agencies; these affiliation ID numbers included both the primary affiliation codes for the agencies (e.g., 60012471: US Department of Defense; 60000947: US Department of Commerce) and codes for author affiliations nested under them (e.g., 60032984: Naval Dental Center; 60027716: National Oceanic and Atmospheric Administration). I then used the Scopus API to download the metadata for all articles, data papers, reviews, notes, and book chapters published between 2019-2025 by authors using theses affiliation IDs. The author lists of the resulting publications were then searched for any federal affiliations not included in the initial query (N = `r comma(followup_affils)`), and the search was repeated using complete list of N = `r comma(total_affils_searched)` affiliations.
+Article records are uploaded daily to Scopus from over 25,000 currently active journals, with the metadata for each record including information such as the publication title, abstract, keywords, publication date. An article's record also includes the names and affiliations of all authors, both of which are assigned unique identification numbers. I used the Scopus Affiliation ID numbers assigned to Departments, Agencies, Commissions, and other units of the United States federal government (see _Supporting Information Table S2_) to search Scopus for all peer-reviewed journal articles, book chapters, and other scholarly publications produced between January 2019 and `r final_month` 2025 by authors using these affiliations. I began by identifying N = `r comma(original_affils)` Scopus affiliation ID numbers nested under the Scopus Institution Codes of all US Cabinet-level Departments and independent federal agencies; these affiliation ID numbers included both the primary affiliation codes for the agencies (e.g., 60012471: US Department of Defense; 60000947: US Department of Commerce) and codes for author affiliations nested under them (e.g., 60032984: Naval Dental Center; 60027716: National Oceanic and Atmospheric Administration). I then used the Scopus API to download the metadata for all articles, data papers, reviews, notes, and book chapters published between 2019-2025 by authors using theses affiliation IDs. The author lists of the resulting publications were then searched for any federal affiliations not included in the initial query (N = `r comma(followup_affils)`), and the search was repeated using complete list of N = `r comma(total_affils_searched)` affiliations.
 
 <!-- WHAT FRACTION OF PUBS WERE COVEWRED BY AFFILS ORIGINAL aND FOLLOWUP? -->
 
@@ -314,15 +335,15 @@ It is possible that any changes in productivity at federal agencies reflect a br
 
 I analyzed productivity in the first `r as.english(unique(perc_change_fed$PM))` months of 2025 relative to the same time period in previous years using publications whose first author had a federal or focal university affiliation (`r comma(perc_pubs_fed1st)`% and `r comma(as.numeric(uni_summary_data %>% filter(value=="prop_papers_focal_1st") %>% select(n)))`% of each group's publications, respectively). First-author position is typically interpreted as the person leading the research and the study's primary contributor. It is important to note, however, that authorship norms are used inconsistently within- and across disciplines [@burrowsTrendsAuthorshipOrder2011; @duffyLastCorrespondingAuthorship2017], and in some fields [e.g., the biomedical sciences, @pichiniAuthorshipManuscriptsSubmitted2005] the last- or corresponding author position is used to indicate the person with primary project oversight. Moreover, the increasing complexity of research means that many publications written by non-federal first authors describe work that could not have been conducted without the intellectual contributions or other resources provided by their federal coauthors. As such, the estimates of changing productivity based on first-author position described here could be considered conservative. To address this possibility I also quantified changes in 2025 productivity relative to previous years using the subset of publications whose authors were exclusively federal affiliates.  
 
-All data were collected from Scopus between September 1-4, 2025. However, the analyses were restricted to publications with cover dates from January 2019 through September 2025 to avoid potential underestimates of productivity due to upload lags [_sensu_ @adeosunScopusIndexingDelays2024 and _Supplementary Materials_]. 
+All data were collected from Scopus between September 1-4, 2025. However, the analyses were restricted to publications with cover dates from January 2019 through `r final_month` 2025 to avoid potential underestimates of productivity due to upload lags [_sensu_ @adeosunScopusIndexingDelays2024 and _Supplementary Materials_]. 
 
 # Results  
 <!-- **_Publication productivity of US federal authors and agencies_** -->
-I identified N = `r comma(total_pubs)` research articles (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="article") %>% select(perc)))`%), reviews (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="review") %>% select(perc)))`%), book chapters (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="book chapter") %>% select(perc)))`%), Notes (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="note") %>% select(perc)))`%), and Data Papers (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="data paper") %>% select(perc)))`%) in Scopus with at least one federally affiliated author and a publication date between January 1, 2019 and September 30, 2025 (hereafter, _'publications'_).  The publications in this corpus had a total of N = `r comma(unique_authors)` unique authors, of which N = `r comma(unique_fed_authors)` (`r comma(as.numeric(perc_papers_fed_first))`%) had federal primary affiliations. Federal researchers were highly collaborative: the publications in the data set had on average `r comma(mean_authors)` ± `r comma(sd_authors)` SD authors, of which `r comma(mean_nonfed_authors)` ± `r comma(sd_nonfed_authors)` SD had affiliations outside of the US federal government. 
+I identified N = `r comma(total_pubs)` research articles (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="article") %>% select(perc)))`%), reviews (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="review") %>% select(perc)))`%), book chapters (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="book chapter") %>% select(perc)))`%), Notes (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="note") %>% select(perc)))`%), and Data Papers (`r comma(as.numeric(papers_by_cat_agency %>% filter(DT=="data paper") %>% select(perc)))`%) in Scopus with at least one federally affiliated author and a publication date between January 1, 2019 and `r final_month` `r final_day`, 2025 (hereafter, _'publications'_).  The publications in this corpus had a total of N = `r comma(unique_authors)` unique authors, of which N = `r comma(unique_fed_authors)` (`r comma(as.numeric(perc_papers_fed_first))`%) had federal primary affiliations. Federal researchers were highly collaborative: the publications in the data set had on average `r comma(mean_authors)` ± `r comma(sd_authors)` SD authors, of which `r comma(mean_nonfed_authors)` ± `r comma(sd_nonfed_authors)` SD had affiliations outside of the US federal government. 
 
-During the reference time period the focal universities produced N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_pubs") %>% select(n)))` publications (Fig. \@ref(fig:cumulative-fig-uni), Table S1, Fig. S4) with N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_authors") %>% select(n)))` authors. There were N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_unique_authors") %>% select(n)))` unique authors in the data set, of which N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_focal") %>% select(n)))` had one of the focal universities as their primary affiliation. Each article had an average of N = `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD authors, of which `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Focal") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Focal") %>% select(sd)))` SD were affiliated with the focal universities.
+During the reference time period the focal universities produced N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_pubs") %>% select(n)))` publications (Fig. \@ref(fig:cumulative-fig-uni), Table S1, Fig. S4) with N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_authors") %>% select(n)))` authors. There were N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_unique_authors") %>% select(n)))` unique authors in the data set, of which N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_focal") %>% select(n)))` had one of the focal universities as their primary affiliation. Each article had an average of N = `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD authors, of which `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="focal") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="focal") %>% select(sd)))` SD were affiliated with the focal universities.
 
-There were N = `r comma(as.numeric(n2025))` publications indexed in Scopus with a federally affiliated first author and a January 1-September 30, 2025 publication date (Table \@ref(tab:pubstable)). This is a `r comma(abs(as.numeric(perc_change_fed_last_yr)))`% decline relative to the same time period in 2024, and a `r comma(abs(as.numeric(drop_from_avg)))`% decline relative to the 2019-2024 average (Fig. \@ref(fig:cumulative-fig-fed)A). Both this decline, and the `r comma(abs(as.numeric(perc2025_uni)))`% decline in first author publications observed for the focal universities (Fig. \@ref(fig:cumulative-fig-uni)), were highly significant (P < 0.0001, see the _Supporting Information_ for a description of the bootstrapping procedure used to assess significance). Finally, from 2019-2025 there were N = `r comma(as.numeric(summary_data %>% filter(value=="papers_w_allfed_authors") %>% select(n)))` publications whose authors were exclusively affiliated with the federal government; the number of January-September publications in 2025 was ~18% lower in 2024 (Fig. \@ref(fig:cumulative-fig-fed)B).
+There were N = `r comma(as.numeric(n2025))` publications indexed in Scopus with a federally affiliated first author and a January 1-`r final_month` `r final_day`, 2025 publication date (Table \@ref(tab:pubstable)). This is a `r comma(abs(as.numeric(perc_change_fed_last_yr)))`% decline relative to the same time period in 2024, and a `r comma(abs(as.numeric(drop_from_avg)))`% decline relative to the 2019-2024 average (Fig. \@ref(fig:cumulative-fig-fed)A). Both this decline, and the `r comma(abs(as.numeric(perc_change_uni_last_yr)))`% decline in first author publications observed for the focal universities (Fig. \@ref(fig:cumulative-fig-uni)), were highly significant (P < 0.0001, see the _Supporting Information_ for a description of the bootstrapping procedure used to assess significance). Finally, from 2019-2025 there were N = `r comma(as.numeric(summary_data %>% filter(value=="papers_w_allfed_authors") %>% select(n)))` publications whose authors were exclusively affiliated with the federal government; the number of January-`r final_month` publications in 2025 was ~`r abs(round(perc_change_only_feds_25))`% lower in 2024 (Fig. \@ref(fig:cumulative-fig-fed)B).
 
 
 ```{r unidata, cache=FALSE, echo=FALSE}
@@ -337,7 +358,7 @@ There were N = `r comma(as.numeric(n2025))` publications indexed in Scopus with 
 ```
 
 # DISCUSSION  
-Scholarly publications such as peer-reviewed journal articles are the primary means of documenting, validating, and sharing research results; the data and conclusions they communicate are used to guide public policy and are the foundation on which future discoveries are built [@usnationalresearchcouncilcommitteeonresponsibilitiesofauthorshipinthebiologicalsciencesPurposePublicationResponsibilities2003]. I estimate that the US Federal Government --- historically a leading global producer of knowledge across a vast array of disciplines --- has accumulated a research publication deficit of `r comma(as.numeric(lost_articles[1,1]))`-`r comma(as.numeric(lost_articles[2,1]))` articles in only the first `r as.english(unique(perc_change_fed$PM))` months of 2025. This deficit is primarily driven by declining research output at several of the largest and most-research intensive agencies of the federal government. For example, the number of publications by authors affiliated with the Departments of Defense, Commerce, Veterans Affairs, and NASA all declined 15-20%, while the number of publications from the Smithsonian Institution and the Departments of Energy, Health & Human Services, and Agriculture decreased 9-15% (Table \@ref(tab:pubstable)). However, the greatest proportional decline was at the Department of the Interior, whose 2025 research output to date has declined `r round(abs(as.numeric(perc_change_agency %>% filter(agency_primary=="interior") %>% select(perc_previous))),0)`% relative to the same time period in 2024 (Fig. \@ref(fig:agency-decline-3)). 
+Scholarly publications such as peer-reviewed journal articles are the primary means of documenting, validating, and sharing research results; the data and conclusions they communicate are used to guide public policy and are the foundation on which future discoveries are built [@usnationalresearchcouncilcommitteeonresponsibilitiesofauthorshipinthebiologicalsciencesPurposePublicationResponsibilities2003]. I estimate that the US Federal Government --- historically a leading global producer of knowledge across a vast array of disciplines --- has accumulated a research publication deficit of `r comma(as.numeric(lost_articles[1,1]))`-`r comma(as.numeric(lost_articles[2,1]))` articles in only the first `r as.english(unique(perc_change_fed$PM))` months of 2025. This deficit is primarily driven by declining research output at several of the largest and most-research intensive agencies of the federal government. For example, the number of publications by authors affiliated with the Departments of Defense, Veterans Affairs, Interior, and NASA all declined `r perc_change_focal_1[1]`-`r perc_change_focal_1[2]`%, which greatly exceeded the rate of decline in previous years (Table \@ref(tab:pubstable)). However, the greatest proportional decline was at the Department of Commerce, which oversees such agencies the National Oceanic and Atmospheric Administration (NOAA), the National Marine Fisheries Service (MIFS), the National Institute of Standards and Technology (NIST), the National Weather Service (NSWS), and the Bureau of Economic Analysis (BEA). To date in 2025 the research output of this vital Department has declined `r round(abs(as.numeric(perc_change_agency %>% filter(agency_primary=="commerce") %>% select(perc_previous))),0)`% relative to the same time period in 2024 (Fig. \@ref(fig:agency-decline-3)).  
 
 The proposed reductions to the budgets of federal agencies that support research and education, along with the ongoing efforts to strip universities of previously allocated research funds and limit the enrollment of international students [@malakoffHowTrumpUpended2025], have led a broad array of stakeholders to warn of an imminent and potentially catastrophic decline in the scientific preeminence of the United States [e.g., @associationofamericanuniversitiesFederalResearchCuts2025; @bakerwill; @barocasCutsScientificFunding2025]. The results presented here suggest that executive orders dismissing research and support staff, suspending agency funding, and requiring federal scientists to withdraw manuscripts undergoing peer review [@amudalatajasaEPAOrdersScientists2025; @wadmanWreckingBallRFK2025; @mullinRFKJrsHHS2025] have already set this decline in motion --- particularly at agencies conducting research on the economy, environment, public health, and national security. Given the disciplinary breadth and highly collaborative research conducted by the staff of these agencies [@leydenFederalLaboratoriesResearch1999; @linkScientificPublicationsUS2021], in concert with their role in training early career scientists [@irwinCooperativeFishWildlife2025], it is likely the long-term consequences of these declines have already begun cascading through public and private-sector research institutions beyond the federal government.
 
@@ -590,31 +611,41 @@ knitr::asis_output(tmp)
 
 ```
 
-```{r  label = cumulative-fig-fed, echo = FALSE, fig.cap = "Cumulative number of articles published per month (2019-2025). (A) Articles whose first-authors are affiliated with the US federal government. (B) Articles with all authors having US federal government affiliations. Solid lines represent the cumulative counts for 2019-2025; the dashed line is the 2019-2024 average. Also shown is the percent change in cumulative publications through Sept 2025 vs. the same period in 2024.", out.width = '85%',out.height = '85%',fig.align='center'}
+```{r  label = cumulative-fig-fed, echo = FALSE, fig.cap = "Cumulative number of articles published per month (2019-2025). (A) Articles with all authors having US federal government affiliations. (B) Articles whose first-authors are affiliated with the US federal government. (C) Articles for which any author has a federal goverment affiliation.  Solid lines represent the cumulative counts for 2019-2025; the dashed line is the 2019-2024 average. Also shown is the percent change in cumulative publications through December 2025 vs. the same period in 2024. Note the scale of the Y-axis differs in the three panels.", out.width = '85%',out.height = '85%',fig.align='center'}
 
 # knitr::include_graphics('../docs/images/pubs_mo_cum_fig_multipanel.png', error=FALSE)
-knitr::include_graphics(paste(".",fed_dir,"/pubs_mo_cum_fig_multipanel.png",sep=""),error=FALSE)
+knitr::include_graphics(paste(fed_dir,"/pubs_mo_cum_fig_multipanel.png",sep=""),error=FALSE)
+```
 
 
+```{r  label = perc-change-bar-fed, echo = FALSE, fig.cap = "Percent change in publications by authors with US federal government affiliations relative to the previous year (2019-2025). (A) Articles with all authors having US federal government affiliations. (B) Articles whose first-authors are affiliated with the US federal government. (C) Articles for which any author has a federal goverment affiliation. Note the scale of the Y-axis differs in the three panels.", out.width = '85%',out.height = '85%',fig.align='center'}
 
+# knitr::include_graphics('../docs/images/pubs_mo_cum_fig_multipanel.png', error=FALSE)
+knitr::include_graphics(paste(fed_dir,"/perc_change_bar_multipanel.png",sep=""),error=FALSE)
 ```
 
 
 
-```{r  label = cumulative-fig-uni, echo = FALSE, fig.cap = "Cumulative number of articles published per month (2019-2025) whose first authors were affiliated with one of twelve focal universities. Solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average. The percentage indicates the change in cumulative publications through Sept 2025 vs. the same time period in 2024.", out.width = '90%', fig.align='center'}
+
+```{r  label = cumulative-fig-uni, echo = FALSE, fig.cap = "Cumulative number of articles published per month (2019-2025) whose first authors were affiliated with one of twelve focal universities. Solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average. The percentage indicates the change in cumulative publications through December 2025 vs. the same time period in 2024.", out.width = '90%', fig.align='center'}
 
 # knitr::include_graphics("../docs/images/pubs_mo_cum_fig_uni.png", error=FALSE)
-knitr::include_graphics(paste('.',uni_dir,"/pubs_mo_cum_fig_uni.png",sep=""),error=FALSE)
+knitr::include_graphics(paste(uni_dir,"/pubs_mo_cum_fig_uni.png",sep=""),error=FALSE)
 ```
 
 
 
-```{r  label = agency-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through Sept (2019-2025) for nine US federal departments or agencies based on first author affiliation. These federal units had the most articles indexed in Scopus from January 2019 through Sept 2025 (Table 1). The solid lines are each year’s cumulative counts; the dashed line is the 2019-2024 average. Note the different scales of the y-axes for each subplot.", out.width = '105%',fig.align='center'}
+```{r  label = agency-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through December (2019-2025) for nine US federal departments or agencies based on first author affiliation. These federal units had the most articles indexed in Scopus from January 2019 through December 2025 (Table 1). The solid lines are each year’s cumulative counts; the dashed line is the 2019-2024 average. Note the different scales of the y-axes for each subplot.", out.width = '105%',fig.align='center'}
 # ,out.extra='angle=270'
 # knitr::include_graphics("images/pubs_mo_cum_agency_lines.png", error=FALSE)
-knitr::include_graphics(paste('.',fed_dir,"/pubs_mo_cum_agency_lines.png",sep=""),error=FALSE)
+knitr::include_graphics(paste(fed_dir,"/pubs_mo_cum_agency_lines.png",sep=""),error=FALSE)
 
 ```
 
+```{r  label = agency-decline-4, echo = FALSE, fig.cap = "Annual percent change in first-author publications for the nine US federal departments or agencies with > 4000  publications indexed in Scopus from January 2019 through December 2025 (Table 1).", out.width = '90%',fig.align='center'}
+# ,out.extra='angle=270'
+knitr::include_graphics(paste(fed_dir,"/perc_change_bar_multipanel_2.png",sep=""),error=FALSE)
+
+```
 
 

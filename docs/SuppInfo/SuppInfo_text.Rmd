@@ -1,6 +1,5 @@
 ```{r setup-infotext, include = FALSE}
 library("papaja")
-r_refs("fed_pubs.bib")
 
 library(tidyverse)
 library(janitor)
@@ -19,21 +18,23 @@ comma <- function(x) format(x, digits = 2, big.mark = ",")
 knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
 
 knitr::asis_output("\0430")
+
+r_refs(here("fed_pubs.bib"))
+
 ```
 
 
 
 ```{r bs-results} 
 
-# date<-"20250901"
-date<-"20251010"
+date<-"20251210"
 
 
-fed_dir<-paste("./docs/summary_info/fed_",date,sep="")
-uni_dir<-paste("./docs/summary_info/uni_",date,sep="")
+fed_dir<-paste("docs/summary_info/fed_",date,sep="")
+uni_dir<-paste("docs/summary_info/uni_",date,sep="")
 
-bs_stats<-read_csv(paste(fed_dir,"bs_stats_all_fed.csv",sep="/"))
-
+bs_stats_fed<-read_csv(here(paste(fed_dir,"bs_stats_all_fed.csv",sep="/")))
+bs_stats_uni<-read_csv(here(paste(uni_dir,"bs_stats_all_uni.csv",sep="/")))
 # bs_stats<-read_csv("./docs/summary_info/bs_stats_all.csv")
 ```
 
@@ -43,22 +44,22 @@ bs_stats<-read_csv(paste(fed_dir,"bs_stats_all_fed.csv",sep="/"))
 # Read data
 # uni_summary_data<-read_csv("./docs/summary_info/summary_data_uni.csv")
 
-uni_summary_data<-read_csv(paste(uni_dir,"summary_data_uni.csv",sep="/"))
+uni_summary_data<-read_csv(here(paste(uni_dir,"summary_data_uni.csv",sep="/")))
 
 # jrnls_overall_first<-read_csv("./docs/summary_info/uni_jrnls_overall_first.csv")
 
 # journals_n_perc_annual_first<-read_csv("./docs/summary_info/uni_journals_n_perc_annual_first.csv")
 
 # uni_auth_per_pub_means<-read_csv("./docs/summary_info/uni_auth_per_pub_means.csv")
-uni_auth_per_pub_means<-read_csv(paste(uni_dir,"auth_per_pub_means_uni.csv",sep="/"))
+uni_auth_per_pub_means<-read_csv(here(paste(uni_dir,"auth_per_pub_means_uni.csv",sep="/")))
 
 # total_papers_by_uni<-read_csv("./docs/summary_info/total_papers_by_uni.csv")
-total_papers_by_uni<-read_csv(paste(uni_dir,"total_papers_by_uni.csv",sep="/")) %>% 
+total_papers_by_uni<-read_csv(here(paste(uni_dir,"total_papers_by_uni.csv",sep="/"))) %>% 
   filter(!is.na(uni))
 
 
 # total_pubs_per_uni_first<-read_csv("./docs/summary_info/uni_total_pubs_per_uni_first.csv") %>% 
-  total_pubs_per_uni_first<-read_csv(paste(uni_dir,"uni_total_pubs_per_uni_first.csv",sep="/")) %>% 
+  total_pubs_per_uni_first<-read_csv(here(paste(uni_dir,"uni_total_pubs_per_uni_first.csv",sep="/"))) %>% 
   rename(first_author=n)
 
 
@@ -67,7 +68,7 @@ uni_pubs<-full_join(total_papers_by_uni,total_pubs_per_uni_first) %>%
   arrange(desc(total_papers))
 
 # papers_by_cat_uni<-read_csv("./docs/summary_info/papers_by_cat_uni.csv")
-papers_by_cat_uni<-read_csv(paste(uni_dir,"papers_by_cat_uni.csv",sep="/"))
+papers_by_cat_uni<-read_csv(here(paste(uni_dir,"papers_by_cat_uni.csv",sep="/")))
 
 
 
@@ -99,6 +100,13 @@ uni_pubs<-uni_pubs %>%
 uni_names_flat<-paste(uni_pubs$uni, collapse=', ' )
 
 
+
+
+perc_change_fed<-read_csv(here(paste(fed_dir,"perc_change_agency_fed.csv",sep="/")))
+
+final_month<-perc_change_fed %>% slice_tail(n=1) %>% select(PM)
+final_day<-as.numeric(lubridate::days_in_month(as.numeric(final_month)))
+final_month<-month.name[as.numeric(final_month)]
 ```
 
 <!-- \newpage -->
@@ -157,15 +165,17 @@ To quantify the scale of changes in publication productivity by the US Federal G
 Although MGH is the largest of the clinical education and research hospitals affiliated with the Harvard Medical School, it is not the only one. Moreover, many other universities are affiliated with hospitals for research purposes, but identifying these relationships and the extent to which research conducted there is directly supported by the the university and its infrastructure is challenging. We therefore excluded MGH from our analyses as a stand-alone institution and focused exclusively on publications whose authors had primary affiliations with a university or its medical school. For example, articles with at least one author with 'Harvard University' or 'Harvard Medical School' as a primary address were included. However, articles using 'Massachusetts General Hospital' as a primary address were not included, even if 'Harvard Medical School' was listed as an author's secondary address.  
 
 <!-- returned N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_affils") %>% select(n)))`.  -->
-The initial search of university productivity was conducted using N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id_initial") %>% select(n)))` Scopus affiliation IDs; following review of the results for additional affiliations the search was repeated using the N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id_followup") %>% select(n)))` Scopus Affiliation IDs found in table \@ref(tab:unicodes). This search resulted in N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_pubs") %>% select(n)))` publications, of which `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="article") %>% select(perc)))`% were Articles, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="review") %>% select(perc)))`% were Reviews, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="book chapter") %>% select(perc)))`% were book chapters, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="note") %>% select(perc)))`% were Notes, and `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="data paper") %>% select(perc)))`% were Data Papers. These publications had N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_unique_authors") %>% select(n)))` unique authors; N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_focal") %>% select(n)))` of which had one of the focal universities as their primary affiliation. Each article had an average of N = `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD authors, of which `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="focal") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="focal") %>% select(sd)))` SD were affiliated with the focal universities. The number of articles published from January 2019 through July 2025 whose first-author was affiliated with each focal university can be found in table \@ref(tab:unicodes); the cumulative monthly productivity for each institution through July of 2019-2025 is in fig. \@ref(fig:uni-decline-3).  
+The initial search of university productivity was conducted using N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id_initial") %>% select(n)))` Scopus affiliation IDs; following review of the results for additional affiliations the search was repeated using the N = `r comma(as.numeric(uni_summary_data %>% filter(value=="scopus_id_followup") %>% select(n)))` Scopus Affiliation IDs found in table \@ref(tab:unicodes). This search resulted in N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_pubs") %>% select(n)))` publications, of which `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="article") %>% select(perc)))`% were Articles, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="review") %>% select(perc)))`% were Reviews, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="book chapter") %>% select(perc)))`% were book chapters, `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="note") %>% select(perc)))`% were Notes, and `r comma(as.numeric(papers_by_cat_uni %>% filter(DT=="data paper") %>% select(perc)))`% were Data Papers. These publications had N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_unique_authors") %>% select(n)))` unique authors; N = `r comma(as.numeric(uni_summary_data %>% filter(value=="total_focal") %>% select(n)))` of which had one of the focal universities as their primary affiliation. Each article had an average of N = `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="Total") %>% select(sd)))` SD authors, of which `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="focal") %>% select(mean_per_pub)))` ± `r comma(as.numeric(uni_auth_per_pub_means %>% filter(author_category=="focal") %>% select(sd)))` SD were affiliated with the focal universities. The number of articles published from January 2019 through `r final_month` 2025 whose first-author was affiliated with each focal university can be found in table \@ref(tab:unicodes); the cumulative monthly productivity for each institution through `r final_month` of 2019-2025 is in fig. \@ref(fig:uni-decline-3).  
 
 A .csv file with the Scopus ID codes in table \@ref(tab:unicodes) and their respective affiliations can be downloaded from https://github.com/BrunaLab/fed_pubs.
 
 ### Statistical analyses  
 
-We used bootstrapping [@efronIntroductionBootstrap1994] to determine if the number of articles published from January-July 2025 with a federal first author was significantly different from the number published during this time period in previous years. Because the bootstrap sampling should reflect as closely as possible the structure of the underlying data, and the number of published articles differs by month (fig. \@ref(fig:pubs-monthly-fed)), we first used the 2019-2024 data to count the number of publications produced by each agency in each month of each year. We then simulated each agency's January-July productivity by sampling at random with replacement from each month's publication counts and then summing the January-July total across all agencies. This procedure was repeated N = 1000 times, after which we counted the percentage of bootstrap runs where the simulated number of total January-July papers was lower than the actual number published in 2025. Finally, we conducted a less conservative bootstrap test in which an agency's publication counts for each month of the simulation were selected without replacement from the pooled monthly counts.
+We used bootstrapping [@efronIntroductionBootstrap1994] to determine if the number of articles published from January-`r final_month` 2025 with a federal first author was significantly different from the number published during this time period in previous years. Because the bootstrap sampling should reflect as closely as possible the structure of the underlying data, and the number of published articles differs by month (fig. \@ref(fig:pubs-monthly-fed)), we first used the 2019-2025 data to count the number of publications produced by each agency in each month of each year. We then simulated each agency's January-`r final_month` productivity by sampling at random with replacement from each month's publication counts and then summing the January-`r final_month` total across all agencies. This procedure was repeated N = 1000 times, after which we counted the percentage of bootstrap runs where the simulated number of total January-`r final_month` papers was lower than the actual number published in 2025. Finally, we conducted a less conservative bootstrap test in which an agency's publication counts for each month of the simulation were selected without replacement from the pooled monthly counts.
 
-The number of May-July publications in the 'strict' bootstrap ranged from `r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(min_bs_c_pubs)))`-`r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(max_bs_c_pubs)))` (median = `r comma(as.numeric(bs_stats %>% filter(bs_cat=="strict") %>% select(median_bs_c_pubs)))`). In the less conservative simulations, the number of publications ranged from `r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(min_bs_c_pubs)))`-`r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(max_bs_c_pubs)))` (median = `r comma(as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(median_bs_c_pubs)))`). For both the 'strict' and less-conservative tests,`r comma(100-as.numeric(bs_stats %>% filter(bs_cat=="open") %>% select(perc_below_obs)))`% of the bootstrap runs had simulated 'strict' and less-conservative bootstrap tests, the observed number of 2025 publications was less than (fig. \@ref(fig:bs-fig)). Finally, we used these bootstrapping procedures to compare the number of publications with focal university first authors from January-July 2025 with the number produced during the same time period in the years 2019-2005. The results for universities were similar to those for the federal first author publications (fig. \@ref(fig:bs-fig-uni)).
+The number of January-`r final_month` publications in the 'strict' bootstrap ranged from `r comma(as.numeric(bs_stats_fed %>% filter(bs_cat=="strict") %>% select(min_bs_c_pubs)))`-`r comma(as.numeric(bs_stats_fed %>% filter(bs_cat=="strict") %>% select(max_bs_c_pubs)))` (median = `r comma(as.numeric(bs_stats_fed %>% filter(bs_cat=="strict") %>% select(median_bs_c_pubs)))`). In the less conservative simulations, the number of publications ranged from `r comma(as.numeric(bs_stats_fed %>% filter(bs_cat=="open") %>% select(min_bs_c_pubs)))`-`r comma(as.numeric(bs_stats_fed %>% filter(bs_cat=="open") %>% select(max_bs_c_pubs)))` (median = `r comma(as.numeric(bs_stats_fed %>% filter(bs_cat=="open") %>% select(median_bs_c_pubs)))`). Both the 'strict' and less-conservative tests indicate that the total number of federal first-author publications produced from January-`r final_month` 2025 is significantly lower than in previous years (`r comma(100-as.numeric(bs_stats_fed %>% filter(bs_cat=="open") %>% select(perc_below_obs)))`% of the bootstrap runs are below the observed value for 2025, fig. \@ref(fig:bs-fig)). 
+
+We used identical bootstrapping procedures to determine if the number of January-`r final_month` 2025 publications with first authors from focal universities was significantly different from comparable productivity in previous years. In contrast, to the results for Federal first-authors, 2025 productivity by first-authors at focal universities is not significantly different from that in previous years (percentage of runs in which the number of publications was lower than that observed in 2025: `r bs_stats_uni %>% filter(bs_cat=="strict") %>% select(perc_below_obs)`% ('strict' simulations) and `r bs_stats_uni %>% filter(bs_cat=="open") %>% select(perc_below_obs)`% (less-conservative simulations), fig. \@ref(fig:bs-fig-uni)).
 
 \bigskip
 
@@ -184,7 +194,7 @@ The number of May-July publications in the 'strict' bootstrap ranged from `r com
 
 ### Potential lags in Scopus uploads
 
-It is important to note that our estimates of institutional productivity must account for the temporal lag when article's  are published and their indexing in Scopus; information on the magnitude of this delay helps ensures the window selected for analysis will minimize potential underestimates of productivity. Despite the widespread use of bibliographic databases such as Scopus and the Web of Science [@baasScopusCuratedHighquality2020; @liuMatterTimePublication2024; @thelwallScopus19002020Growth2022] to assess institutional productivity, to our knowledge only one study has quantified the lag between an article's publication online and it being indexed in Scopus. @adeosunScopusIndexingDelays2024 found that once articles had been published online, the median time-to-Scopus-indexing was only 36 days, and that 91% of articles were indexed within 10 weeks. As a result "Scopus indexing delays do not support the arbitrarily prolonged wait for bibliometric data" [@adeosunScopusIndexingDelays2024], and a 10-week window between the date of data collection and the close of the analysis window provides a "reasonable balance between the recency and completeness of published data". We therefore chose July 31, 2025 as the end of analysis window.  This cut-off appears to be conservative - when comparing results of searches conducted in July and September 2025, we found similar resultsab: (<1% difference) when using windows as short as 4 weeks. 
+It is important to note that our estimates of institutional productivity must account for the temporal lag when article's  are published and their indexing in Scopus; information on the magnitude of this delay helps ensures the window selected for analysis will minimize potential underestimates of productivity. Despite the widespread use of bibliographic databases such as Scopus and the Web of Science [@baasScopusCuratedHighquality2020; @liuMatterTimePublication2024; @thelwallScopus19002020Growth2022] to assess institutional productivity, to our knowledge only one study has quantified the lag between an article's publication online and it being indexed in Scopus. @adeosunScopusIndexingDelays2024 found that once articles had been published online, the median time-to-Scopus-indexing was only 36 days, and that 91% of articles were indexed within 10 weeks. As a result "Scopus indexing delays do not support the arbitrarily prolonged wait for bibliometric data" [@adeosunScopusIndexingDelays2024], and a 10-week window between the date of data collection and the close of the analysis window provides a "reasonable balance between the recency and completeness of published data". We therefore chose `r final_month` `r final_day`, 2025 as the end of analysis window.  This cut-off appears to be conservative - when comparing results of searches conducted in July and September 2025, we found similar resultsab: (<1% difference) when using windows as short as 4 weeks. 
 
 
 ## References
@@ -197,14 +207,14 @@ It is important to note that our estimates of institutional productivity must ac
 \newpage
 
 ```{r  label = pubs-monthly-fed, echo = FALSE, fig.cap = "Articles by US federal government agency affiliates indexed monthly in Scopus (2019-2024).", out.width = '50%',out.width = '70%', fig.align='center'}
-knitr::include_graphics(paste('.',fed_dir,"/pubs_per_month.png",sep=""),error=FALSE)
+knitr::include_graphics(here(paste(fed_dir,"/pubs_per_month.png",sep="")),error=FALSE)
 # knitr::include_graphics("../docs/images/pubs_per_month.png", error=FALSE)
 ```
 \newpage
 
 
 ```{r  label = bs-fig, echo = FALSE, fig.cap = "Total publications produced from June-July by federal agencies and departments of the US Federal government in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the these agencies and departments in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '90%', out.height= '90%', fig.align='center'}
-knitr::include_graphics(paste('.',fed_dir,"/bs_composite_fig.png",sep=""),error=FALSE)
+knitr::include_graphics(here(paste(fed_dir,"/bs_composite_fig.png",sep="")),error=FALSE)
 # knitr::include_graphics("../docs/images/bs_composite_fig.png", error=FALSE)
 ```
 
@@ -213,7 +223,7 @@ knitr::include_graphics(paste('.',fed_dir,"/bs_composite_fig.png",sep=""),error=
 
 ```{r  label = bs-fig-uni, echo = FALSE, fig.cap = "Total publications produced from June-July by focal universities in N = 1000 bootstrap simulations. The simulations are based on monthly productivity from January-July in the years 2019-2024. The number of January-July publications produced by the focal universities in 2025 is indicated by the dahsed line. (A) Results from the conservative bootstrap proceedure drawing samples for a given month from the 2019-2024 data for that month. (B) Results from the bootstrap relaxing the requirement that samples be drawn exclusively from the data for a corresponding month.", out.width = '90%', out.height= '90%', fig.align='center'}
 # knitr::include_graphics("../docs/images/bs_composite_fig_uni.png", error=FALSE)
-knitr::include_graphics(paste('.',uni_dir,"/bs_composite_fig_uni.png",sep=""),error=FALSE)
+knitr::include_graphics(here(paste(uni_dir,"/bs_composite_fig_uni.png",sep="")),error=FALSE)
 
 ```
 
@@ -223,7 +233,7 @@ knitr::include_graphics(paste('.',uni_dir,"/bs_composite_fig_uni.png",sep=""),er
 
 ```{r  label = uni-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through July of 2019-2025 whose 1st author was affiliated with one of 12 focal universities. The solid lines are the annual values for 2019-2025; the dashed line is the 2019-2024 average. Note the different scales of the y-axes of each subplot.", out.height = '90%', out.width = '90%',fig.align='center'}
 # knitr::include_graphics("images/pubs_mo_cum_uni_lines.png", error=FALSE)
-knitr::include_graphics(paste('.',uni_dir,"/pubs_mo_cum_uni_lines.png",sep=""),error=FALSE)
+knitr::include_graphics(here(paste(uni_dir,"/pubs_mo_cum_uni_lines.png",sep="")),error=FALSE)
 ```
 
 \elandscape

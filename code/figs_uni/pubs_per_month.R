@@ -2,10 +2,12 @@ pubs_per_month <- function(pubs_mo, PY_max) {
   
   library(gghighlight)
   pubs_mo_fig<-pubs_mo %>% 
-    filter(PY<PY_max) %>%
+    filter(PY<PY_max+1) %>%
     mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
     mutate(label = if_else(PY == "avg", NA, as.character(label))) %>% 
+    mutate(PY=as.factor(PY)) %>%
     ggplot(aes(x=month_name, y=n,group=PY,color=PY)) +
+    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000"))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
     geom_line() + 
@@ -22,7 +24,8 @@ pubs_per_month <- function(pubs_mo, PY_max) {
     scale_x_discrete(labels=c(month))+
     scale_y_continuous(expand = c(0, 0), n.breaks = 20, limits = c(0, max(pubs_mo %>% select(n))+500))+
     # gghighlight(min(n) < 50)
-    gghighlight(PY == 2024)
+    gghighlight(PY == "2024" | PY=="2025",
+                unhighlighted_params = list(colour = NULL)) 
     # geom_label(aes(label = label, nudge_x = 0.25, size = 3))
   # +
   #   

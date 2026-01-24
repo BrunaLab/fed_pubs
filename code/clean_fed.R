@@ -1,4 +1,4 @@
-clean_fed <- function(cat, date) {
+clean_fed <- function(date) {
   
   # into --------------------------------------------------------------------
   # 
@@ -13,6 +13,9 @@ clean_fed <- function(cat, date) {
   library(fs)
   library(data.table)
   
+  # this is to clean fed files
+  
+  cat<-"fed"
   
   # create folders for output -----------------------------------------------
   
@@ -79,6 +82,10 @@ clean_fed <- function(cat, date) {
     scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") 
   }
   
+  
+  if (date=="20251210"){
+    scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") 
+  }
   
   scopus_ids_searched<-scopus_ids_searched %>% mutate(city=NA)
   # 

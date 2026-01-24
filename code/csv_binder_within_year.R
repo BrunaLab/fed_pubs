@@ -21,7 +21,7 @@ library(here)
 
 
 # cat<-"fed"
-# date<-"20250901"
+# date<-"20251210"
 
 # cat<-"fed"
 # date<-"20251010"
@@ -33,7 +33,7 @@ library(here)
 # date<-"20251010"
 
 
-data<-paste("scopus_downloads/",cat,"_",date,sep="")
+data<-paste0("scopus_downloads/",cat,"_",date)
 
 if (cat =="fed"){
   folder<-c(
@@ -53,7 +53,22 @@ if (cat =="fed"){
     "2022", # 4
     "2023", # 5
     "2024", # 6
-    "2025") # 7
+    "2025",
+    "2019_uni_20251010", # 1
+    "2020_uni_20251010", # 2
+    "2021_uni_20251010", # 3
+    "2022_uni_20251010", # 4
+    "2023_uni_20251010", # 5
+    "2024_uni_20251010", # 6
+    "2025_uni_20251010", # 7
+    "2019_uni_20250901", # 1
+    "2020_uni_20250901", # 2
+    "2021_uni_20250901", # 3
+    "2022_uni_20250901", # 4
+    "2023_uni_20250901", # 5
+    "2024_uni_20250901", # 6
+    "2025_uni_20250901"  # 7
+    ) 
 }
 
 
@@ -290,6 +305,9 @@ validate_csv_structure <- function(...) {
       mutate(file=str_remove(file,"_affils_ ")) %>% 
       mutate(folder="affils")
     
+    af_dup<-affils_list %>% group_by(file) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
+    au_dup<-authors_list %>% group_by(file) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
+    pa_dup<-papers_list %>% group_by(file) %>% tally() %>% arrange(desc(n)) %>% filter(n>1)
     file_checker<-full_join(papers_list,authors_list,by="file") %>% 
       full_join(affils_list,by="file") %>% 
       filter(is.na(folder)|is.na(folder.x)|is.na(folder.y)) %>% 
@@ -298,9 +316,12 @@ validate_csv_structure <- function(...) {
              affils=folder)
     
     print(file_checker)
+    print(af_dup)
+    print(au_dup)
+    print(pa_dup)
     
     stop("ERROR: Either the file path is incorrect OR folders contain non-CSV or 
-         mismatched files. Here is the file mismatch.")
+         mismatched files OR there are duplicates. Here is the file mismatch.")
   }
   
   message("All files are csvs. If comparing multiple folders, all have the 

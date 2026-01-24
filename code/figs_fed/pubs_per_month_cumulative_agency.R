@@ -210,9 +210,9 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     # scale_x_continuous( breaks=seq(1,12,by=1))+
     # scale_y_continuous(expand = c(0, 0), breaks=seq(0,(max(pubs_mo_cumulative %>% select(cumul_pubs))+5000),by=2500))+
     theme(axis.text.y = element_text(size = 10))+
-    theme(axis.text.x =element_text(size = 10))+
+    theme(axis.text.x =element_text(size = 10,angle = 45, vjust = 1, hjust= 1))+
     theme(axis.title.y = element_text(size = 12,face = "bold"))+
-    theme(axis.title.x =element_text(size = 12,face = "bold"))+
+    theme(axis.title.x =element_text(size = 12,face = "bold"))+ 
     theme(strip.text.x = element_text(face = "bold",hjust = 0,size=10))+ #hjust makes it flush left in strip instead of default center
     theme(strip.background.x = element_rect(fill = "white", color = "white", linetype = "solid", linewidth = 0))+
     theme(

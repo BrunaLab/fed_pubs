@@ -1,4 +1,4 @@
-bootstrap_npubs_fed <- function(cat, date,PM_max,author_position) {
+bootstrap_npubs_fed <- function(date,PM_max,author_position) {
 library(tidyverse)
 library(janitor)
 library(gghighlight)
@@ -10,16 +10,9 @@ library(progress)
 library(fs)
 library(data.table)
 
-# PM_max<-8
-
-
 
  
-# cat<-"fed"
-# date<-"20250901"
-
-# cat<-"fed"
-# date<-"20251010"
+cat<-"fed"
 
 
 # create folders for output -----------------------------------------------
@@ -219,9 +212,11 @@ gc() # free up memory
 
 # The bootstrap is of the mean for 2019-2024 to see if
 # the 2025 value falls outside CIs
+# 
+# data_for_boot<-mo_data %>% 
+#   filter(PY!=2025)
 
-data_for_boot<-mo_data %>% 
-  filter(PY!=2025)
+data_for_boot<-mo_data 
 
 
 
@@ -298,7 +293,7 @@ c_pubs_25<-mo_data %>%
 
 # average cumulative publications by month 2019-2024
 avg_cum_obs<-mo_data %>% 
-  filter(PY!=2025) %>% 
+  # filter(PY!=2025) %>% 
   group_by(PY,PM) %>% 
   summarize(month_total=sum(n)) %>% 
   group_by(PM) %>% 
@@ -430,8 +425,8 @@ data_for_boot_2<-mo_data %>%
 
 
 
-set.seed(20250111)
-runs <- 1000
+# set.seed(20250111)
+# runs <- 1000
 
 yr<-1 # can set this up so that each run does X years) 
 run_no<-seq(1:runs)
@@ -645,3 +640,171 @@ ggsave(paste(save_dir,"/","bs_composite_fig.png",sep=""),
 
 
 }
+
+
+# 
+# 
+# 
+# 
+# 
+# 
+# mo_data<-first_authors %>% 
+#   group_by(PY,PM,agency_primary) %>% 
+#   # group_by(PY,PM) %>% 
+#   tally() %>% 
+#   arrange(PM,agency_primary) %>% 
+#   filter(PM<PM_max+1)
+# 
+# 
+# # https://mac-theobio.github.io/QMEE/lectures/permutation_examples.notes.html
+# 
+# 
+# 
+# 
+# perm_data<-mo_data %>% 
+#   filter(PY > 2023)
+# 
+# set.seed(101)
+# nsim <- 500
+# 
+# # Initialize results dataframe
+# res <- data.frame(
+#   simulation = 1:nsim,
+#   n_24 = numeric(nsim),
+#   n_25 = numeric(nsim),
+#   diff = numeric(nsim)
+# )
+# 
+# # Run permutation simulations
+# for (i in 1:nsim) {
+#   # Scramble the n values
+#   scrambled_data <- perm_data %>%
+#     ungroup() %>% 
+#     select(n,PM) %>% 
+#     group_by(PM) %>% 
+#     slice_sample(n=2)
+#   scrambled_data$PY=rep(c("2024","2025"),12)
+#     
+#   
+#   # Calculate sum by year
+#   year_totals <- scrambled_data %>%
+#     group_by(PY) %>%
+#     summarise(total = sum(n), .groups = "drop")
+#   
+#   # Add the values for each year  and add to df
+#   res$n_24[i] <- year_totals$total[year_totals$PY == "2024"] 
+#   
+#   res$n_25[i] <- year_totals$total[year_totals$PY == "2025"] 
+#   
+#   
+#   # Calculate difference between years and add to df
+#   
+#   res$diff[i] <- year_totals$total[year_totals$PY == "2025"]-
+#     year_totals$total[year_totals$PY == "2024"]
+# }
+# 
+# res<-res %>% 
+#   mutate(simulation=as.character(simulation))
+# # Observed difference
+# obs <- perm_data %>%
+#   group_by(PY) %>%
+#   summarise(total = sum(n), .groups = "drop") %>%
+#   pivot_wider(names_from = PY, values_from = total) %>%
+#   rename(n_25=`2025`,
+#          n_24=`2024`) %>% 
+#   mutate(simulation="observed") %>% 
+#   mutate(diff = n_25-n_24) 
+#   
+# 
+# # res <- bind_rows(res,obs)
+# ggplot(res, aes(x = diff)) +
+#   geom_histogram(fill = "gray", color = "black") +
+#   geom_vline(xintercept = obs$diff, color = "red", linewidth = 1) +
+#   theme_classic() +
+#   labs(title = "", x = "Difference (2025-2024)", y = "Frequency")
+# 
+# 
+# 
+# nrow(res %>% filter(diff<obs$diff))/nrow(res)
+# 
+# 
+# 
+# 
+# #######
+# perm_data <- mo_data %>%
+#   filter(PY > 2023)
+# 
+# 
+# 
+# complete_data <- perm_data %>% 
+#   as_tibble() %>% 
+#   complete(PM,PY, agency_primary) %>% 
+#   replace_na(list(n=0))
+# 
+# 
+# set.seed(101)
+# nsim <- 500
+# 
+# # Initialize results dataframe
+# res2 <- data.frame(
+#   simulation = 1:nsim,
+#   n_24 = numeric(nsim),
+#   n_25 = numeric(nsim),
+#   diff = numeric(nsim)
+# )
+# 
+# # Run permutation simulations
+# for (i in 1:nsim) {
+#   # Scramble the n values
+#   
+#   
+#   scrambled_data <- complete_data %>%
+#     ungroup() %>% 
+#     select(n,PM) %>% 
+#     group_by(PM) %>% 
+#     slice_sample(n=2)
+#   scrambled_data$PY=rep(c("2024","2025"),12)
+#   
+#   
+#   
+#   
+#   # Calculate sum by year
+#   year_totals <- scrambled_data %>%
+#     group_by(PY) %>%
+#     summarise(total = sum(n), .groups = "drop")
+#   
+#   # Add the values for each year  and add to df
+#   res2$n_24[i] <- year_totals$total[year_totals$PY == "2024"] 
+#   
+#   res2$n_25[i] <- year_totals$total[year_totals$PY == "2025"] 
+#   
+#   
+#   # Calculate difference between years and add to df
+#   
+#   res2$diff[i] <- year_totals$total[year_totals$PY == "2025"]-
+#     year_totals$total[year_totals$PY == "2024"]
+# }
+# 
+# res2<-res2 %>% 
+#   mutate(simulation=as.character(simulation))
+# # Observed difference
+# obs <- perm_data %>%
+#   group_by(PY) %>%
+#   summarise(total = sum(n), .groups = "drop") %>%
+#   pivot_wider(names_from = PY, values_from = total) %>%
+#   rename(n_25=`2025`,
+#          n_24=`2024`) %>% 
+#   mutate(simulation="observed") %>% 
+#   mutate(diff = n_25-n_24) 
+# 
+# 
+# # res <- bind_rows(res,obs)
+# ggplot(res2, aes(x = diff)) +
+#   geom_histogram(fill = "gray", color = "black") +
+#   geom_vline(xintercept = obs$diff, color = "red", linewidth = 1) +
+#   theme_classic() +
+#   labs(title = "", x = "Difference (2025-2024)", y = "Frequency")
+# 
+# 
+# 
+# nrow(res %>% filter(diff<obs$diff))/nrow(res)

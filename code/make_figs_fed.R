@@ -1,4 +1,4 @@
-make_figs_fed <- function(cat, date,PM_max, author_position) {
+make_figs_fed <- function(date,PM_max, PY_max, author_position) {
 
 # load libraries ----------------------------------------------------------
 
@@ -13,7 +13,7 @@ library(data.table)
 library(forcats)
 
   
-  PY_max<-2025
+  cat<-"fed"
 # 
 # 
 # 
@@ -770,16 +770,23 @@ save_dir<-paste(main_dir2,sub_dir2,sep="/")
     
     
   }else if(author_position=="first"){ 
-    
+    # FED FIRST AUTHORS 
     papers_dataset<-read_csv("./data_clean/for_pub/papers_df_fed_first.csv") 
-    papers_dataset<-as.data.frame(papers_dataset)
+    papers_dataset<-as.data.frame(papers_dataset) %>% 
+      filter(PY<=PY_max) 
+    authors_dataset<-read_csv("./data_clean/for_pub/authors_df_fed_first.csv") 
+    authors_dataset<-as.data.frame(authors_dataset) %>% 
+      filter(PY<=PY_max) 
     
-    authors_dataset<-read_csv("./data_clean/for_pub/authors_df_fed_fed_first.csv") 
-    authors_dataset<-as.data.frame(authors_dataset)
-    # 
+    # ALL AUTHORS FEDS
     papers_with_only_feds<-read_csv("./data_clean/for_pub/papers_df_only_fed_authors.csv")
-    papers_with_only_feds<-as.data.frame(papers_with_only_feds)
+    papers_with_only_feds<-as.data.frame(papers_with_only_feds) %>% 
+      filter(PY<=PY_max) 
     
+    # ANY AUTHOR FED
+    papers_df_fed_anywhere<-read_csv("./data_clean/for_pub/papers_df_fed_anywhere.csv") 
+    papers_df_fed_anywhere<-as.data.frame(papers_df_fed_anywhere) %>% 
+      filter(PY<=PY_max) 
     
     
     authors_df_fed_anywhere<-read_csv("./data_clean/for_pub/authors_df_fed_anywhere.csv") 
@@ -872,7 +879,7 @@ pubs_mo<-papers_dataset %>%
 source("code/figs_fed/pubs_per_month.R")
 # message("error check 5")
 
-pubs_mo_fig<-pubs_per_month(pubs_mo,2024)
+pubs_mo_fig<-pubs_per_month(pubs_mo,2025)
 pubs_mo_fig
 # SAVE IMAGE
 # message("error check 6")
@@ -981,16 +988,34 @@ source("code/figs_fed/pubs_per_month_cumulative_multipanel.R")
 # message("error check 8")
 pubs_mo_fig_cumulative<-pubs_per_month_cumulative_multipanel(papers_dataset,
                                                              papers_with_only_feds,
+                                                             papers_df_fed_anywhere,
                                                              PM_max,
                                                              PY_max)
 # perc_chg_panel1<-pubs_mo_fig_cumulative[[2]]
 # perc_chg_panel2<-pubs_mo_fig_cumulative[[4]]
-fig<-pubs_mo_fig_cumulative[[5]]
+fig<-pubs_mo_fig_cumulative[[7]]
 # message("error check 9")
 fig
 ggsave(paste(save_dir,"/","pubs_mo_cum_fig_multipanel.png",sep=""),
           width = 6, height = 8, units = "in",
           device='png', dpi=700)  
+
+perc_change_cumul_only_feds<-as.data.frame(pubs_mo_fig_cumulative[4])
+perc_change_cumul_first_fed<-as.data.frame(pubs_mo_fig_cumulative[2])
+perc_change_cumul_any_fed<-as.data.frame(pubs_mo_fig_cumulative[6])
+write_csv(perc_change_cumul_only_feds,paste(save_dir,"/","perc_change_cumul_only_feds.csv",sep="")) 
+
+write_csv(perc_change_cumul_first_fed,paste(save_dir,"/","perc_change_cumul_first_fed.csv",sep="")) 
+
+write_csv(perc_change_cumul_any_fed,paste(save_dir,"/","perc_change_cumul_any_fed.csv",sep="")) 
+
+
+#TODO: convert the three csvs saved above to just one below, chanmge in Rmd
+perc_change_cumul_only_feds<-perc_change_cumul_only_feds %>% mutate(cat="only_feds")
+perc_change_cumul_first_fed<-perc_change_cumul_first_fed %>% mutate(cat="first_fed")
+perc_change_cumul_any_fed<-perc_change_cumul_any_fed %>% mutate(cat="any_fed")
+
+agency_n_decline_sum<-bind_rows(perc_change_cumul_only_feds,perc_change_cumul_first_fed,perc_change_cumul_any_fed)
 
 # message("error check 10")
 # message("pubs_mo_cum_fig_multipanel.png saved")
@@ -1041,7 +1066,7 @@ ggsave(paste(save_dir,"/","pubs_mo_cum_fig_multipanel.png",sep=""),
 
 # source("code/figs_fed/total_pubs_to_month_x.R")
 # number is max month you want to visualize (i.e., 6 = june, 7 = july)
-# pubs_per_quarter(pubs_mo,8)
+# pubs_per_quarter(pubs_mo,12)
 # total_pubs_to_month_x_fig<-total_pubs_to_month_x(pubs_mo, PM_max)
 # ggsave("./docs/images/total_pubs_to_month_x.png", 
 #        width = 6, height = 4, units = "in", 
@@ -1098,20 +1123,24 @@ agency_n_decline_first <-
 agency_n_decline<-agency_n_decline_first %>% 
   mutate(PY=as.numeric(PY))
 
-
-agency_n_decline_sum<- agency_n_decline %>%
-  # filter(author_position=="any") %>%
-  select(agency_primary,PY,n) %>%
-  arrange(PY) %>% 
-  group_by(PY) %>%
-  summarize(n=sum(n)) %>%
-  mutate(n_diff=n-lag(n)) %>%
-  mutate(perc_previous_yr=n_diff/lag(n)*100)
-
-# bar chart of decline for top agencies -----------------------------------
-# source("code/figs_fed/agency_n_decline_bar.R")
-# agency_n_decline_bar_fig <- agency_n_decline_bar(agency_n_decline_sum, PY_max) 
 # 
+# agency_n_decline_sum<- agency_n_decline %>%
+#   # filter(author_position=="any") %>%
+#   select(agency_primary,PY,n) %>%
+#   arrange(PY) %>% 
+#   group_by(PY) %>%
+#   summarize(n=sum(n)) %>%
+#   mutate(n_diff=n-lag(n)) %>%
+#   mutate(perc_previous_yr=n_diff/lag(n)*100)
+
+# bar chart of % decline  -----------------------------------
+source("code/figs_fed/agency_n_decline_bar.R")
+agency_n_decline_bar_fig <- agency_n_decline_bar(agency_n_decline_sum, PY_max) 
+
+ggsave(paste(save_dir,"/","perc_change_bar_multipanel.png",sep=""),
+       width = 6, height = 8, units = "in",
+       device='png', dpi=700)  
+
 # ggsave("./docs/images/agency_n_decline_sum.png", 
 #        width = 7, height = 10, units = "in", 
 #        device='png', dpi=700)
@@ -1146,6 +1175,50 @@ ggsave(paste(save_dir,"/","pubs_mo_cum_agency_lines.png",sep=""),
 #   distinct(affil_id,.keep_all=TRUE) %>% 
 #   filter(country=="usa"|is.na(country))
 
+
+
+
+
+
+
+
+# bar chart percent by agency ---------------------------------------------
+threshold<-4000
+
+threshhold_ct<-authors_dataset %>% 
+  mutate(agency=if_else(agency=="us department of the interior", "interior",agency)) %>% 
+  mutate(agency=if_else(agency=="federal reserve system", "frs",agency)) %>% 
+  mutate(agency=if_else(agency=="us department of defense", "dod",agency)) %>% 
+  select(refID,agency_primary) %>% 
+  distinct() %>% 
+  drop_na() %>% 
+  group_by(agency_primary) %>% 
+  summarize(n=n_distinct(refID)) %>% 
+  arrange(desc(n)) %>% 
+  filter(n>=4000) %>% 
+  select(agency_primary)
+
+
+# 
+# pubs_by_agency_yr<-authors_dataset %>% 
+#   mutate(agency=if_else(agency=="us department of the interior", "interior",agency)) %>% 
+#   mutate(agency=if_else(agency=="federal reserve system", "frs",agency)) %>% 
+#   mutate(agency=if_else(agency=="us department of defense", "dod",agency)) %>% 
+#   select(refID,PY,agency_primary) %>% 
+#   distinct() %>% 
+#   drop_na() %>% 
+#   group_by(agency_primary,PY) %>% 
+#   summarize(n=n_distinct(refID)) %>% 
+#   arrange(PY,agency_primary)
+
+
+
+source("code/figs_fed/agency_n_decline_bar_facets.R")
+agency_perc_decline_bar_fig2 <- agency_n_decline_bar_facets(agency_n_decline_first, threshhold_ct, PY_max) 
+
+ggsave(paste(save_dir,"/","perc_change_bar_multipanel_2.png",sep=""),
+       width = 6, height = 8, units = "in",
+       device='png', dpi=700)  
 
 
 # table for ms ------------------------------------------------------------

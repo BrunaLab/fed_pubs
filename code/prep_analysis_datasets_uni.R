@@ -1,12 +1,14 @@
-prep_analysis_datasets_uni <- function(cat, date,PM_max) {
+prep_analysis_datasets_uni <- function(date,PM_max,PY_max) {
 
   library(tidyverse)
 library(janitor)
 library(data.table)
 
-  PY_max<-2025
+  
+  cat<-"uni"
+  
 
-
+  
   
   if(date=="20250901"){
     scopus_ids_searched<-read_csv("./data_clean/api_uni_affils_searched_2025-09-01.csv")
@@ -17,13 +19,13 @@ library(data.table)
     scopus_ids_searched<-read_csv("./data_clean/api_uni_affils_searched_2025-10-18.csv")
   }
   
+  
+  
+  if(date=="20251210"){
+    scopus_ids_searched<-read_csv("./data_clean/api_uni_affils_searched_2025-10-18.csv")
+  }
 
 # 
-# cat<-"uni"
-# date<-"20250901"
-
-# cat<-"uni"
-# date<-"20251010"
 
 
 # create folders for output -----------------------------------------------

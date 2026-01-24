@@ -2,31 +2,26 @@ uni,affil_id,affiliation
 harvard university,129850405,advarra; multi-regional clinical trials center of brigham & women’s hospital and harvard
 harvard university,60017087,baim institute for clinical research
 harvard university,128589001,bloomberg harvard city leadership initiative
-harvard university,60097058,blue hill observatory
-harvard university,128326215,boston-harvard burn injury model system and spalding rehabilitation center
 harvard university,127777113,botswana harvard aids institute
 harvard university,60107841,botswana harvard aids institute partnership
 harvard university,124438944,botswana harvard health partnership
 harvard university,131291223,botswana harvard health partnership
 harvard university,132172111,botswana harvard health partnership
 harvard university,122105920,botswana-harvard aids institute partnership
+harvard university,132021519,botswana-harvard health partnership
 harvard university,100476136,botswana-harvard laboratory
-harvard university,108006165,brigham women's hosp. harvard m.
-harvard university,60001001,broad institute
-harvard university,131778861,broadinstituteofmitandharvard cambridge ma usa
-harvard university,128505247,bwh/mgh harvard combined endocrine
+harvard university,125234143,center for astrophysics–harvard and smithsonian
 harvard university,60005478,center for biostatistics in aids research
 harvard university,60002564,center for climate health and the global environment
 harvard university,60023563,center for international development at harvard university
-harvard university,60100090,center for medical simulation cambridge
 harvard university,131393531,ceuharvard university
 harvard university,60010869,channing division of network medicine
+harvard university,129821852,co-director of the harvard macy program for educators in the health professions
 harvard university,100613296,crico/risk management foundation of the harvard medical institutions
-harvard university,60007838,dana-farber/harvard cancer center
 harvard university,60079465,davis center for russian and eurasian studies
 harvard university,60020482,department of biomedical informatics
 harvard university,113113218,ecole de médecine harvard
-harvard university,127941013,from mass general brigham harvard plastic surgery
+harvard university,130489181,escuela de salud pública t. h. chan de harvard
 harvard university,126236339,fxb harvard school of public health
 harvard university,100829052,harvard
 harvard university,105195629,harvard
@@ -55,6 +50,7 @@ harvard university,60022098,harvard center for population and development studie
 harvard university,107913788,harvard center for population and developmental medicine
 harvard university,60027409,harvard center for risk analysis
 harvard university,126585984,harvard center of european studies
+harvard university,125387983,harvard ceramics studio
 harvard university,113759833,harvard chemical laboratory
 harvard university,122434725,harvard china project on economy
 harvard university,105284061,harvard club
@@ -77,10 +73,8 @@ harvard university,60145297,harvard department of stem cell and regenerative bio
 harvard university,130391158,harvard digital data and design institute
 harvard university,60003705,harvard divinity school
 harvard university,60010402,harvard division of continuing education
+harvard university,133445171,harvard division of continuing education
 harvard university,128395671,harvard emergency ultrasound fellowship program
-harvard university,101768949,harvard eye associates
-harvard university,131497585,harvard eye associates
-harvard university,131525999,harvard eye associates
 harvard university,60006303,harvard faculty of arts and sciences
 harvard university,60007624,harvard forest
 harvard university,100661265,harvard françois xavier bagnoud center for health and human rights
@@ -123,8 +117,10 @@ harvard university,126775336,harvard kenneth c. griffin graduate school of arts 
 harvard university,60017150,harvard law school
 harvard university,127908290,harvard law school project on disability
 harvard university,131149506,harvard law school project on disability
+harvard university,112872878,harvard longwood psychiatry residency program
 harvard university,100435655,harvard longwood psychiatry residency training program
 harvard university,100490756,harvard macy institute
+harvard university,126987131,harvard macy institute
 harvard university,106688676,harvard mass general brigham plastic surgery residency program
 harvard university,108890390,harvard medical a.a. martinos center for biomedical imaging
 harvard university,111115866,harvard medical center
@@ -136,6 +132,8 @@ harvard university,60008361,harvard medical school center for hereditary deafnes
 harvard university,129043175,harvard medical schoolal
 harvard university,125682984,harvard medical schoolc
 harvard university,106668362,harvard medical toxicology fellowship
+harvard university,132791828,harvard negotiation and mediation clinical program
+harvard university,100662094,harvard negotiation project
 harvard university,113914173,harvard neonatal-perinatal medicine fellowship program
 harvard university,60012535,harvard neurodiscovery center
 harvard university,130106498,harvard new research building
@@ -146,7 +144,6 @@ harvard university,127436313,harvard orthopaedic trauma service
 harvard university,123933597,harvard orthopedic trauma service
 harvard university,128286348,harvard pediatric health services research fellowship
 harvard university,100598920,harvard pediatric health services research fellowship program
-harvard university,121401745,harvard pilgrim healthcare
 harvard university,132187896,harvard program in ethics and health
 harvard university,113489174,harvard program in speech and hearing bioscience and technology
 harvard university,125890090,harvard program in virology
@@ -160,12 +157,10 @@ harvard university,123934231,harvard retinal imaging lab
 harvard university,60005856,harvard school of dental medicine
 harvard university,131079114,harvard school of dental medicine
 harvard university,60287955,harvard seas‐cupb joint laboratory on petroleum science
-harvard university,100588742,harvard shoulder service
 harvard university,101205724,harvard south shore psychiatry program
+harvard university,114721831,harvard south shore psychiatry residency program
 harvard university,115126631,harvard south shore psychiatry residency training program
 harvard university,60027452,harvard stem cell institute
-harvard university,132494657,harvard street neighborhood health center
-harvard university,127944790,harvard street neighborhood health center inc
 harvard university,126837316,harvard t. h. chang school of public medicine
 harvard university,60032499,harvard t.h. chan school of public health
 harvard university,127928350,harvard t.h. chan school of public health
@@ -178,14 +173,14 @@ harvard university,106929009,harvard ukrainian research institute
 harvard university,60009982,harvard university
 harvard university,60028031,harvard university herbaria & libraries
 harvard university,60077569,harvard university jefferson physical laboratory
-harvard university,129188623,harvard vanguard medical
-harvard university,107921429,harvard vanguard medical association
 harvard university,121290621,harvard visual computing group
 harvard university,132102016,harvard's belfer center's arctic initiative
 harvard university,126606799,harvard's graduate school of education
+harvard university,129467281,harvard's institute for world literature
+harvard university,101151238,harvard's school of public health
 harvard university,60097350,harvard-mit health sciences and technology
 harvard university,60020680,harvard-smithsonian center for astrophysics
-harvard university,100686306,harvard-westlake school
+harvard university,100450818,harvard-westlake school
 harvard university,112741771,harvard-wide pediatric health services research fellowship
 harvard university,132797667,harvard/bidmc disaster medicine fellowship
 harvard university,123795628,harvard/mgh center on genomics
@@ -194,24 +189,21 @@ harvard university,130803724,harvard–mit program in health sciences and techno
 harvard university,131145304,harvard’s center for african studies
 harvard university,132138820,harvard’s fairbank center for east asian research
 harvard university,101784824,harvard’s graduate school of education
-harvard university,129467281,harvard’s institute for world literature
 harvard university,130337687,harvard’s sakharov seminars on human rights
+harvard university,131079851,hutchins center for african & amp; african american research at harvard
+harvard university,133267414,institute for biologically inspired engineering at harvard
 harvard university,60002294,institute for theoretical atomic molecular and optical physics
 harvard university,129847528,intl. secty. prog. belfer ctr. for sci. and intl. aff. harvard kennedy sch. and the secty. studs. prog. mit
 harvard university,60006332,john f. kennedy school of government
 harvard university,127653268,john harvard distinguished science and itc fellow
 harvard university,128005358,ludwig cancer center at harvard
 harvard university,60013733,lyman laboratory of physics
-harvard university,60272417,massachusetts green high performance computing center
 harvard university,128505285,max planck harvard research center for the archaeoscience of the ancient mediterranean (mhaam)
 harvard university,60122560,max planck-harvard research center for the archaeoscience of the ancient mediterranean
 harvard university,123935025,max planck-harvard research center for the archaeoscience of the ancient mediterranean
 harvard university,120298855,max planck-harvard research center for thearchaeoscience of the ancient mediterranean
 harvard university,118605795,metalab (at) harvard
-harvard university,108061986,mit and harvard
-harvard university,109850837,mit and harvard
-harvard university,113949049,multi-regional clinical trials center of brigham and women’s hospital and harvard
-harvard university,125436009,multi-regional clinical trials center of brigham and women’s hospitaland harvard
+harvard university,60027589,mineralogical and geological museum at harvard university
 harvard university,126718615,nutrition obesity research center at harvard (norch)
 harvard university,109677816,oral health policy and epidemiology at the harvard
 harvard university,126424529,psychodynamic training in the harvard south shore residency program
@@ -224,9 +216,11 @@ harvard university,60028849,society of fellows harvard university
 harvard university,119156616,spaulding-harvard traumatic brain injury model system
 harvard university,121379707,spaulding-harvard traumatic brain injury model system
 harvard university,130133883,spaulding/harvard physical medicine and rehabilitation residency training program
+harvard university,129116049,the harvard crimson
 harvard university,127149182,the harvard cryo-em center for structural biology
 harvard university,131437625,the human flourishing program at harvard’s institute for quantitative social science
 harvard university,60008789,the rowland institute at harvard
+harvard university,131546871,veterans affairs boston/harvard south shore
 harvard university,60100185,weatherhead center for international affairs
 harvard university,127599177,wyss institute at harvard
 stanford university,122434362,10stanford cancer institute
@@ -237,27 +231,22 @@ stanford university,132318263,cbastanford medicine children’s health
 stanford university,60075286,center for advanced study in the behavioral sciences
 stanford university,60078422,center for turbulence research
 stanford university,60104839,computer systems laboratory stanford
-stanford university,124936723,defence medical rehabilitation centre stanford hall
 stanford university,60003743,department of aeronautics and astronautics
 stanford university,60141509,department of bioengineering
 stanford university,60141511,department of civil & environmental engineering
 stanford university,60141505,department of energy science and engineering
 stanford university,127268517,division of oncologydepartment of medicinestanford universitystanfordcalifornia
 stanford university,60028364,falk cardiovascular research center
-stanford university,131765196,family support services at ronald mcdonald house at stanford
 stanford university,60091253,geballe laboratory for advanced materials
 stanford university,60074650,ginzton laboratory
 stanford university,113172012,glenn laboratories for the biology of aging at stanford
-stanford university,60026163,hoover institution
 stanford university,129485877,interventional radiology innovation at stanford (iris)
 stanford university,124218990,jane lathrop stanford middle school
 stanford university,127786539,joint replacement center at stanford
 stanford university,60091251,kavli institute for particle astrophysics and cosmology
-stanford university,60032063,lucile packard children's hospital stanford
-stanford university,125822358,palo alto vahcs/stanford som
+stanford university,105195911,leinweber institute for theoretical physics at stanford
 stanford university,112085313,pgsp-stanford psy.d. consortium
 stanford university,124080998,pgsp-stanford psy.d. consortium
-stanford university,60121420,policy analysis for california education
 stanford university,60141708,precourt institute for energy
 stanford university,60091249,richard m. lucas center for imaging
 stanford university,126957307,section chief of the va palo alto-stanford palliative care program
@@ -324,6 +313,7 @@ stanford university,121338716,stanford division of primary care and population h
 stanford university,125216640,stanford division of primary care and population health
 stanford university,60141503,stanford doerr school of sustainability
 stanford university,113446493,stanford ear institute
+stanford university,131918056,stanford emmett interdisciplinary program for environment and resources
 stanford university,60141508,stanford engineering
 stanford university,123707305,stanford exploration project
 stanford university,131482752,stanford female athlete science and translational research (fastr) program
@@ -332,7 +322,6 @@ stanford university,123752242,stanford functional genomics facility
 stanford university,127165578,stanford global center for gender equality
 stanford university,60020928,stanford graduate school of business
 stanford university,60025911,stanford graduate school of education
-stanford university,126229901,stanford hall
 stanford university,129814773,stanford health care
 stanford university,132183971,stanford health care
 stanford university,127084361,stanford health center
@@ -342,8 +331,10 @@ stanford university,60015615,stanford healthcare
 stanford university,129612714,stanford healthcaretri-valley
 stanford university,130007380,stanford heart and vascular clinic- vascular laboratory
 stanford university,130047536,stanford hospital medicine
+stanford university,126760680,stanford hospitals and clinics
 stanford university,123894114,stanford human intracranial cognitive electrophysiology program (shicep)
 stanford university,124439443,stanford immigration policy lab
+stanford university,131645998,stanford immune behavioral health clinic and research program
 stanford university,125763200,stanford innovative medicines accelerator
 stanford university,132356037,stanford institute for computational and mathematical engineering
 stanford university,124812265,stanford institute for human-centered ai
@@ -358,6 +349,7 @@ stanford university,125286346,stanford lifestyle medicine
 stanford university,130210417,stanford maternal and child health research institute
 stanford university,60274003,stanford medicine
 stanford university,129241498,stanford medicine
+stanford university,129943370,stanford medicine children's health
 stanford university,133191662,stanford metabolic psychiatry clinic
 stanford university,131399807,stanford mstp
 stanford university,126243835,stanford nano shared facilities
@@ -395,7 +387,6 @@ stanford university,123801244,stanford-surgery policy improvement research and e
 stanford university,124865684,stanford-surgery policy improvement research and education center (s-spire)
 stanford university,131866089,stanford/kaiser emergency medicine program
 stanford university,123828670,stanford/kaiser emergency medicine residency program
-stanford university,124376601,stanford/va alzheimer’s center
 stanford university,132599457,stanford’s center for innovation in global health
 stanford university,132599474,stanford’s center for innovation in global health and human & planetary health initiative
 stanford university,109996174,stanford’s center on democracy
@@ -403,9 +394,6 @@ stanford university,131905406,stanford’s psychology department
 stanford university,60287975,suncat center for interface science and catalysis
 stanford university,129775828,the stanford child and adult hip preservation center
 stanford university,60141711,tomkat center for sustainable energy
-stanford university,126050963,ucsf-stanford pediatric device consortium
-stanford university,132854924,ucsf–stanford pediatric device consortium
-stanford university,115019335,uscf-stanford center of excellence in regulatory science and innovation (cersi)
 stanford university,129794565,virx stanford
 the ohio state university,60119229,animal welfare science centre
 the ohio state university,60013997,byrd polar and climate research center
@@ -431,7 +419,6 @@ the ohio state university,133194504,ohio state university’s college of social 
 the ohio state university,60149893,spine research institute
 the ohio state university,130095838,the ohio state college of public health division of epidemiology
 the ohio state university,60003500,the ohio state university
-the ohio state university,60138929,the ohio state university at marion
 the ohio state university,60032497,the ohio state university college of medicine
 the ohio state university,60002058,the ohio state university comprehensive cancer center
 the ohio state university,60015140,the ohio state university wexner medical center
@@ -449,10 +436,8 @@ unc chapel hill,128502043,duke/unc alzheimer's disease research center
 unc chapel hill,132653442,elizabeth city state campus of the university of north carolina (unc)
 unc chapel hill,106118929,institute for the environmentunc at chapel hillnc
 unc chapel hill,124914743,lineberger comprehensive cancer centeruniversity of north carolina
-unc chapel hill,130330420,mdunc family medicine (adjunct faculty)
-unc chapel hill,131752484,pardee/ unc healthcare
-unc chapel hill,124032297,pastoral care services rex healthcare university of north carolina
 unc chapel hill,123264492,rockingham/unc cancer center
+unc chapel hill,133421606,rti–university of north carolina evidence-based practice center
 unc chapel hill,110044774,the hamner-university of north carolina institute for drug safety sciences
 unc chapel hill,60025111,the university of north carolina at chapel hill
 unc chapel hill,124617761,the university of north carolina at chapel hill unc project-china
@@ -479,6 +464,7 @@ unc chapel hill,60122501,unc kenan-flagler business school
 unc chapel hill,126389420,unc medical center
 unc chapel hill,127410673,unc orthopedics and sports medicine at lenoir
 unc chapel hill,129612285,unc physicians network
+unc chapel hill,127561832,unc primary care
 unc chapel hill,120187099,unc project
 unc chapel hill,121267830,unc project vietnam
 unc chapel hill,113041034,unc project-china
@@ -496,8 +482,10 @@ unc chapel hill,109727961,university of north carolina
 unc chapel hill,115351973,university of north carolina
 unc chapel hill,117504699,university of north carolina
 unc chapel hill,121177509,university of north carolina
+unc chapel hill,121428952,university of north carolina
 unc chapel hill,129612267,university of north carolina
 unc chapel hill,132155300,university of north carolina
+unc chapel hill,132184177,university of north carolina
 unc chapel hill,119591818,university of north carolina (unc) hiv cure center
 unc chapel hill,121501038,university of north carolina at cha
 unc chapel hill,132561130,university of north carolina at chapel hill school of medicine
@@ -507,6 +495,7 @@ unc chapel hill,117184300,university of north carolina coastal studies institute
 unc chapel hill,131974099,university of north carolina collaborative for maternal and infant health
 unc chapel hill,120356173,university of north carolina global projects zambia
 unc chapel hill,130892646,university of north carolina global projects zambia
+unc chapel hill,132338414,university of north carolina global projects-kamwala health centre
 unc chapel hill,129498429,university of north carolina global projects-zambia
 unc chapel hill,132402479,university of north carolina health blue ridge
 unc chapel hill,106542009,university of north carolina hospitals
@@ -522,8 +511,10 @@ unc chapel hill,126189755,university of north carolina project-china
 unc chapel hill,127190702,university of north carolina project-china
 unc chapel hill,127674760,university of north carolina project-china
 unc chapel hill,130256479,university of north carolina project-china
+unc chapel hill,122118382,university of north carolina school of global public health
 unc chapel hill,122628494,university of north carolina school of law
 unc chapel hill,127593137,university of north carolina school of medicine
+unc chapel hill,127694839,university of north carolina school of medicine
 unc chapel hill,126553733,university of north carolina southeastern
 unc chapel hill,122493923,university of north carolina's biomedical research imaging center
 unc chapel hill,100513236,university of north carolina-lilongwe
@@ -531,7 +522,9 @@ unc chapel hill,123777239,university of north carolina-lilongwe clinical researc
 unc chapel hill,128670470,university of north carolina‒world health organization (unc who)
 unc chapel hill,115638385,university of north carolina’s
 unc chapel hill,123294944,university of north carolina’s school of media and journalism
+university of california los angeles,123427247,ahmanson-ucla cardiomyopathy center
 university of california los angeles,127054028,ahmanson–ucla cardiomyopathy center
+university of california los angeles,126358707,black feminism initiative ucla center for the study of women ucla (haley)
 university of california los angeles,60117623,california nanosystems institute
 university of california los angeles,131220443,california policy lab at ucla and california
 university of california los angeles,101400071,california los angeles u. of
@@ -541,18 +534,22 @@ university of california los angeles,131265338,david geffen school of medicine a
 university of california los angeles,129770715,distinguished professor of medicine and research director of the california nano systems institute at ucla
 university of california los angeles,122628008,doheny eye center ucla
 university of california los angeles,115241743,euclados bioinformatics solutions
+university of california los angeles,130536663,fielding school of public health at ucla
 university of california los angeles,129517809,goodman-luskin microbiome center at ucla
 university of california los angeles,100737194,harbor-ucla
 university of california los angeles,107003722,harbor-ucla
 university of california los angeles,124208642,harbor-ucla
+university of california los angeles,133262015,harbor-ucla
 university of california los angeles,60016081,harbor-ucla medical center
+university of california los angeles,100658058,harbor-ucla research and education institute
 university of california los angeles,132231994,hope therapy center/ucla medical school integrative psychiatry
 university of california los angeles,60101299,institute of geophysics and planetary physics (igpp) at ucla
+university of california los angeles,125879876,iris cantor-ucla women's health center
+university of california los angeles,125879989,iris cantor-ucla women's health education and research center
 university of california los angeles,60006511,jane & terry semel institute for neuroscience & human behavior
 university of california los angeles,132950840,kern medical (ucla david geffen school of medicine affiliate)
-university of california los angeles,126907022,los angeles county department of mental health + ucla strike team
-university of california los angeles,130457150,olive view- ucla education and research institute
-university of california los angeles,60014575,olive view-ucla medical center
+university of california los angeles,107995864,olive view-ucla education and res inst
+university of california los angeles,60361149,olive view-ucla education and research institute
 university of california los angeles,101686413,pathology university of california at los angeles
 university of california los angeles,129498395,ronald reagan ucla
 university of california los angeles,60032023,ronald reagan ucla medical center
@@ -574,6 +571,8 @@ university of california los angeles,101846187,ucla brain injury research center
 university of california los angeles,115363059,ucla brain tumor imaging laboratory
 university of california los angeles,133135281,ucla broad stem cell research center
 university of california los angeles,132231939,ucla cardiac arrhythmia center and electrophysiology programs
+university of california los angeles,128501824,ucla cardiology lab
+university of california los angeles,133281628,ucla care center crs
 university of california los angeles,126803587,ucla center for east-west medicine
 university of california los angeles,109725014,ucla center for health services and society
 university of california los angeles,125946597,ucla center for hiv identification
@@ -581,6 +580,8 @@ university of california los angeles,60085730,ucla center for human nutrition
 university of california los angeles,106777613,ucla center for near eastern studies
 university of california los angeles,126889147,ucla center for smart health
 university of california los angeles,107822793,ucla center for surgical outcomes and quality
+university of california los angeles,131173016,ucla center for the liberal arts and free institutions (clafi)
+university of california los angeles,133258879,ucla centre for the transformation of schools
 university of california los angeles,112703212,ucla cerebral blood flow laboratory
 university of california los angeles,113993471,ucla children's discovery and innovation institute
 university of california los angeles,101340336,ucla children's hospital
@@ -593,6 +594,7 @@ university of california los angeles,127430863,ucla department of emergency medi
 university of california los angeles,105866027,ucla department of internal medicine
 university of california los angeles,125719257,ucla department of medicine biostats
 university of california los angeles,117637577,ucla department of neurosurgery
+university of california los angeles,106628937,ucla department of orthopedic surgery
 university of california los angeles,101014702,ucla department of psychiatry and biobehavioral sciences
 university of california los angeles,122109249,ucla department of psychiatry and biobehavioral sciences
 university of california los angeles,100472691,ucla department of psychology
@@ -618,6 +620,7 @@ university of california los angeles,132301512,ucla health
 university of california los angeles,132383081,ucla health
 university of california los angeles,132564905,ucla health cirm alpha clinic
 university of california los angeles,112366099,ucla health ethics center
+university of california los angeles,130359750,ucla hip hop initiative
 university of california los angeles,126791455,ucla institute for technology
 university of california los angeles,117619675,ucla institute of transportation studies
 university of california los angeles,124276629,ucla interdepartmental program for neuroscience
@@ -627,6 +630,7 @@ university of california los angeles,133135246,ucla jonsson comprehensive cancer
 university of california los angeles,113089832,ucla latin american center
 university of california los angeles,122220930,ucla law
 university of california los angeles,128726517,ucla law promise institute for human rights
+university of california los angeles,127409429,ucla lewis center housing initiative
 university of california los angeles,105496660,ucla library
 university of california los angeles,130324594,ucla lowell milken center for music of american jewish experience
 university of california los angeles,60138296,ucla mattel children's hospital
@@ -636,6 +640,7 @@ university of california los angeles,119601979,ucla microbiome center
 university of california los angeles,128867742,ucla mindful awareness research centre
 university of california los angeles,126157240,ucla molecular
 university of california los angeles,131471346,ucla molecular cellular and integrative physiology interdepartmental program
+university of california los angeles,114543100,ucla national center for child traumatic stress
 university of california los angeles,101827399,ucla neuro-oncology program
 university of california los angeles,127376506,ucla neuropsychiatrie institute and hospital
 university of california los angeles,132580279,ucla neuropsychological services
@@ -653,11 +658,13 @@ university of california los angeles,60020418,ucla stein eye institute
 university of california los angeles,131089789,ucla steve tisch brainsport program
 university of california los angeles,132232120,ucla vascular neurology residency program
 university of california los angeles,129516943,ucla vatche and tamar manoukian division of digestive diseases
+university of california los angeles,133281567,ucla vine street clinic crs
 university of california los angeles,132503617,ucla westlake village
 university of california los angeles,105865691,ucla's burkle center for international relations
 university of california los angeles,130308019,ucla's institute of the environment and sustainability
 university of california los angeles,122644327,ucla's school of public health in community health sciences
 university of california los angeles,128800008,ucla-caltech medical scientist training program
+university of california los angeles,132906863,ucla-cdu center for aids research (cfar)
 university of california los angeles,60138295,ucla-doe institute for genomics and proteomics
 university of california los angeles,127223154,ucla-drc health research and training program
 university of california los angeles,128179964,ucla-drc health research and training program
@@ -669,12 +676,15 @@ university of california los angeles,123822431,ucla-olive view
 university of california los angeles,129687540,ucla-va veteran family wellbeing center
 university of california los angeles,126381769,uclan
 university of california los angeles,131690033,ucla’s center for the advancement of teaching
+university of california los angeles,125447416,ucla’s david geffen school of medicine
 university of california los angeles,130389794,ucla’s department of design media arts
+university of california los angeles,131661591,ucla’s department of world arts and cultures
 university of california los angeles,123318070,ucla’s graduate school of education and information studies (gseis)
 university of california los angeles,130454651,ucla’s institute for immigration
 university of california los angeles,125946346,ucla’s luskin school of public affairs
 university of california los angeles,128252518,ucla’s native nations law and policy center
 university of california los angeles,130454374,ucla’s school of education
+university of california los angeles,129966484,ucla’s school of education and information studies (ed&is)
 university of california los angeles,129662747,university of california los angeles-democratic
 university of california los angeles,60027550,university of california los angeles
 university of california los angeles,126148431,urban schooling division of ucla’s graduate school of education & information studies
@@ -775,7 +785,6 @@ university of california san diego,60121576,marine biology research division
 university of california san diego,60121579,marine physical laboratory
 university of california san diego,60086300,moores cancer center
 university of california san diego,60003262,nevada cancer institute
-university of california san diego,60120814,protein data bank
 university of california san diego,60121509,qualcomm institute
 university of california san diego,131245694,qualcomm institute (ucsd's branch of the california institute for telecommunication and information technology)
 university of california san diego,60116256,rady school of management
@@ -790,6 +799,7 @@ university of california san diego,60001708,shiley eye institute
 university of california san diego,60121593,simulation training center
 university of california san diego,60121568,skaggs school of pharmacy & pharmaceutical sciences
 university of california san diego,60121658,sustainable power and energy center
+university of california san diego,130351269,tata institute for genetics and society-ucsd
 university of california san diego,60121647,the arthur c. clarke center for human imagination
 university of california san diego,60121488,the beyster institute
 university of california san diego,60121506,the center for neural circuits and behavior
@@ -808,7 +818,10 @@ university of california san diego,131333824,ucsd actri building
 university of california san diego,131355768,ucsd actri dissemination and implementation science center
 university of california san diego,131355231,ucsd actri dissemination and implementation science center and an alumna of the implementation research institute
 university of california san diego,132228479,ucsd and veterans administration medical center
+university of california san diego,133407222,ucsd bariatric and metabolic institute
 university of california san diego,60121611,ucsd department of theatre and dance
+university of california san diego,131458443,ucsd division of rheumatology allergy and immunology
+university of california san diego,133317688,ucsd global health institute
 university of california san diego,130351228,ucsd health
 university of california san diego,132773693,ucsd health science and va san diego healthcare
 university of california san diego,60018246,ucsd medical center-hillcrest
@@ -816,6 +829,7 @@ university of california san diego,131752256,ucsd school of global policy and st
 university of california san diego,130741946,ucsdh
 university of california san diego,131471383,ucsdh
 university of california san diego,131355735,university of california at sail diego
+university of california san diego,130351326,university of california san diegoclinical and translational fungal
 university of california san diego,130351207,university of california sandiego
 university of california san diego,60030612,university of california san diego
 university of california san diego,108301883,university of california san diego and the va san diego healthcare system
@@ -823,11 +837,10 @@ university of california san francisco,133250435,17ucsf helen diller family comp
 university of california san francisco,130149463,a ucsf affiliate
 university of california san francisco,132469037,a ucsf health clinic
 university of california san francisco,106662827,california university of san francisco
+university of california san francisco,132539043,center of community engagement (cce) at ucsf
 university of california san francisco,60280125,department of bioengineering and therapeutic sciences
 university of california san francisco,115021545,epithelial section of the ucsf eli and edythe broad
 university of california san francisco,60076081,ernest gallo clinic and research center
-university of california san francisco,128550328,gladstone|ucsf center for cell circuitry
-university of california san francisco,127630794,gladstone–ucsf institute of genomic immunology
 university of california san francisco,60226504,innovative genomics institute
 university of california san francisco,128933937,kemri-ucsf
 university of california san francisco,122396734,uc berkeley- ucsf joint medical program
@@ -838,8 +851,8 @@ university of california san francisco,124526927,ucsf anesthesia residency progr
 university of california san francisco,130764498,ucsf benioff children's hospital
 university of california san francisco,132401673,ucsf benioff children's hospital
 university of california san francisco,60008261,ucsf benioff children's hospital oakland
+university of california san francisco,127186527,ucsf benioff children's hospitals
 university of california san francisco,60033399,ucsf benioff children‘s hospital
-university of california san francisco,127186527,ucsf benioff children’s hospitals
 university of california san francisco,128571662,ucsf benioff children’s hospitals
 university of california san francisco,125151559,ucsf benioff homelessness and housing initiative
 university of california san francisco,123669553,ucsf benioff initiative for prostate cancer research
@@ -849,6 +862,7 @@ university of california san francisco,127163703,ucsf california preterm birth i
 university of california san francisco,112993221,ucsf carol franc buck breast care center
 university of california san francisco,60014751,ucsf center for aids prevention studies
 university of california san francisco,100507451,ucsf center for health and community
+university of california san francisco,128427286,ucsf center for health equity in surgery and anesthesia
 university of california san francisco,115757263,ucsf center for healthcare value
 university of california san francisco,108150877,ucsf center for reproductive health
 university of california san francisco,108378769,ucsf center for translational and policy research on personalized medicine (transpers)
@@ -859,6 +873,7 @@ university of california san francisco,130679801,ucsf centre for evidence synthe
 university of california san francisco,121082562,ucsf centre for evidence synthesis and implementation
 university of california san francisco,123720454,ucsf centre for evidence synthesis and implementation
 university of california san francisco,122686048,ucsf child & adolescent headache program
+university of california san francisco,128910849,ucsf child and adolescent gender center
 university of california san francisco,127999989,ucsf colabss
 university of california san francisco,114447757,ucsf cornea service
 university of california san francisco,131558657,ucsf curry international tuberculosis center
@@ -877,6 +892,7 @@ university of california san francisco,101720022,ucsf department of neurosurgery
 university of california san francisco,121483038,ucsf department of obstetrics
 university of california san francisco,112893503,ucsf department of ophthalmology
 university of california san francisco,107782516,ucsf department of orthopaedic surgery
+university of california san francisco,125070505,ucsf department of orthopaedic surgery
 university of california san francisco,127864573,ucsf department of orthopaedic surgery
 university of california san francisco,100509924,ucsf department of otolaryngology- head and neck surgery (ohns)
 university of california san francisco,109550046,ucsf department of psychiatry
@@ -920,6 +936,7 @@ university of california san francisco,131501472,ucsf orthopedics
 university of california san francisco,101086624,ucsf osher center for integrative medicine
 university of california san francisco,108117682,ucsf osher center for integrative medicine
 university of california san francisco,112369309,ucsf pediatric hematology-oncology
+university of california san francisco,133082025,ucsf pulmonary rehabilitation/sleep
 university of california san francisco,101696146,ucsf san francisco
 university of california san francisco,60031970,ucsf school of medicine
 university of california san francisco,125443132,ucsf school of nursing
@@ -930,6 +947,8 @@ university of california san francisco,120409187,ucsf weill institute for neuros
 university of california san francisco,108160918,ucsf women's hiv program
 university of california san francisco,130535526,ucsf | department of social & behavioral sciences
 university of california san francisco,108330811,ucsf | department of urology
+university of california san francisco,132184448,ucsf –vntp research collaboration unit
+university of california san francisco,123688676,ucsf's institute for health and aging
 university of california san francisco,105672503,ucsf-fresno
 university of california san francisco,128243672,ucsf-hair analytical laboratory
 university of california san francisco,112897233,ucsf-natividad family medicine residency
@@ -973,6 +992,7 @@ university of florida,127577998,university of florida health jacksonville school
 university of florida,60007929,university of florida health science center jacksonville
 university of florida,60010177,university of florida institute of food and agricultural sciences
 university of florida,126299434,university of florida's appui à la recherche et au développement agricole project
+university of florida,128258416,university of floridau
 university of florida,119096081,usa department of animal sciencesuniversity of florida
 university of florida,60122769,warrington college of business
 university of florida,60154389,william r. maples center for forensic medicine
@@ -993,6 +1013,7 @@ university of michigan,60009861,michigan neuroscience institute
 university of michigan,132757706,ncam-university of michigan
 university of michigan,60027017,stephen m. ross school of business
 university of michigan,128486096,taubman health sciences library university of michigan
+university of michigan,133331453,technical university of michigan
 university of michigan,132065108,the university of michigan adolescent health initiative
 university of michigan,60028497,the university of michigan program in biology
 university of michigan,115972852,university of michigan
@@ -1000,11 +1021,15 @@ university of michigan,120779720,university of michigan
 university of michigan,128202185,university of michigan
 university of michigan,130193227,university of michigan
 university of michigan,132929822,university of michigan
+university of michigan,133428083,university of michigan
 university of michigan,126950877,university of michigan (jpwb)
+university of michigan,128427064,university of michigan based
 university of michigan,125171426,university of michigan center for drug repurposing
+university of michigan,128111867,university of michigan center on assets
 university of michigan,120773880,university of michigan depart. of pediatrics
 university of michigan,126239920,university of michigan department of epidemiology
 university of michigan,131877525,university of michigan department of psychology
+university of michigan,128036823,university of michigan department of statistics
 university of michigan,126441705,university of michigan department of urban and regional planning
 university of michigan,120777892,university of michigan depression center
 university of michigan,130043637,university of michigan division of pulmonary & critical care medicine
@@ -1037,7 +1062,6 @@ university of michigan,118838797,university of michigan's population studies cen
 university of michigan,60025778,university of michigan ann arbor
 university of michigan,129825378,university of michigan ann arbor
 university of michigan,133239456,university of michigan ann arbor
-university of michigan,132246908,university of michigan-flin
 university of michigan,110026872,university of michiganm
 university of michigan,130930130,university of michigan–michigan medicine
 university of michigan,124588532,university of michigan–school of dentistry
@@ -1045,7 +1069,6 @@ university of michigan,124242677,university of michigan’s
 university of michigan,127642833,university of michigan’s (um)
 university of michigan,132840846,university of michigan’s marsal family school of education
 university of michigan,130517672,university of michigan’s school of public health
-university of michigan,132318527,usc- university of michigan
 university of minnesota,129437094,7university of minnesota
 university of minnesota,60286724,biotechnology institute
 university of minnesota,60123802,carlson school of management
@@ -1063,7 +1086,6 @@ university of minnesota,60000204,minnesota obesity center
 university of minnesota,120257659,regents of the university of minnesota
 university of minnesota,121301546,regents of the university of minnesota
 university of minnesota,60076825,regional injury prevention research center
-university of minnesota,60076959,saint mary's university of minnesota
 university of minnesota,60030576,school of dentistry
 university of minnesota,60005693,school of nursing
 university of minnesota,60013223,school of public health
@@ -1072,6 +1094,7 @@ university of minnesota,60007191,the hormel institute
 university of minnesota,132580598,the university of minnesota's department of pediatrics
 university of minnesota,132581151,the university of minnesota's medical school
 university of minnesota,129086381,the university of minnesota’s center for infectious disease research and policy (cidrap)
+university of minnesota,130607012,the university of minnesota’s southwest research and outreach center
 university of minnesota,124394781,university of minnesota
 university of minnesota,124450844,university of minnesota
 university of minnesota,126204364,university of minnesota
@@ -1086,16 +1109,16 @@ university of minnesota,126357513,university of minnesota college of design
 university of minnesota,129110585,university of minnesota college of food
 university of minnesota,106015426,university of minnesota college of pharmacy
 university of minnesota,124194303,university of minnesota college of pharmacy
+university of minnesota,129018879,university of minnesota college of pharmacy pharmacy.umn.edu
 university of minnesota,60015026,university of minnesota crookston
 university of minnesota,100873105,university of minnesota department of medicine
 university of minnesota,128469024,university of minnesota department of ophthalmology and visual neurosciences
 university of minnesota,126208411,university of minnesota department of otolaryngology-head and neck surgery
 university of minnesota,119442123,university of minnesota department of soil
-university of minnesota,60009875,university of minnesota duluth
 university of minnesota,120266513,university of minnesota extension center for community vitality
+university of minnesota,133259115,university of minnesota faculty
 university of minnesota,117086987,university of minnesota health
 university of minnesota,126240479,university of minnesota health sciences libraries
-university of minnesota,129575199,university of minnesota independent consultant
 university of minnesota,60020255,university of minnesota law school
 university of minnesota,132781641,university of minnesota law school
 university of minnesota,100386828,university of minnesota libraries in the twin cities
@@ -1106,7 +1129,6 @@ university of minnesota,60005989,university of minnesota medical center fairview
 university of minnesota,60008772,university of minnesota medical school
 university of minnesota,128231243,university of minnesota methodist hospital family medicine residency program
 university of minnesota,131526107,university of minnesota microbiota therapeutics program
-university of minnesota,125262309,university of minnesota morris (umn morris)
 university of minnesota,126845023,university of minnesota north memorial family medicine residency program
 university of minnesota,112852009,university of minnesota northwest research and outreach center
 university of minnesota,122800056,university of minnesota pediatric residency
@@ -1117,6 +1139,7 @@ university of minnesota,113437466,university of minnesota school of law
 university of minnesota,128858089,university of minnesota school of nursing global health scholar
 university of minnesota,116083632,university of minnesota school of social work
 university of minnesota,100681524,university of minnesota southern research and outreach center
+university of minnesota,125967632,university of minnesota system
 university of minnesota,60029445,university of minnesota twin cities
 university of minnesota,125759259,university of minnesota veterinary diagnostic lab
 university of minnesota,123400729,university of minnesota west metro equine practice
@@ -1136,7 +1159,6 @@ university of pennsylvania,108234125,from penn internal medicine university city
 university of pennsylvania,60138417,hospital of the university of pennsylvania
 university of pennsylvania,60278649,hospital of the university of pennsylvania - pavilion
 university of pennsylvania,60073168,linguistic data consortium
-university of pennsylvania,60138958,national center on homelessness among veterans
 university of pennsylvania,60138421,new bolton center
 university of pennsylvania,102057473,penn cardiac care at radnor
 university of pennsylvania,114876010,penn care at home
@@ -1167,6 +1189,7 @@ university of pennsylvania,130000837,penn medicine’s division of general inter
 university of pennsylvania,125719197,penn musculoskeletal center
 university of pennsylvania,106172312,penn museum
 university of pennsylvania,124509079,penn museum
+university of pennsylvania,115413707,penn museum of archaeology and anthropology
 university of pennsylvania,107149117,penn nursing
 university of pennsylvania,60138419,penn presbyterian medical center
 university of pennsylvania,113187823,penn radnor
@@ -1177,7 +1200,6 @@ university of pennsylvania,129474808,penn transplant institute
 university of pennsylvania,132717032,penn wharton budget model
 university of pennsylvania,60138418,pennsylvania hospital
 university of pennsylvania,114817694,perelman center for advanced medicine
-university of pennsylvania,132480999,perelman school of medicine of the university of pennsylvania
 university of pennsylvania,130217444,primary care and penn specialty practices
 university of pennsylvania,126230053,regional physician practices of penn medicine
 university of pennsylvania,60138420,ryan veterinary hospital
@@ -1189,12 +1211,14 @@ university of pennsylvania,60004517,university of pennsylvania annenberg school 
 university of pennsylvania,60015802,university of pennsylvania carey law school
 university of pennsylvania,60102564,university of pennsylvania graduate school of education
 university of pennsylvania,60003711,university of pennsylvania perelman school of medicine
+university of pennsylvania,132480999,university of pennsylvania perelman school of medicine
 university of pennsylvania,133234953,university of pennsylvania perelman school of medicine
 university of pennsylvania,60096942,university of pennsylvania school of dental medicine
 university of pennsylvania,60102561,university of pennsylvania school of nursing
 university of pennsylvania,60031115,university of pennsylvania school of veterinary medicine
 university of pennsylvania,60102563,university of pennsylvania stuart weitzman school of design
 university of pennsylvania,126935692,university of pennsylvaniagrid.25879.31
+university of pennsylvania,133384965,university of pennsylvaniahttps://ror.org/00b30xv10
 university of pennsylvania,132940614,university of pennsylvanian
 university of pennsylvania,118052185,university of pennsylvania’s graduate school of education
 university of pennsylvania,127428940,upenn school of medicine
@@ -1209,7 +1233,6 @@ university of washington,60116364,foster school of business
 university of washington,60014462,friday harbor laboratories
 university of washington,60032180,harborview injury prevention and research center
 university of washington,60001212,harborview medical center
-university of washington,60073077,health alliance international
 university of washington,131191888,human centered design and engineering program at the university of washington
 university of washington,130176349,human-centered design and engineering department at the university of washington
 university of washington,123505245,iddrc rodent behavior laboratorycenter on human development and disabilityuniversity of washington
@@ -1223,10 +1246,13 @@ university of washington,60279025,milgard school of business
 university of washington,131781535,ms university of washington
 university of washington,60012095,northwest lipid research clinic
 university of washington,128327028,northwest regional burn model system at university of washington
+university of washington,133158585,oncology university of washington
+university of washington,133387484,phd candidate in epidemiology at the university of washington
 university of washington,128470603,roger and angie karalis retina center at university of washington
 university of washington,60278845,school of business
 university of washington,60008032,school of public health
 university of washington,127608107,sociology at university of washington
+university of washington,132906657,technology and social change group at the university of washington information school
 university of washington,130516712,the university of washington clinical learning
 university of washington,60015481,university of washington
 university of washington,100443845,university of washington
@@ -1273,6 +1299,7 @@ university of washington,124242634,university of washington
 university of washington,124242646,university of washington
 university of washington,124242660,university of washington
 university of washington,124242671,university of washington
+university of washington,124242674,university of washington
 university of washington,124242680,university of washington
 university of washington,124242681,university of washington
 university of washington,124242684,university of washington
@@ -1288,6 +1315,7 @@ university of washington,124242741,university of washington
 university of washington,124242743,university of washington
 university of washington,124242753,university of washington
 university of washington,124242788,university of washington
+university of washington,124242853,university of washington
 university of washington,124242872,university of washington
 university of washington,124242898,university of washington
 university of washington,124242917,university of washington
@@ -1325,9 +1353,11 @@ university of washington,124256323,university of washington
 university of washington,124256330,university of washington
 university of washington,124256334,university of washington
 university of washington,124256343,university of washington
+university of washington,124256359,university of washington
 university of washington,124256376,university of washington
 university of washington,124256386,university of washington
 university of washington,124256388,university of washington
+university of washington,124256428,university of washington
 university of washington,124256430,university of washington
 university of washington,124256454,university of washington
 university of washington,124256488,university of washington
@@ -1377,6 +1407,7 @@ university of washington,128477609,university of washington
 university of washington,128531592,university of washington
 university of washington,128579572,university of washington
 university of washington,128584603,university of washington
+university of washington,128592173,university of washington
 university of washington,128604917,university of washington
 university of washington,128982122,university of washington
 university of washington,129134748,university of washington
@@ -1408,13 +1439,17 @@ university of washington,131284182,university of washington
 university of washington,131322089,university of washington
 university of washington,131364240,university of washington
 university of washington,131550274,university of washington
+university of washington,131777630,university of washington
 university of washington,131799461,university of washington
 university of washington,126876569,university of washington (a.m.o.
 university of washington,133239944,university of washington (cifor)
 university of washington,127987375,university of washington (pa)
 university of washington,122262486,university of washington (usa)
 university of washington,126985401,university of washington (uw)
+university of washington,127590216,university of washington (uw) bothell
 university of washington,126905756,university of washington (uw) family medicine residency network
+university of washington,132906098,university of washington (uw) information school
+university of washington,123456884,university of washington and intentionet
 university of washington,122262601,university of washington and microsoft
 university of washington,124826899,university of washington and microsoft research
 university of washington,122262508,university of washington applied physics laboratory
@@ -1438,9 +1473,11 @@ university of washington,122120652,university of washington division of cardiolo
 university of washington,126597008,university of washington division of family planning
 university of washington,122120519,university of washington division of pulmonary critical care medicine
 university of washington,122262534,university of washington hiv cohort
+university of washington,129649875,university of washington indigenous wellness research institute
 university of washington,115003779,university of washington information school
 university of washington,122262500,university of washington information school
 university of washington,120568196,university of washington institute for neuroengineering
+university of washington,122262482,university of washington ischool
 university of washington,129979196,university of washington psychiatry and behavioral sciences
 university of washington,121840809,university of washington regional burn center
 university of washington,130397194,university of washington resuscitation engineering science unit (rescu)
@@ -1463,8 +1500,10 @@ university of washington,107733214,university of washington school of public hea
 university of washington,112891293,university of washington school of public health
 university of washington,120840283,university of washington school of public health
 university of washington,122263235,university of washington school of public health
+university of washington,132091453,university of washington school of public health
 university of washington,132031635,university of washington school of public health department of environmental and occupational health sciences
 university of washington,132031311,university of washington school of public health department of epidemiology
+university of washington,120571576,university of washington school of social work
 university of washington,129662974,university of washington system
 university of washington,119923625,university of washington's center
 university of washington,126173534,university of washington's elementary teacher education
@@ -1476,13 +1515,12 @@ university of washington,127774228,university of washington.
 university of washington,126477865,university of washington/ northwest association of networked ocean observing systems
 university of washington,126876731,university of washington/wwami idaho
 university of washington,131786622,university of washington;
+university of washington,133394124,university of washington’s community engagement project
 university of washington,129164263,university of washington’s information school
 university of washington,60028661,uw college of engineering
 university of washington,60138689,uw medical center - northwest
 university of washington,60033293,uw medical center – montlake
 university of washington,60138688,uw neighborhood woodinville clinic
-university of washington,125785988,va puget sound and the university of washington
 university of washington,60000864,valley medical center
 university of washington,60091917,washington neuroscience institute
-university of washington,60292186,washington sea grant
 university of washington,128806493,washington state innovation model evaluation at the university of washington

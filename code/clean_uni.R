@@ -1,4 +1,4 @@
-clean_uni <- function(cat, date) {
+clean_uni <- function(date) {
 
 library(janitor)
 library(tidyverse)
@@ -6,7 +6,7 @@ library(progress)
 library(fs)
 
   
-  
+  cat<-"uni"  
 
   
   # create folders for output -----------------------------------------------
@@ -57,13 +57,6 @@ library(fs)
   
   
   
-# cat<-"uni"
-# date<-"20250901"
-
-
-# cat<-"uni"
-# date<-"20251010"
-
 
 
 # read the files   --------------------------------------

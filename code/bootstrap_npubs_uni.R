@@ -1,4 +1,4 @@
-bootstrap_npubs_uni <- function(cat, date,PM_max) {
+bootstrap_npubs_uni <- function(date,PM_max,author_position) {
   
   
 library(tidyverse)
@@ -12,15 +12,7 @@ library(progress)
 library(fs)
 library(data.table)
 
-# PM_max<-8
-
-
-# 
-# cat<-"uni"
-# date<-"20250901"
-
-# cat<-"uni"
-# date<-"20251010"
+cat<-"uni"
 
 
 # create folders for output -----------------------------------------------
@@ -281,8 +273,11 @@ gc() # free up memory
 # The bootstrap is of the mean for 2019-2024 to see if
 # the 2025 value falls outside CIs
 
-data_for_boot<-mo_data %>% 
-  filter(PY!=2025)
+# data_for_boot<-mo_data %>% 
+#   filter(PY!=2025)
+
+
+data_for_boot<-mo_data
 
 
 
@@ -359,7 +354,7 @@ c_pubs_25<-mo_data %>%
 
 # averegae cumulative publications by month 2019-2024
 avg_cum_obs<-mo_data %>% 
-  filter(PY!=2025) %>% 
+  # filter(PY!=2025) %>% 
   group_by(PY,PM) %>% 
   summarize(month_total=sum(n)) %>% 
   group_by(PM) %>% 
@@ -398,23 +393,26 @@ bs_stats
 avg_cum_obs
 c_pubs_25
 
-x_min<-c_pubs_25 %>% 
+x1<-c_pubs_25 %>% 
   filter(PM==PM_max) %>% 
   select(n_c_25) %>% 
   mutate(n_c_25=as.numeric(n_c_25-2000)) %>% 
   mutate(n_c_25=round(n_c_25,-3))
-x_min<-as.numeric(x_min)
+x1<-as.numeric(x1)
 
 
-x_max<-bs_output_run_cml %>% 
+x2<-bs_output_run_cml %>% 
   ungroup() %>% 
   select(cumul_pubs) %>% 
   filter(cumul_pubs==max(cumul_pubs)) %>% 
   mutate(cumul_pubs=as.numeric(cumul_pubs+1000)) %>% 
   mutate(cumul_pubs=round(cumul_pubs,-3))
-x_max<-as.numeric(x_max)
+x2<-as.numeric(x2)
 
-
+min_max<-c(x1,x2)
+min_max<-sort(min_max)
+x_min<-min_max[1]
+x_max<-min_max[2]
 
 final_bs_n<-bs_output_run_cml %>% 
   # filter(PM==PM_max) %>% 
@@ -442,13 +440,16 @@ final_bs_n<-bs_output_run_cml %>%
   theme(axis.title.y = element_text(size = 8,face = "bold"))+
   # theme(axis.title.x =element_text(size = 8,face = "bold"))+
   theme(axis.title.x = element_blank())+
-  theme(axis.text.x = element_blank())+
+  # theme(axis.text.x = element_blank())+
   theme(strip.text.x = element_text(face = "bold"))+
-  expand_limits(x= c(x_min,x_max))+
-  # expand_limits(y= c(0,150))+
-  scale_x_continuous(limits = c(x_min,
-                                x_max),
-                     breaks = seq(x_min, x_max,by = 2500))
+  expand_limits(y= c(0,150))
+# +
+# +
+#   # expand_limits(x= c(x_min,x_max))+
+#   
+#   scale_x_continuous(limits = c(x_min,
+#                                 x_max),
+#                      breaks = seq(x_min, x_max,by = 2500))
 
 
 
@@ -472,31 +473,44 @@ ggsave(paste(save_dir,"/","final_bs_n_uni.png",sep=""),
 obs<-c_pubs_25 %>% filter(PM==PM_max) %>% select(n_c_25)
 
 
-n_runs_less_than_obs<-bs_output_run_cml %>% 
+n_runs_less_than_obs_cml<-bs_output_run_cml %>% 
   # filter(PM==PM_max) %>% 
   ungroup() %>% 
   select(cumul_pubs) %>% 
   arrange(cumul_pubs) %>% 
   mutate(less_than_obs=if_else(cumul_pubs<as.numeric(obs),TRUE,FALSE)) 
 
-n_runs_less_than_obs<-n_runs_less_than_obs%>% tally(less_than_obs)
+n_runs_less_than_obs_cml<-n_runs_less_than_obs_cml%>% tally(less_than_obs)
 
 
-percent_below<-n_runs_less_than_obs/runs*100
+percent_below_cml<-n_runs_less_than_obs_cml/runs*100
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 # LESS conservative bootstrap (any month selected) ------------------------
 
+# 
+# data_for_boot_2<-mo_data %>% 
+#   filter(PY!=2025)
 
-data_for_boot_2<-mo_data %>% 
-  filter(PY!=2025)
+data_for_boot_2<-mo_data 
 
 
 
-set.seed(20250111)
-runs <- 1000
+# set.seed(20250111)
+# runs <- 1000
 
 yr<-1 # can set this up so that each run does X years) 
 run_no<-seq(1:runs)
@@ -588,25 +602,32 @@ bs_stats_2<-bs_output_run_cml_less_conservative %>%
 #   left_join(avg_cum_obs) %>% 
 #   left_join(c_pubs_25)
 
-bs_stats
+bs_stats_2
 avg_cum_obs
 c_pubs_25
 
-x_min<-c_pubs_25 %>% 
+x1<-c_pubs_25 %>% 
   filter(PM==PM_max) %>% 
   select(n_c_25) %>% 
   mutate(n_c_25=as.numeric(n_c_25-2000)) %>% 
   mutate(n_c_25=round(n_c_25,-3))
-x_min<-as.numeric(x_min)
+x1<-as.numeric(x1)
 
 
-x_max<-bs_output_run_cml_less_conservative %>% 
+x2<-bs_output_run_cml_less_conservative %>% 
   ungroup() %>% 
   select(cumul_pubs) %>% 
   filter(cumul_pubs==max(cumul_pubs)) %>% 
   mutate(cumul_pubs=as.numeric(cumul_pubs+2000)) %>% 
   mutate(cumul_pubs=round(cumul_pubs,-3))
-x_max<-as.numeric(x_max)
+x2<-as.numeric(x2)
+
+
+
+min_max<-c(x1,x2)
+min_max<-sort(min_max)
+x_min<-min_max[1]
+x_max<-min_max[2]
 
 final_bs_n_less_conservative<-bs_output_run_cml_less_conservative %>% 
   # filter(PM==PM_max) %>% 
@@ -635,10 +656,12 @@ final_bs_n_less_conservative<-bs_output_run_cml_less_conservative %>%
   theme(axis.title.x =element_text(size = 8,face = "bold"))+
   theme(strip.text.x = element_text(face = "bold"))+
   expand_limits(x= c(x_min,x_max))+
-  expand_limits(y= c(0,150))+
-  scale_x_continuous(limits = c(x_min,
-                                x_max),
-                     breaks = seq(x_min, x_max,by = 2500))
+  expand_limits(y= c(0,150))
+
+# +
+#   scale_x_continuous(limits = c(x_min,
+#                                 x_max),
+#                      breaks = seq(x_min, x_max,by = 2500))
 
 
 
@@ -657,16 +680,7 @@ ggsave(paste(save_dir,"/","final_bs_n_less_conservative_uni.png",sep=""),
 obs<-c_pubs_25 %>% filter(PM==PM_max) %>% select(n_c_25)
 
 
-n_runs_less_than_obs<-bs_output_run_cml %>% 
-  # filter(PM==PM_max) %>% 
-  ungroup() %>% 
-  select(cumul_pubs) %>% 
-  mutate(less_than_obs=cumul_pubs<obs) %>% 
-  tally(less_than_obs)
-
-percent_below<-n_runs_less_than_obs/runs*100
-
-n_runs_less_than_obs_2<-bs_output_run_cml_less_conservative %>% 
+less_than_obs_cml_less_conservative<-bs_output_run_cml_less_conservative %>% 
   arrange(cumul_pubs) %>% 
   # filter(PM==PM_max) %>% 
   ungroup() %>% 
@@ -674,22 +688,22 @@ n_runs_less_than_obs_2<-bs_output_run_cml_less_conservative %>%
   mutate(less_than_obs=if_else(cumul_pubs<as.numeric(obs),TRUE,FALSE)) 
 
 
-n_runs_less_than_obs_2<-n_runs_less_than_obs_2 %>% tally(less_than_obs)
+n_runs_less_than_obs_cml_less_conservative<-less_than_obs_cml_less_conservative %>% tally(less_than_obs)
 
-percent_below<-n_runs_less_than_obs/runs*100
+percent_below_cml_less_conservative<-n_runs_less_than_obs_cml_less_conservative/runs*100
 
-percent_below_2<-n_runs_less_than_obs_2/runs*100
+
 
 
 
 bs_stats<-bs_stats %>% 
   mutate(bs_cat="strict",
-         perc_below_obs=percent_below$n)
+         perc_below_obs=percent_below_cml$n)
 
 
 bs_stats_2<-bs_stats_2%>% 
   mutate(bs_cat="open",
-         perc_below_obs=percent_below_2$n)
+         perc_below_obs=percent_below_cml_less_conservative$n)
 
 bs_stats_all<-bind_rows(bs_stats,bs_stats_2)
 
@@ -712,3 +726,177 @@ ggsave(paste(save_dir,"/","bs_composite_fig_uni.png",sep=""),
 
 
 }
+
+
+#########
+
+# mo_data<-first_authors %>% 
+#   group_by(PY,PM,uni) %>% 
+#   # group_by(PY,PM) %>% 
+#   tally() %>% 
+#   arrange(PM,uni) %>% 
+#   filter(PM<PM_max+1)
+# 
+# 
+# # https://mac-theobio.github.io/QMEE/lectures/permutation_examples.notes.html
+# 
+# 
+# 
+# 
+# perm_data<-mo_data %>% 
+#   filter(PY > 2023)
+# 
+# set.seed(101)
+# nsim <- 5
+# 
+# # Initialize results dataframe
+# res <- data.frame(
+#   simulation = 1:nsim,
+#   n_24 = numeric(nsim),
+#   n_25 = numeric(nsim),
+#   diff = numeric(nsim)
+# )
+# 
+# # Run permutation simulations
+# for (i in 1:nsim) {
+#   # Scramble the n values
+#   scrambled_data <- perm_data %>%
+#     ungroup() %>% 
+#     select(n,PM) %>% 
+#     group_by(PM) %>% 
+#     slice_sample(n=2)
+#   scrambled_data$PY=rep(c("2024","2025"),12)
+#   
+#   
+#   # Calculate sum by year
+#   year_totals <- scrambled_data %>%
+#     group_by(PY) %>%
+#     summarise(total = sum(n), .groups = "drop")
+#   
+#   # Add the values for each year  and add to df
+#   res$n_24[i] <- year_totals$total[year_totals$PY == "2024"] 
+#   
+#   res$n_25[i] <- year_totals$total[year_totals$PY == "2025"] 
+#   
+#   
+#   # Calculate difference between years and add to df
+#   
+#   res$diff[i] <- year_totals$total[year_totals$PY == "2025"]-
+#     year_totals$total[year_totals$PY == "2024"]
+# }
+# 
+# res<-res %>% 
+#   mutate(simulation=as.character(simulation))
+# # Observed difference
+# obs <- perm_data %>%
+#   group_by(PY) %>%
+#   summarise(total = sum(n), .groups = "drop") %>%
+#   pivot_wider(names_from = PY, values_from = total) %>%
+#   rename(n_25=`2025`,
+#          n_24=`2024`) %>% 
+#   mutate(simulation="observed") %>% 
+#   mutate(diff = n_25-n_24) 
+# 
+# 
+# # res <- bind_rows(res,obs)
+# ggplot(res, aes(x = diff)) +
+#   geom_histogram(fill = "gray", color = "black") +
+#   geom_vline(xintercept = obs$diff, color = "red", linewidth = 1) +
+#   theme_classic() +
+#   labs(title = "", x = "Difference (2025-2024)", y = "Frequency")
+# 
+# 
+# 
+# nrow(res %>% filter(diff<obs$diff))/nrow(res)
+
+
+
+
+#######
+# 
+# mo_data2<-first_authors %>% 
+#   group_by(PY,PM,affiliation,uni) %>% 
+#   # group_by(PY,PM) %>% 
+#   tally() %>% 
+#   arrange(PM,uni) %>% 
+#   filter(PM<PM_max+1)
+# 
+# 
+# 
+# perm_data <- mo_data2 %>%
+#   filter(PY > 2023)
+# 
+# 
+# 
+# complete_data <- perm_data %>% 
+#   as_tibble() %>% 
+#   complete(PM,PY, uni,affiliation) %>% 
+#   replace_na(list(n=0))
+# 
+# 
+# set.seed(101)
+# nsim <- 5
+# 
+# # Initialize results dataframe
+# res2 <- data.frame(
+#   simulation = 1:nsim,
+#   n_24 = numeric(nsim),
+#   n_25 = numeric(nsim),
+#   diff = numeric(nsim)
+# )
+# 
+# # Run permutation simulations
+# for (i in 1:nsim) {
+#   # Scramble the n values
+#   
+#   
+#   scrambled_data <- complete_data %>%
+#     ungroup() %>% 
+#     select(n,PM,uni,affiliation) %>% 
+#     group_by(PM,uni,affiliation) %>% 
+#     slice_sample(n=2)
+#   scrambled_data$PY=rep(c("2024","2025"),12)
+#   
+#   
+#   
+#   
+#   # Calculate sum by year
+#   year_totals <- scrambled_data %>%
+#     group_by(PY) %>%
+#     summarise(total = sum(n), .groups = "drop")
+#   
+#   # Add the values for each year  and add to df
+#   res2$n_24[i] <- year_totals$total[year_totals$PY == "2024"] 
+#   
+#   res2$n_25[i] <- year_totals$total[year_totals$PY == "2025"] 
+#   
+#   
+#   # Calculate difference between years and add to df
+#   
+#   res2$diff[i] <- year_totals$total[year_totals$PY == "2025"]-
+#     year_totals$total[year_totals$PY == "2024"]
+# }
+# 
+# res2<-res2 %>% 
+#   mutate(simulation=as.character(simulation))
+# # Observed difference
+# obs <- perm_data %>%
+#   group_by(PY) %>%
+#   summarise(total = sum(n), .groups = "drop") %>%
+#   pivot_wider(names_from = PY, values_from = total) %>%
+#   rename(n_25=`2025`,
+#          n_24=`2024`) %>% 
+#   mutate(simulation="observed") %>% 
+#   mutate(diff = n_25-n_24) 
+# 
+# 
+# # res <- bind_rows(res,obs)
+# ggplot(res2, aes(x = diff)) +
+#   geom_histogram(fill = "gray", color = "black") +
+#   geom_vline(xintercept = obs$diff, color = "red", linewidth = 1) +
+#   theme_classic() +
+#   labs(title = "", x = "Difference (2025-2024)", y = "Frequency")
+# 
+# 
+# 
+# nrow(res %>% filter(diff<obs$diff))/nrow(res)

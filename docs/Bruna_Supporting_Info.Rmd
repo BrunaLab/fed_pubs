@@ -96,9 +96,30 @@ header-includes:
 # https://pubs.usgs.gov/search?q=&startYear=2019&__ncforminfo=Rf6y9tBB_4xn4sDOJ7tdSPmxI5Eu33dcCKy8YpAAAQRE-JJvXyAJAosPJMziEEMnxQE_iCi7dgGWVwrbQe9Gpb9a-7115VxO
 ---
 
-```{r, child=c('./docs/SuppInfo/SuppInfo_text.Rmd','./docs/SuppInfo/fed_codes_table.Rmd','./docs/SuppInfo/uni_codes_table.Rmd')}
+
+
+```{r setup-supporting-info, include=FALSE}
+
+library(here)
+
 ```
 
 
-<!-- ```{r, child=c('./docs/SuppInfo/SuppInfo_text.Rmd')} -->
-<!-- ```  -->
+```{r, child=c(here('./docs/SuppInfo/SuppInfo_text.Rmd'),here('./docs/SuppInfo/fed_codes_table.Rmd'),here('./docs/SuppInfo/uni_codes_table.Rmd'))}
+```
+
+
+
+<!-- ```{r, child=c(here('./docs/SuppInfo/SuppInfo_text.Rmd'))} -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, child=c(here('./docs/SuppInfo/fed_codes_table.Rmd'))} -->
+<!-- ``` -->
+
+
+
+<!-- ```{r, child=c(here('./docs/SuppInfo/uni_codes_table.Rmd'))} -->
+<!-- ``` -->
+

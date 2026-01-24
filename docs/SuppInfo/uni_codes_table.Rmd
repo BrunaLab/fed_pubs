@@ -89,9 +89,8 @@ knitr::opts_chunk$set(dpi=300,fig.width=6)
 \newpage
 
 ```{r unicodes}
-
-
-scopus_id<-read_rds("./data_clean/affils_df_clean_uni_20251010.rds") %>% 
+data_path <- here("data_clean", "affils_df_clean_uni_20251210.rds")
+scopus_id<-read_rds(data_path) %>% 
   mutate(uni=case_when(
     is.na(uni) ~ "other",
     .default = as.character(uni)
@@ -131,7 +130,8 @@ uni_scopus_codes<-scopus_id %>%
   mutate(uni=tolower(uni)) %>% 
   mutate(uni=gsub("[,]","",uni)) %>% 
   mutate(affiliation=gsub("[,]","",affiliation)) %>% 
-  write_csv("./data_archive/uni_scopus_codes.csv")
+  write_csv(here("data_archive","uni_scopus_codes.csv"))
+  
 rm(uni_scopus_codes)
 
 

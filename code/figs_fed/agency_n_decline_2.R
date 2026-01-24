@@ -7,8 +7,8 @@ agency_n_decline_2 <- function(agency_n_decline) {
       mutate(PY=as.factor(PY)) %>% 
       drop_na() %>%
       # filter(author_position=="any") %>%
-      # filter(PY == "2023"|PY == "2024"| PY == "2025") %>%
-      filter(PY == "2024"| PY == "2025") %>%
+      filter(PY == "2020"|PY == "2021"| PY == "2022"|PY == "2023"|PY == "2024"| PY == "2025") %>%
+      # filter(PY == "2024"| PY == "2025") %>%
       ggplot(aes(x = PY, y = perc_previous, fill = PY)) +
       geom_bar(stat = "identity", position = "dodge") +
       # scale_y_continuous(limits=c(-30,20),breaks = seq(-30,20,by=5))+

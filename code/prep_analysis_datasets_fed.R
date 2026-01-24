@@ -1,4 +1,4 @@
-prep_analysis_datasets_fed <- function(cat, date,PM_max) {
+prep_analysis_datasets_fed <- function(date,PM_max,PY_max) {
 
 # load libraries ----------------------------------------------------------
 
@@ -16,12 +16,7 @@ library(forcats)
 
 
 
-# cat<-"fed"
-# date<-"20250901"
-# 
-# cat<-"fed"
-# date<-"20251010"
-
+cat<-"fed"
 
 # create folders for output -----------------------------------------------
 
@@ -78,7 +73,7 @@ message("(sub)directories created")
 # PM_max<-6 # june
 # PM_max<-7 # july
 # PM_max<-8 # aug
-PY_max<-2025
+
 
 # load data  --------------------------------------------------------------
 
@@ -386,6 +381,16 @@ scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.cs
   tally() %>% 
   filter(search_cat=="returned_affil") %>% 
   select(n)
+}
+
+
+
+if (date=="20251210"){
+  scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") %>%
+    group_by(search_cat) %>% 
+    tally() %>% 
+    filter(search_cat=="returned_affil") %>% 
+    select(n)
 }
 # note search_cat==original_affil is how many of the ones origianlly 
 # searched actually pinged a paper back socketAccept(it is less than number searched)
@@ -767,7 +772,7 @@ write_csv(authors_df,"./data_clean/for_pub/authors_df_fed_anywhere.csv")
 
 
 write_csv(papers_with_fed_first,"./data_clean/for_pub/papers_df_fed_first.csv")
-write_csv(first_authors,"./data_clean/for_pub/authors_df_fed_fed_first.csv")
+write_csv(first_authors,"./data_clean/for_pub/authors_df_fed_first.csv")
 
 write_csv(papers_with_only_feds,"./data_clean/for_pub/papers_df_only_fed_authors.csv")
 

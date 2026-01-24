@@ -1,10 +1,10 @@
-make_figs_uni <- function(cat, date,PM_max,author_position) {
+make_figs_uni <- function(date,PM_max,PY_max,author_position) {
 
   library(tidyverse)
 library(janitor)
 library(data.table)
 
-  PY_max<-2025
+  cat<-"uni"
   
 
   
