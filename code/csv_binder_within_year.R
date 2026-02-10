@@ -31,6 +31,8 @@ library(here)
 
 # cat<-"uni"
 # date<-"20251010"
+  
+# date<-"20260101"
 
 
 data<-paste0("scopus_downloads/",cat,"_",date)
@@ -38,39 +40,41 @@ data<-paste0("scopus_downloads/",cat,"_",date)
 if (cat =="fed"){
   folder<-c(
     "usgs",
-    "2019", # 1
+    # "2019", # 1
     "2020", # 2
     "2021", # 3
     "2022", # 4
     "2023", # 5
     "2024", # 6
     "2025") # 7
-} else {
+}else if(cat=="uni"){
   folder<-c(
-    "2019", # 1
+    # "2019_uni_20251010", # 1
+    # "2020_uni_20251010", # 2
+    # "2021_uni_20251010", # 3
+    # "2022_uni_20251010", # 4
+    # "2023_uni_20251010", # 5
+    # "2024_uni_20251010", # 6
+    # "2025_uni_20251010", # 7
+    # "2019_uni_20250901", # 1
+    # "2020_uni_20250901", # 2
+    # "2021_uni_20250901", # 3
+    # "2022_uni_20250901", # 4
+    # "2023_uni_20250901", # 5
+    # "2024_uni_20250901", # 6
+    # "2025_uni_20250901"  # 7
+    
+    # "2019", # 1
     "2020", # 2
     "2021", # 3
     "2022", # 4
     "2023", # 5
     "2024", # 6
-    "2025",
-    "2019_uni_20251010", # 1
-    "2020_uni_20251010", # 2
-    "2021_uni_20251010", # 3
-    "2022_uni_20251010", # 4
-    "2023_uni_20251010", # 5
-    "2024_uni_20251010", # 6
-    "2025_uni_20251010", # 7
-    "2019_uni_20250901", # 1
-    "2020_uni_20250901", # 2
-    "2021_uni_20250901", # 3
-    "2022_uni_20250901", # 4
-    "2023_uni_20250901", # 5
-    "2024_uni_20250901", # 6
-    "2025_uni_20250901"  # 7
+    "2025"
     ) 
-}
-
+}else{
+  stop("ERROR: Please enter 'fed' or 'uni' for the variable 'cat'")
+  }
 
 
 # create folders - subfolder for cats --------------------------------------
@@ -120,25 +124,8 @@ if (file.exists(sub_dir2)){
 main_dir3 <- paste(main_dir2,"/papers",sep="")
 main_dir4 <- paste(main_dir2,"/authors",sep="")
 main_dir5 <- paste(main_dir2,"/affils",sep="")
-# 
-# # setting up the main directory
-# main_dir3 <- paste(main_dir2,"/papers",sep="")
-# 
-# # setting up the sub directory
-# sub_dir3 <- paste("year_files_",cat,sep="")
-# 
-# # check if sub directory exists 
-# if (file.exists(sub_dir3)){
-#   
-#   # specifying the working directory
-#   setwd(file.path(main_dir3, sub_dir3))
-# } else {
-#   
-#   # create a new sub directory inside
-#   # the main path
-#   dir.create(file.path(main_dir3, sub_dir3))
-#   
-# }
+
+
 
 
 # create folders - authors records --------------------------------------
@@ -163,24 +150,6 @@ if (file.exists(sub_dir4)){
 
 
 
-# 
-# # setting up the main directory
-# main_dir4 <- paste(main_dir2,"/authors",sep="")
-# # setting up the sub directory
-# 
-# 
-# # check if sub directory exists 
-# if (file.exists(sub_dir3)){
-#   
-#   # specifying the working directory
-#   setwd(file.path(main_dir4, sub_dir3))
-# } else {
-#   
-#   # create a new sub directory inside
-#   # the main path
-#   dir.create(file.path(main_dir4, sub_dir3))
-#   
-# }
 # create folders - affils records --------------------------------------
 
 
@@ -202,23 +171,7 @@ if (file.exists(sub_dir5)){
 
 
 
-# 
-# # setting up the main directory
-# main_dir5 <- paste(main_dir2,"/affils",sep="")
-# # setting up the sub directory
-# 
-# # check if sub directory exists 
-# if (file.exists(sub_dir3)){
-#   
-#   # specifying the working directory
-#   setwd(file.path(main_dir5, sub_dir3))
-# } else {
-#   
-#   # create a new sub directory inside
-#   # the main path
-#   dir.create(file.path(main_dir5, sub_dir3))
-#   
-# }
+
 # create folders - incomplete records --------------------------------------
 
 

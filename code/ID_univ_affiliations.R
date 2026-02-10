@@ -23,6 +23,12 @@ ID_univ_affiliations <- function(affils_df,date) {
   }
   
   
+  
+  if(date=="20260101"){
+    uni_affils<-read_csv("./data_clean/api_uni_affils_searched_2025-10-18.csv")
+    
+  }
+  
   uni_affils<-uni_affils %>% 
   mutate_all(tolower) %>% 
   mutate(affil_id=as.numeric(affil_id))

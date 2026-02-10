@@ -17,7 +17,8 @@ uni_n_decline_2 <- function(uni_n_decline) {
       scale_y_continuous(limits=c(-30,20),breaks = seq(-30,20,by=5))+
       labs(x = "Year", size=5)+
       labs(y = "Percent Change in Productivity from Previous Year", size=5)+
-      scale_fill_manual("legend",  values = c("#8B0000","#36648B","#36648B","#36648B","#36648B","#8B0000"))+
+      # scale_fill_manual("legend",  values = c("#8B0000","#36648B","#36648B","#36648B","#36648B","#8B0000"))+
+    scale_fill_manual("legend",  values = c("#36648B","#36648B","#36648B","#36648B","#8B0000"))+
       # scale_fill_manual("legend",  values = c("#36648B","#36648B","#8B0000"))+
       theme_classic() +
       theme(legend.position="none")+

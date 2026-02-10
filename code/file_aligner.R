@@ -1,6 +1,9 @@
 
 library(tidyverse)
 library(janitor)
+
+# TTHIS CHECKS TO MAKE SURE FILES IN FOLDER ARE CSV AND THAT ALL FOLDERS HAVE 
+# SAME NUMBER OF FILES
 # read & standardize: SCOPUS papers ---------------------------------------
 
 #####################################

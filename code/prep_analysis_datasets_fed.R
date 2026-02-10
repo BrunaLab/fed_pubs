@@ -1,4 +1,4 @@
-prep_analysis_datasets_fed <- function(date,PM_max,PY_max) {
+prep_analysis_datasets_fed <- function(date,PM_max,PY_min,PY_max) {
 
 # load libraries ----------------------------------------------------------
 
@@ -86,6 +86,7 @@ affils_df  <- setDT(read_rds(paste("./data_clean/affils_df_clean_",cat,"_",date,
 # papers_df  <- setDT(read_rds("./data_clean/papers_df_clean.rds")) 
 papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
   filter(PY<=PY_max) %>% 
+  filter(PY>=PY_min) %>% 
   filter(if_else(PY==2025, PM<=PM_max,PM<=12)) 
   
 # Authors
@@ -392,6 +393,17 @@ if (date=="20251210"){
     filter(search_cat=="returned_affil") %>% 
     select(n)
 }
+
+
+if (date=="20260101"){
+  scopus_id_followup<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") %>%
+    group_by(search_cat) %>% 
+    tally() %>% 
+    filter(search_cat=="returned_affil") %>% 
+    select(n)
+}
+
+
 # note search_cat==original_affil is how many of the ones origianlly 
 # searched actually pinged a paper back socketAccept(it is less than number searched)
 

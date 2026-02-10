@@ -6,7 +6,8 @@ agency_n_decline_bar_facets <- function(agency_n_decline_first,threshhold_ct, PY
   
   
     fig_data<-agency_n_decline_first %>% 
-    filter(PY>2019) %>% 
+    # filter(PY>2019) %>% 
+      filter(PY>2020) %>% 
       filter(agency_primary%in%threshhold_ct$agency_primary) %>% 
       mutate(PY=as.factor(PY)) %>% 
       mutate(agency_primary=if_else(nchar(agency_primary)<5,str_to_upper(agency_primary),str_to_title(agency_primary))) %>% 
@@ -58,7 +59,8 @@ agency_n_decline_bar_facets <- function(agency_n_decline_first,threshhold_ct, PY
     labs(x = "Year", size=7)+
     labs(y = "Percent change in productivity", size=5)+
     geom_bar(stat="identity", color="black")+
-    scale_fill_manual(values=c("#8B0000",rep("#36648B",4),"#8B0000"))+
+    scale_fill_manual(values=c(rep("#36648B",4),"#8B0000"))+
+    # scale_fill_manual(values=c("#8B0000",rep("#36648B",4),"#8B0000"))+
     geom_text(aes(label=n), position=position_dodge(width=0.9), color="black", size = 3)+
     
     facet_wrap(~factor(agency_primary, c(as.vector(order$agency_primary))),

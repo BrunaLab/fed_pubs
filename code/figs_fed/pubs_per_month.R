@@ -5,7 +5,7 @@ pubs_per_month <- function(pubs_mo, PY_max) {
     filter(PY<PY_max+1) %>% 
     mutate(PY=as.factor(PY)) %>%
     ggplot(aes(x=month_name, y=n,group=PY,color=PY)) +
-    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000"))+
+    scale_color_manual(values=c(rep("lightgray",4),"#36648B","#8B0000"))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications Indexed", size=5)+
     geom_line() + 

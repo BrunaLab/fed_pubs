@@ -27,7 +27,8 @@ r_refs(here("fed_pubs.bib"))
 
 ```{r bs-results} 
 
-date<-"20251210"
+# date<-"20251210"
+date<-"20260101"
 
 
 fed_dir<-paste("docs/summary_info/fed_",date,sep="")

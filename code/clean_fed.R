@@ -87,6 +87,11 @@ clean_fed <- function(date) {
     scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") 
   }
   
+  if (date=="20260101"){
+    scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") 
+  }
+  
+  
   scopus_ids_searched<-scopus_ids_searched %>% mutate(city=NA)
   # 
   # scopus_ids_searched<-read_csv("./data_clean/api_fed_affils_searched_2025-11-04.csv") %>% 
@@ -99,7 +104,7 @@ clean_fed <- function(date) {
   
   affils_df<-read_csv(paste("./data_raw/fed_",date,"/","all_affils_df_fed.csv",sep=""))
   
-  message("STEP 2/7: tagging federal affiliations affiliations and authors...this might take a while...")
+  message("STEP 2/7: tagging federal affiliations and authors...this might take a while...")
   
   source("./code/ID_fed_affiliations.R")
   affils_df<-ID_fed_affiliations(affils_df,scopus_ids_searched)

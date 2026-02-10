@@ -133,7 +133,7 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,dataset_3,P
     # filter(PM<=PM_max) %>% 
     mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
     mutate(label = if_else(PY == "Avg. (all yrs)", NA, as.character(label))) %>% 
-    mutate(label = if_else((PY == "2019"|PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
+    mutate(label = if_else((PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
     ggplot(aes(x=month_name, 
                y=cumul_pubs,
                group=PY,
@@ -146,8 +146,8 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,dataset_3,P
     geom_point(size=1.0)+
     # scale_color_manual(values=c(rep("darkgray",5),"#36648B", "#8B0000","#36648B"))+
     # scale_linetype_manual(values = c(rep("solid", 5),"solid", "solid", "longdash"))+
-    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000","black"))+
-    scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
+    scale_color_manual(values=c(rep("lightgray",4),"#36648B","#8B0000","black"))+
+    scale_linetype_manual(values = c(rep("solid", 5), "solid", "longdash"))+
     # expand_limits(y = 0)+
     # expand_limits(x= c(0,length(levels(plot_data_1$month_name)) + 1.25))+
     expand_limits(x= c(1,length(levels(plot_data_3 %>% filter(PM<=PM_max) %>% select(month_name))) + 13))+
@@ -199,7 +199,7 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,dataset_3,P
     # filter(PM<=PM_max) %>% 
     mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
     mutate(label = if_else(PY == "Avg. (all yrs)", NA, as.character(label))) %>% 
-    mutate(label = if_else((PY == "2019"|PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
+    mutate(label = if_else((PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
     ggplot(aes(x=month_name, 
                y=cumul_pubs,
                group=PY,
@@ -212,8 +212,8 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,dataset_3,P
     geom_point(size=1.0)+
     # scale_color_manual(values=c(rep("darkgray",5),"#36648B", "#8B0000","#36648B"))+
     # scale_linetype_manual(values = c(rep("solid", 5),"solid", "solid", "longdash"))+
-    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000","black"))+
-    scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
+    scale_color_manual(values=c(rep("lightgray",4),"#36648B","#8B0000","black"))+
+    scale_linetype_manual(values = c(rep("solid", 5), "solid", "longdash"))+
     # expand_limits(y = 0)+
     # expand_limits(x= c(0,length(levels(plot_data_1$month_name)) + 1.25))+
     expand_limits(x= c(1,length(levels(plot_data_1 %>% filter(PM<=PM_max) %>% select(month_name))) + 13))+
@@ -288,8 +288,8 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,dataset_3,P
     # scale_color_manual(values=c(rep("lightgray",5),"#36648B", "#8B0000","#36648B"))+
     # scale_linetype_manual(values = c(rep("solid", 5),"solid", "solid", "longdash"))+
     # scale_color_manual(values=c(rep("lightgray",6),"#8B0000","black"))+
-    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000","black"))+
-    scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
+    scale_color_manual(values=c(rep("lightgray",4),"#36648B","#8B0000","black"))+
+    scale_linetype_manual(values = c(rep("solid", 5), "solid", "longdash"))+
       # expand_limits(y = 0)+
       # expand_limits(x= c(0,length(levels(plot_data_2$month_name)) + 1.25))+
       expand_limits(x= c(1,length(levels(plot_data_2 %>% filter(PM<=PM_max) %>% select(month_name))) + 13))+
@@ -375,7 +375,7 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,dataset_3,P
   #   geom_line(linewidth = if_else(plot_data_1$PY == "Avg. (all yrs)",1.5,1)) + 
   #   geom_point(size=1.5)+
   #   scale_color_manual(values=c(rep("darkgray",6),"#8B0000","#36648B"))+
-  #   scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
+  #   scale_linetype_manual(values = c(rep("solid", 5), "solid", "longdash"))+
   #   # expand_limits(y = 0)+
   #   # expand_limits(x= c(0,length(levels(plot_data_1$month_name)) + 1.25))+
   #   expand_limits(x= c(1,length(levels(plot_data_1 %>% filter(PM<=PM_max) %>% select(month_name))) + 2))+
@@ -445,7 +445,7 @@ pubs_per_month_cumulative_multipanel <- function(dataset_1,dataset_2,dataset_3,P
   #   geom_line(linewidth = if_else(plot_data_1$PY == "Avg. (all yrs)",1.5,1)) + 
   #   geom_point(size=1.5)+
   #   scale_color_manual(values=c(rep("darkgray",6),"#8B0000","#36648B"))+
-  #   scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
+  #   scale_linetype_manual(values = c(rep("solid", 5), "solid", "longdash"))+
   #   # expand_limits(y = 0)+
   #   # expand_limits(x= c(0,length(levels(plot_data_2$month_name)) + 1.25))+
   #   expand_limits(x= c(1,length(levels(plot_data_1 %>% filter(PM<=PM_max) %>% select(month_name))) + 2))+

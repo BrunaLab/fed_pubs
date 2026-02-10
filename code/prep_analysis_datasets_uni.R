@@ -1,4 +1,4 @@
-prep_analysis_datasets_uni <- function(date,PM_max,PY_max) {
+prep_analysis_datasets_uni <- function(date,PM_max,PY_min,PY_max) {
 
   library(tidyverse)
 library(janitor)
@@ -25,6 +25,13 @@ library(data.table)
     scopus_ids_searched<-read_csv("./data_clean/api_uni_affils_searched_2025-10-18.csv")
   }
 
+  
+  
+  
+  if(date=="20260101"){
+    scopus_ids_searched<-read_csv("./data_clean/api_uni_affils_searched.csv")
+  }
+  
 # 
 
 
@@ -90,7 +97,10 @@ affils_df  <- setDT(read_rds(paste("./data_clean/affils_df_clean_",cat,"_",date,
 
 
 # papers_df  <- setDT(read_rds("./data_clean/papers_df_uni_clean.rds")) 
-papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep="")))
+papers_df  <- setDT(read_rds(paste("./data_clean/papers_df_clean_",cat,"_",date,".rds",sep=""))) %>% 
+  filter(PY<=PY_max) %>% 
+  filter(PY>=PY_min) %>% 
+  filter(if_else(PY==2025, PM<=PM_max,PM<=12)) 
 # %>% 
 #   mutate(PM=
 #            case_when(

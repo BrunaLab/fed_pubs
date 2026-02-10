@@ -1403,10 +1403,11 @@ journals_n_perc_annual_first <- jrnls_yr_first %>%
          perc_yr_2022,
          n_yr_2021,
          perc_yr_2021,
+         # n_yr_2019,
+         # perc_yr_2019,
          n_yr_2020,
-         perc_yr_2020,
-         n_yr_2019,
-         perc_yr_2019)     
+         perc_yr_2020
+         )     
 
 
 

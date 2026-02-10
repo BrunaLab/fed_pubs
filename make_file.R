@@ -15,9 +15,11 @@
 
 # chose data download date and max month  ---------------------------------
 
-date<-"20251210"
+# date<-"20251210"
+date<-"20260101"
 PM_max<-12
 PY_max<-2025
+PY_min<-2020
 author_position<-"first"
 # author_position<-"anywhere"
 # process federal records -------------------------------------------------
@@ -55,10 +57,10 @@ clean_uni(date)
 # prep datasets for analyses and make overall summaries
 
 source("./code/prep_analysis_datasets_fed.R")
-prep_analysis_datasets_fed(date, PM_max,PY_max)
+prep_analysis_datasets_fed(date, PM_max,PY_min,PY_max)
 
 source("./code/prep_analysis_datasets_uni.R")
-prep_analysis_datasets_uni(date, PM_max,PY_max)
+prep_analysis_datasets_uni(date, PM_max, PY_min, PY_max)
 
 
 # bootstrapping -----------------------------------------------------------

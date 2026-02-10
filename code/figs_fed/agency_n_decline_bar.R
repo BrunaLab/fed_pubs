@@ -4,7 +4,8 @@ agency_n_decline_bar <- function(agency_n_decline_sum, PY_max) {
   library(patchwork)
   
   agency_n_decline_sum<-agency_n_decline_sum %>% 
-    filter(PY>2019) %>% 
+    # filter(PY>2019) %>% 
+    filter(PY>2020) %>%   
     mutate(PY=as.factor(PY)) 
     
   
@@ -23,7 +24,8 @@ agency_n_decline_bar <- function(agency_n_decline_sum, PY_max) {
     labs(x = "Year", size=7)+
     labs(y = "Percent change in productivity", size=5)+
     geom_bar(stat="identity", color="black")+
-    scale_fill_manual(values=c("#8B0000",rep("#36648B",4),"#8B0000"))+
+    scale_fill_manual(values=c(rep("#36648B",4),"#8B0000"))+
+    # scale_fill_manual(values=c("#8B0000",rep("#36648B",4),"#8B0000"))+
     geom_text(aes(label=cumul_pubs), position=position_dodge(width=0.9), color="black")+
     theme_classic()+
     geom_hline(yintercept = 0)+
@@ -58,7 +60,8 @@ agency_n_decline_bar <- function(agency_n_decline_sum, PY_max) {
     labs(x = "Year", size=7)+
     labs(y = "Percent change in productivity", size=5)+
     geom_bar(stat="identity", color="black")+
-    scale_fill_manual(values=c("#8B0000",rep("#36648B",4),"#8B0000"))+
+    # scale_fill_manual(values=c("#8B0000",rep("#36648B",4),"#8B0000"))+
+      scale_fill_manual(values=c(rep("#36648B",4),"#8B0000"))+
     geom_text(aes(label=cumul_pubs), position=position_dodge(width=0.9), color="black")+
     theme_classic()+
     geom_hline(yintercept = 0)+
@@ -92,7 +95,8 @@ agency_n_decline_bar <- function(agency_n_decline_sum, PY_max) {
       labs(x = "Year", size=7)+
       labs(y = "Percent change in productivity", size=5)+
       geom_bar(stat="identity", color="black")+
-      scale_fill_manual(values=c("#8B0000",rep("#36648B",4),"#8B0000"))+
+      # scale_fill_manual(values=c("#8B0000",rep("#36648B",4),"#8B0000"))+
+      scale_fill_manual(values=c(rep("#36648B",4),"#8B0000"))+
       geom_text(aes(label=cumul_pubs), position=position_dodge(width=0.9), color="black")+
       theme_classic()+
       geom_hline(yintercept = 0)+

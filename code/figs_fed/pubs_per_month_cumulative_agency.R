@@ -189,15 +189,17 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     filter(PM<PM_max+1) %>% 
     mutate(label = if_else(PM == max(PM), as.character(PY), NA_character_)) %>% 
     mutate(label = if_else(PY == "avg", NA, as.character(label))) %>% 
-    mutate(label = if_else((PY == "2019"|PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
+    # mutate(label = if_else((PY == "2019"|PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
+    mutate(label = if_else((PY == "2020"|PY == "2021"|PY == "2022"|PY == "2023"), NA, as.character(label))) %>% 
     ggplot(aes(x=month_name, y=cumul_pubs,group=PY,color=PY,  linetype=PY))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
     # geom_line() + 
     geom_point(size=0.5)+
     geom_line() + 
-    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000","black"))+
-    scale_linetype_manual(values = c(rep("solid", 6), "solid", "longdash"))+
+    scale_color_manual(values=c(rep("lightgray",4),"#36648B","#8B0000","black"))+
+    # scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000","black"))+
+    scale_linetype_manual(values = c(rep("solid", 5), "solid", "longdash"))+
     # expand_limits(y = 0)+
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+

@@ -7,7 +7,8 @@ pubs_per_month <- function(pubs_mo, PY_max) {
     mutate(label = if_else(PY == "avg", NA, as.character(label))) %>% 
     mutate(PY=as.factor(PY)) %>%
     ggplot(aes(x=month_name, y=n,group=PY,color=PY)) +
-    scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000"))+
+    # scale_color_manual(values=c(rep("lightgray",5),"#36648B","#8B0000"))+
+    scale_color_manual(values=c(rep("lightgray",4),"#36648B","#8B0000"))+
     labs(x = "Month", size=5)+
     labs(y = "No. of Publications", size=5)+
     geom_line() + 
