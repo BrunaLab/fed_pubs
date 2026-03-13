@@ -1,4 +1,4 @@
-pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_max,PM_max) {
+pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_dataset,PY_max,PM_max) {
   
   library(gghighlight)
   library(ggrepel)
@@ -10,11 +10,14 @@ pubs_per_month_cumulative_by_uni <- function(papers_dataset,authors_data_set,PY_
     select(refID,PY,PM)
   
   
-  authors_df_info<- authors_data_set %>% 
+  authors_df_info<- authors_dataset %>% 
     select(refID,uni,author_order) 
   
   
-  pubs_mo_info <- left_join(papers_df_info,authors_df_info)
+  pubs_mo_info <- papers_df_info %>% inner_join(authors_df_info)
+  
+  pubs_mo_info %>% group_by(refID) %>% tally() %>% arrange(desc(n))
+  
   unique(pubs_mo_info$uni)
   
   

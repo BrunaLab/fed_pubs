@@ -131,7 +131,7 @@ library(gridExtra)
 library(png)
 library(data.table)
 library(english)
-# library(here)
+library(here)
 
 knitr::opts_chunk$set(echo = FALSE, message=FALSE,warning=FALSE)
 
@@ -410,7 +410,7 @@ The data used in this study are archived at Dryad [*url to be added*], while the
     
     
     
-```{r pubstable, echo = FALSE, fig.cap="Table 1. The number and percentage of publications indexed in Scopus by federal author affiliation and author position. Also shown is the percent difference in first author publications when comparing Jan-Oct 2024 with the same period in 2023 and Jan-Oct 2025 with the same period in 2024."}
+```{r pubstable, echo = FALSE, fig.cap="Table 1. The number and percentage of publications indexed in Scopus by federal author affiliation and author position. Also shown is the percent difference in first author publications when comparing January-December 2024 with the same period in 2023 and January-December 2025 with the same period in 2024."}
 # space btween and table
 # https://tex.stackexchange.com/questions/338435/how-to-reduce-space-between-end-of-table-and-footnote-using-parnote
 
@@ -637,14 +637,14 @@ knitr::include_graphics(paste(uni_dir,"/pubs_mo_cum_fig_uni.png",sep=""),error=F
 
 
 
-```{r  label = agency-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through December (2020-2025) for nine US federal departments or agencies based on first author affiliation. These federal units had the most articles indexed in Scopus from January 2020 through December 2025 (Table 1). The solid lines are each year’s cumulative counts; the dashed line is the 2020-2024 average. Note the different scales of the y-axes for each subplot.", out.width = '105%',fig.align='center'}
+```{r  label = agency-decline-3, echo = FALSE, fig.cap = "Cumulative number of publications through December (2020-2025) for eight US federal departments or agencies based on first author affiliation. These federal units had >6000 articles indexed in Scopus from January 2020 through December 2025 (Table 1). The solid lines are each year’s cumulative counts; the dashed line is the 2020-2024 average. Note the different scales of the y-axes for each subplot.", out.width = '105%',fig.align='center'}
 # ,out.extra='angle=270'
 # knitr::include_graphics("images/pubs_mo_cum_agency_lines.png", error=FALSE)
 knitr::include_graphics(paste(fed_dir,"/pubs_mo_cum_agency_lines.png",sep=""),error=FALSE)
 
 ```
 
-```{r  label = agency-decline-4, echo = FALSE, fig.cap = "Annual percent change in first-author publications for the nine US federal departments or agencies with > 4000  publications indexed in Scopus from January 2020 through December 2025 (Table 1).", out.width = '90%',fig.align='center'}
+```{r  label = agency-decline-4, echo = FALSE, fig.cap = "Annual percent change in first-author publications for the eight US federal departments or agencies with >6000  publications indexed in Scopus from January 2020 through December 2025 (Table 1).", out.width = '90%',fig.align='center'}
 # ,out.extra='angle=270'
 knitr::include_graphics(paste(fed_dir,"/perc_change_bar_multipanel_2.png",sep=""),error=FALSE)
 

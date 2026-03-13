@@ -806,27 +806,44 @@ save_dir<-paste(main_dir2,sub_dir2,sep="/")
 
 # publications per year ---------------------------------------------------
 
+# 
+# pubs_by_affil<-authors_dataset %>% 
+#   filter(federal==TRUE) %>% 
+#   group_by(affil_id,agency_primary,agency) %>% 
+#   tally() %>% 
+#   arrange(desc(n)) 
+# 
+# pubs_by_agency<-authors_dataset %>% 
+#   filter(federal==TRUE) %>% 
+#   group_by(agency_primary,
+#            agency) %>% 
+#   tally() %>% 
+# arrange(desc(n))
+#   arrange(agency_primary,desc(n)) 
+# 
+# pubs_by_affil
 
 # message("calculating pubs_per_yr of focal dataset")
 
 #   
-# pubs_yr <- papers_dataset %>% 
-#   distinct(refID,PY) %>% 
-#   group_by(PY) %>% 
-#   tally()
-# 
-# 
-# source("code/figs_fed/total_pubs_per_year.R")
-# pubs_yr_fig<-total_pubs_per_year(papers_dataset,PY_max-1)
-# pubs_yr_fig
+pubs_yr <- papers_dataset %>%
+  distinct(refID,PY) %>%
+  group_by(PY) %>%
+  tally()
+
+
+source("code/figs_fed/total_pubs_per_year.R")
+pubs_yr_fig<-total_pubs_per_year(papers_dataset,PY_max)
+pubs_yr_fig
 
 
 
 # SAVE FIGURE
-# ggsave("./docs/images/total_pubs_per_yr.png",
-#        width = 6, height = 4, units = "in",
-#        device='png', dpi=700)
 
+
+ggsave(paste(save_dir,"/","total_pubs_per_yr.png",sep=""),
+       width = 6, height = 4, units = "in",
+       device='png', dpi=700)  
 
 # publications per month --------------------------------------------------
 
@@ -1183,7 +1200,7 @@ ggsave(paste(save_dir,"/","pubs_mo_cum_agency_lines.png",sep=""),
 
 
 # bar chart percent by agency ---------------------------------------------
-threshold<-4000
+threshold<-6000
 
 threshhold_ct<-authors_dataset %>% 
   mutate(agency=if_else(agency=="us department of the interior", "interior",agency)) %>% 
@@ -1195,7 +1212,7 @@ threshhold_ct<-authors_dataset %>%
   group_by(agency_primary) %>% 
   summarize(n=n_distinct(refID)) %>% 
   arrange(desc(n)) %>% 
-  filter(n>=4000) %>% 
+  filter(n>=threshold) %>% 
   select(agency_primary)
 
 

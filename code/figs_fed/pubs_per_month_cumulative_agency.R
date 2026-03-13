@@ -14,8 +14,10 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
               "usda",
               "commerce",
               "interior",
-              "nasa",
-              "smithsonian") %>% 
+              "nasa"
+              # ,
+              # "smithsonian"
+              ) %>% 
     tibble() %>% 
     rename(agency_primary=".")
   
@@ -154,7 +156,7 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
       agency_primary == "Commerce"~"(F) Dept Commerce",
       agency_primary == "Interior"~"(G) Dept Interior",
       agency_primary == "NASA"~"(H) NASA",
-      agency_primary == "Smithsonian"~"(I) Smithsonian",
+      # agency_primary == "Smithsonian"~"(I) Smithsonian",
       agency_primary == "NSF"~"National Science Foundation",
       agency_primary == "EPA"~"Environmental Protection Agency",
       agency_primary == "DOJ"~"Justice",
@@ -204,7 +206,7 @@ pubs_per_month_cumulative_agency <- function(papers_dataset,authors_dataset, PY_
     expand_limits(x= c(0,PM_max + 1.25))+
     theme_classic()+
     facet_wrap(~factor(agency_primary, c(as.vector(order$agency_primary))),
-               ncol = 3, 
+               ncol = 2, 
                scales = "free")+
     scale_y_continuous(breaks = scales::breaks_pretty(n=8))+
     # scale_y_continuous(expand = c(0, 0),breaks = scales::breaks_pretty(n=8))+ 

@@ -104,7 +104,8 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     115350562, 116585518, 132056784, 128052398, 127055550, 125577815, 124376601,
     122813821, 117045154, 117356744, 106121997, 131878970, 132380041,
     126824963, 120288931, 122992184, 121169296, 117047886, 127383794, 109346072,
-    122759474, 121368830, 127023381, 127876668, 129434464, 125383607, 128395598
+    122759474, 121368830, 127023381, 127876668, 129434464, 125383607, 128395598,
+    121260715,101592717
   )
 
   # fed_affils <- fed_affils %>% filter(!affil_id %in% nonfed_affils$affil_id)
@@ -791,8 +792,10 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
 
   affils_df <- affils_df %>%
     mutate(affiliation = gsub("[.]", "", affiliation)) %>%
+    mutate(affiliation = gsub("[’]", "'", affiliation)) %>%
     mutate(affiliation = gsub("[/]", " ", affiliation)) %>%
     mutate(affiliation = gsub(",", "", affiliation)) %>%
+    mutate(affiliation = gsub("−", "-", affiliation)) %>%
     mutate(affiliation = gsub("- ", "-", affiliation)) %>%
     mutate(affiliation = gsub(" -", "-", affiliation)) %>%
     mutate(affiliation = gsub("indo-pacific", "indopacific", affiliation)) %>%
@@ -822,9 +825,13 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     mutate(affiliation = gsub("epa's ", "epa ", affiliation)) %>%
     mutate(affiliation = gsub("nasa's ", "nasa ", affiliation)) %>%
     mutate(affiliation = gsub("usda's ", "usda ", affiliation)) %>%
+    mutate(affiliation = gsub("usda’s ", "usda ", affiliation)) %>%
     mutate(affiliation = gsub("fda's ", "fda ", affiliation)) %>%
+    mutate(affiliation = gsub("fda’s ", "fda ", affiliation)) %>%
+    mutate(affiliation = gsub("cdc’s ", "cdc ", affiliation)) %>%
     mutate(affiliation = gsub("cdc's ", "cdc ", affiliation)) %>%
     mutate(affiliation = gsub("energy's ", "energy ", affiliation)) %>%
+    mutate(affiliation = gsub("energy’s ", "energy ", affiliation)) %>%
     mutate(affiliation = gsub("guard's ", "guard ", affiliation)) %>%
     mutate(affiliation = gsub("institute's ", "institute ", affiliation)) %>%
     mutate(affiliation = gsub("smithsonian's ", "smithsonian ", affiliation)) %>%
@@ -835,6 +842,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     mutate(affiliation = gsub("us dep of ", "department of ", affiliation)) %>%
     mutate(affiliation = gsub("us department of ", "department of ", affiliation)) %>%
     mutate(affiliation = gsub("usda-agricultural research services", "usda ars", affiliation)) %>%
+    mutate(affiliation = gsub("agricultural research services", "ars", affiliation)) %>%
     mutate(affiliation = gsub("usda-agricultural research service", "usda ars", affiliation)) %>%
     mutate(affiliation = gsub("us forest service (usda)", "us forest service", affiliation)) %>%
     mutate(affiliation = gsub("us forest service (usfs)", "us forest service", affiliation)) %>%
@@ -856,7 +864,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
         case_when(
           affiliation == "animal and plant health inspection service usda" ~ "usda animal and plant health inspection service",
           affiliation == "european biological control laboratory (usda-ars)" ~ "usda-ars european biological control laboratory",
-          affiliation == "retired us forest service" ~ "us forest service retired",
+          affiliation == "retired us forest service" ~ "usfs retired",
           affiliation == "national forest system)" ~ "national forest system",
           affiliation == "retired usda-ars" ~ "usda-ars retired",
           affiliation == "usda-office of pest management policy" ~ "usda office of pest management policy",
@@ -937,6 +945,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
           affiliation == "walter reed national military med-ical center" ~ "walter reed national military medical center",
           affiliation == "walter reed national military medical center" ~ "walter reed national military medical center",
           affiliation == "womack army med-ical center" ~ "womack army medical center",
+          affiliation == "sda ars" ~ "usda ars",
           affiliation == "womack army medical center" ~ "womack army medical center",
           affiliation == "los alamos national laboratory (retired)" ~ "los alamos national laboratory retired",
           affiliation == "national energy technology laboratory (netl) support contractor" ~ "national energy technology laboratory support contractor",
@@ -988,6 +997,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
           affiliation == "retired usgs" ~ "usgs retired",
           affiliation == "us fish and wildlife service (retired)" ~ "us fish and wildlife service retired",
           affiliation == "usgs (emeritus)" ~ "usgs emeritus",
+          affiliation == "qijian song usda-ars" ~ "usda ars",
           affiliation == "usgs (retired)" ~ "usgs retired",
           affiliation == "usgs (usgs)" ~ "usgs",
           affiliation == "usgs emeritus" ~ "usgs emeritus",
@@ -2656,7 +2666,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
   affils_df_corrected <- affils_df_corrected %>%
     mutate(affiliation = gsub("natural resources conservation service", "nrcs", affiliation)) %>%
     mutate(affiliation = gsub("animal and plant health inspection service", "aphis", affiliation)) %>%
-    mutate(affiliation = gsub("usda agricultural research service", "usda ars", affiliation)) %>%
+    mutate(affiliation = gsub("usda agricultural research service", "ars", affiliation)) %>%
     mutate(affiliation = gsub("national oceanic and atmospheric association", "noaa", affiliation)) %>%
     mutate(affiliation = gsub("national oceanic atmospheric administration", "noaa", affiliation)) %>%
     mutate(affiliation = gsub("national oceanic atmospheric admin", "noaa", affiliation)) %>%
@@ -2668,7 +2678,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     mutate(affiliation = gsub("patant &", "patent and", affiliation)) %>%
     mutate(affiliation = gsub("us bureau of the census", "us census bureau", affiliation)) %>%
     mutate(affiliation = gsub("servicegeneva", "service geneva", affiliation)) %>%
-    mutate(affiliation = gsub("usda fs ", "us forest service", affiliation)) %>%
+    mutate(affiliation = gsub("usda fs ", "us forest service ", affiliation)) %>%
     mutate(affiliation = gsub("usfs", "us forest service", affiliation)) %>%
     mutate(affiliation = gsub("usda forut service", "us forest service", affiliation)) %>%
     mutate(affiliation = gsub("u s ", "us ", affiliation)) %>%
@@ -2712,7 +2722,46 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     mutate(affiliation = gsub("1242centers", "centers", affiliation)) %>%
     mutate(affiliation = gsub("centers for disease control and prevention ", "cdc ", affiliation)) %>%
     mutate(affiliation = gsub(" (rmrmc)", "", affiliation)) %>%
+    mutate(affiliation = gsub("usda-", "", affiliation)) %>%
+    mutate(affiliation = gsub("usda ", "", affiliation)) %>%
+    # mutate(affiliation = gsub("us forest service ", "usfs ", affiliation)) %>%
+    mutate(affiliation = gsub("us forest services", "usfs", affiliation)) %>%
+    mutate(affiliation = gsub("us forest service", "usfs", affiliation)) %>%
+    mutate(affiliation = gsub("agricultural research service", "ars", affiliation)) %>%
+    mutate(affiliation = gsub("national marine fisheries service", "nmfs", affiliation)) %>%
+    mutate(affiliation = gsub("centers for disease control (cdc)", "cdc", affiliation)) %>%
+    mutate(affiliation = gsub("centers for disease control and prevention-", "cdc", affiliation)) %>%
+    mutate(affiliation = gsub("centers for disease con trol and prevention", "cdc", affiliation)) %>%
+    mutate(affiliation = gsub("centers for disease control and prevention", "cdc", affiliation)) %>%
+    mutate(affiliation = gsub("food and drug administration", "fda", affiliation)) %>%
+    mutate(affiliation = gsub("national cancer institute", "nci", affiliation)) %>%
+    mutate(affiliation = gsub("national institutes of health", "nih", affiliation)) %>%
+    mutate(affiliation = gsub("veterans integrated service network", "visn", affiliation)) %>%
+    mutate(affiliation = gsub("va wisn", "visn", affiliation)) %>%
+    mutate(affiliation = gsub("veterans health affairs", "vha", affiliation)) %>%
+    mutate(affiliation = gsub("veterans health affairs", "vha", affiliation)) %>%
+    mutate(affiliation = gsub("us fish and wildlife service", "usfws", affiliation)) %>%
+    mutate(affiliation = gsub("us fish and wildlife ", "usfws", affiliation)) %>%
+    mutate(affiliation = gsub("national aeronautics and space administration", "nasa", affiliation)) %>%
+    mutate(affiliation = gsub("smithsonian institution ", "", affiliation)) %>%
+    mutate(affiliation = gsub("usda fs ", "usfs ", affiliation)) %>%
+    mutate(affiliation = gsub("centers for disease control (cdc) ", "cdc ", affiliation)) %>%
+    mutate(affiliation = gsub("aphis ws ", "aphis wildlife services ", affiliation)) %>%
+    
+    
+  
+    # mutate(affiliation = gsub("usda aphis", "aphis", affiliation)) %>%
+    # mutate(affiliation = gsub("usda ars", "ars", affiliation)) %>%
+    
     mutate(affiliation = case_when(
+
+      affiliation == "us forest service" ~ "usfs",
+      affiliation == "us centers for disease control" ~ "cdc",
+      affiliation == "national aeronautics and space administration" ~ "nasa",
+      affiliation == "northern region us forest service" ~ "usfs northern region",
+      affiliation == "usda ars" ~ "ars",
+      affiliation == "usda–aphis" ~ "usda",
+      
       affiliation == "usaf" ~ "air force",
       affiliation == "usn" ~ "navy",
       affiliation == "us navy" ~ "navy",

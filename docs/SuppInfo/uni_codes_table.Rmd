@@ -89,7 +89,8 @@ knitr::opts_chunk$set(dpi=300,fig.width=6)
 \newpage
 
 ```{r unicodes}
-data_path <- here("data_clean", "affils_df_clean_uni_20251210.rds")
+
+data_path <- here("data_clean", "for_pub","authors_df_analysis_uni.rds") 
 scopus_id<-read_rds(data_path) %>% 
   mutate(uni=case_when(
     is.na(uni) ~ "other",

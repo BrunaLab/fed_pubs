@@ -126,11 +126,19 @@ knitr::opts_chunk$set(fig.pos = "H")
 ```{r fedcodes, cache=FALSE }
 
 pull <-
-  read_rds(here('./data_clean/affils_df_clean_20251010.rds')) %>% 
+  read_rds(here('./data_clean/for_pub/affils_df_analysis_fed.rds')) %>% 
   filter(federal==TRUE) %>% 
   select(affil_id, affiliation,agency,agency_primary) %>% 
   distinct() %>% 
   mutate(affil_id = as.character(affil_id)) 
+
+
+# pull <-
+#   read_rds(here('./data_clean/affils_df_clean_20251010.rds')) %>% 
+#   filter(federal==TRUE) %>% 
+#   select(affil_id, affiliation,agency,agency_primary) %>% 
+#   distinct() %>% 
+#   mutate(affil_id = as.character(affil_id)) 
 
 
   pull$affiliation<-replace_non_ascii(pull$affiliation)

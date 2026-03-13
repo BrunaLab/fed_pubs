@@ -54,7 +54,7 @@ dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
 # Read and tag each file
 dt_list <- lapply(dataFls, function(file) {
   dt <- fread(file, fill = TRUE)
-  dt[, source_file := basename(file)]  # Add column with filename
+  dt[, source_file2:= basename(file)]  # Add column with filename
   return(dt)
 })
 
@@ -76,7 +76,7 @@ dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
 # Read and tag each file
 dt_list <- lapply(dataFls, function(file) {
   dt <- fread(file, fill = TRUE)
-  dt[, source_file := basename(file)]  # Add column with filename
+  dt[, source_file2:= basename(file)]  # Add column with filename
   return(dt)
 })
 
@@ -99,7 +99,7 @@ rm(dt_list)
   # Read and tag each file
   dt_list <- lapply(dataFls, function(file) {
     dt <- fread(file, fill = TRUE)
-    dt[, source_file := basename(file)]  # Add column with filename
+    dt[, source_file2 := basename(file)]  # Add column with filename
     return(dt)
   })
   
@@ -111,13 +111,19 @@ rm(dt_list)
   
 # edit the `source_file` columns   ----------------------------------------------
   papers_df<-papers_df %>% 
-    mutate(source_file = str_replace(source_file, ".csv", ""))
+    mutate(source_file2 = str_replace(source_file, ".csv", "")) %>% 
+    rename(original_source_file=source_file,
+           source_file=source_file2)
   
   authors_df<-authors_df %>% 
-    mutate(source_file = str_replace(source_file, ".csv", ""))
+    mutate(source_file2 = str_replace(source_file, ".csv", "")) %>% 
+    rename(original_source_file=source_file,
+           source_file=source_file2)
   
   affils_df<-affils_df %>% 
-    mutate(source_file = str_replace(source_file, ".csv", ""))
+    mutate(source_file2 = str_replace(source_file, ".csv", "")) %>% 
+    rename(original_source_file=source_file,
+           source_file=source_file2)
   
   
   

@@ -89,8 +89,15 @@ pubs_yr <- papers_dataset %>%
   group_by(PY) %>%
   tally()
 
+
+# 
+# pubs_yr <- authors_dataset %>%
+#   distinct(refID,.keep_all=TRUE) %>%
+#   group_by(PY) %>%
+#   tally()
+
 source("code/figs_uni/total_pubs_per_year.R")
-pubs_yr_fig<-total_pubs_per_year(pubs_yr,2024)
+pubs_yr_fig<-total_pubs_per_year(pubs_yr,2025)
 
 ggsave(paste(save_dir,"/","total_pubs_per_yr_uni.png",sep=""),
        width = 6, height = 8, units = "in",

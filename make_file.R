@@ -12,10 +12,11 @@
 ###########################################################################
 ###########################################################################
 
+# to fix: 60002746_2017_04-1
 
 # chose data download date and max month  ---------------------------------
 
-# date<-"20251210"
+
 date<-"20260101"
 PM_max<-12
 PY_max<-2025
@@ -32,18 +33,27 @@ author_position<-"first"
 # within year: bind csvs for the scopus IDs -------------------------------
 
 cat<-"fed"
-# cat<-"uni"
+source("./code/csv_binder_within_year.R")
+csv_binder_within_year(cat,date)
+
+cat<-"uni"
 source("./code/csv_binder_within_year.R")
 csv_binder_within_year(cat,date)
 
 # across years: bind the annual csvs --------------------------------------
 
-# cat<-"fed"
-# cat<-"uni"
+cat<-"fed"
+source("./code/csv_binder_across_years.R")
+csv_binder_across_years(cat,date)
+
+cat<-"uni"
 source("./code/csv_binder_across_years.R")
 csv_binder_across_years(cat,date)
 
 # clean up the composite files --------------------------------------------
+
+##### Need to update fix_usgs_affils to get most recent usgs
+
 
 # Fed Files
 source("./code/clean_fed.R")
@@ -56,20 +66,17 @@ clean_uni(date)
 
 # prep datasets for analyses and make overall summaries
 
+# NOTE THE FOLLOWING ARE EXCLUDING *ONLY* BOOK CHAPTERS 
+# IF YOU WANT BOOK CHAPTERS NEED TO UNCOMMENT
+# AND ALSO
+# NOT EXCLUDING ANY BY FLAG WORDS
+
 source("./code/prep_analysis_datasets_fed.R")
 prep_analysis_datasets_fed(date, PM_max,PY_min,PY_max)
 
 source("./code/prep_analysis_datasets_uni.R")
 prep_analysis_datasets_uni(date, PM_max, PY_min, PY_max)
 
-
-# bootstrapping -----------------------------------------------------------
-
-source("./code/bootstrap_npubs_fed.R")
-bootstrap_npubs_fed(date,PM_max,author_position)
-
-source("./code/bootstrap_npubs_uni.R")
-bootstrap_npubs_uni(date,PM_max,author_position)
 
 
 # figures and summaries of results ----------------------------------------
@@ -80,6 +87,15 @@ make_figs_fed(date,PM_max,PY_max,author_position)
 source("./code/make_figs_uni.R")
 make_figs_uni(date,PM_max,PY_max,author_position)
 
+
+
+# bootstrapping -----------------------------------------------------------
+
+source("./code/bootstrap_npubs_fed.R")
+bootstrap_npubs_fed(date,PM_max,author_position)
+
+source("./code/bootstrap_npubs_uni.R")
+bootstrap_npubs_uni(date,PM_max,author_position)
 
 # render MS ^ Supplementary Information File -------------------------------
 
@@ -99,14 +115,20 @@ make_figs_uni(date,PM_max,PY_max,author_position)
 
 # lag test ----------------------------------------------------------------
 
-date1<-"20250901"
-date2<-"20251010"
-
-
-source("./code/lag_test_fed.R")
-lag_test_uni(date1, date2,PM_max)
-
-
-source("./code/lag_test_uni.R")
-lag_test_uni(cat, date,PM_max)
+source("code/lag_test.R")
+lag_test_output<-lag_test()
+lag_data<-as.data.frame(lag_test_output[1])
+lag_fig<-lag_test_output[2]
+lag_fig<-lag_fig[[1]]
+sum(lag_data$n_lag)
+# date1<-"20250901"
+# date2<-"20251010"
+# 
+# 
+# source("./code/lag_test_fed.R")
+# lag_test_uni(date1, date2,PM_max)
+# 
+# 
+# source("./code/lag_test_uni.R")
+# lag_test_uni(cat, date,PM_max)
 

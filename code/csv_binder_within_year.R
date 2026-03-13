@@ -46,7 +46,9 @@ if (cat =="fed"){
     "2022", # 4
     "2023", # 5
     "2024", # 6
-    "2025") # 7
+    "2025", # 7
+    "2026"
+    ) # 8
 }else if(cat=="uni"){
   folder<-c(
     # "2019_uni_20251010", # 1
@@ -70,7 +72,8 @@ if (cat =="fed"){
     "2022", # 4
     "2023", # 5
     "2024", # 6
-    "2025"
+    "2025", # 7
+    "2026" # 8
     ) 
 }else{
   stop("ERROR: Please enter 'fed' or 'uni' for the variable 'cat'")
@@ -409,7 +412,8 @@ papers_df<-papers_df %>%
     mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
     separate(source_file,c("source_file","left_over"),"_papers",remove=TRUE,extra="warn") %>% 
     select(-left_over) %>% 
-    mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
+    # mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
+    mutate(refID = paste(folder[k],source_file,entry_no,sep="-")) %>% 
     relocate(refID,.before=1) %>% 
     mutate_all(as.character) 
   
@@ -420,7 +424,8 @@ authors_df<-authors_df %>%
     mutate(source_file = str_replace(source_file, "/scopus_affil_", "")) %>% 
     separate(source_file,c("source_file","left_over"),"_author",remove=TRUE,extra="warn") %>% 
   select(-left_over) %>% 
-  mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
+  # mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
+  mutate(refID = paste(folder[k],source_file,entry_no,sep="-")) %>% 
   relocate(refID,.before=1) %>% 
   mutate_all(as.character) 
 
@@ -430,7 +435,8 @@ authors_df<-authors_df %>%
   mutate(source_file = str_replace(source_file, "scopus_affil_", "")) %>% 
   separate(source_file,c("source_file","left_over"),"_affils",remove=TRUE,extra="warn") %>% 
     select(-left_over) %>% 
-    mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
+    # mutate(refID = paste(source_file, "-",entry_no,sep="")) %>% 
+    mutate(refID = paste(folder[k],source_file,entry_no,sep="-")) %>% 
     relocate(refID,.before=1) %>% 
     mutate_all(as.character) 
   

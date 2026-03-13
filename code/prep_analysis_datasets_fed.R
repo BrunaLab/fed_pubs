@@ -107,8 +107,6 @@ message("data loaded")
 # "data paper"
 
 # ARTICLE TYPES - REMOVE
-# "letter" # excluded below
-# "editorial" # excluded below" 
 
 # papers_df %>% filter(DT=="editorial") %>% select(TI)
 # authors_df %>% filter(is.na(agency)) %>% group_by(federal) %>% tally()
@@ -116,7 +114,9 @@ message("data loaded")
 
 
 papers_cat<-c("article",
-              "book chapter",
+              # "book chapter",
+              "editorial",
+              "letter",
               "data paper",
               "note",
               "review")
@@ -146,12 +146,16 @@ papers_title<-c("editorial comment",
                 "introduction")
 #  
 papers_df <- papers_df %>%
-   filter(DT%in%papers_cat) %>% # KEEP the categories
-   filter(!TI%in%papers_title) # EXCLUDE the titles
+   # filter(!TI%in%papers_title) %>%  # to EXCLUDE the titles with the flag words above
+    filter(DT%in%papers_cat) # KEEP the pubs in the categories above
 
 authors_df<-authors_df %>%
   filter(refID%in%papers_df$refID)
 
+
+
+affils_df<-affils_df %>% 
+  filter(affil_id%in%authors_df$affil_id)
 
 rm(papers_cat,papers_title)
 
@@ -255,27 +259,6 @@ rm(papers_cat,papers_title)
 # write_csv(counts,paste(save_dir,"/","total_papers_by_agency.csv",sep=""))
 
 
-# and also count how many papers by article category
-papers_by_cat_agency<-
-  papers_df %>% 
-  group_by(DT) %>% 
-  tally() %>% 
-  mutate(perc=n/sum(n)*100) %>% 
-  arrange(desc(n))
-
-# write_csv(papers_by_cat_agency,"./docs/summary_info/papers_by_cat_agency.csv")
-write_csv(papers_by_cat_agency,paste(save_dir,"/","papers_by_cat_agency.csv",sep=""))
-
-message("papers by category calculated")
-
-# data summaries ----------------------------------------------------------
-
-# N and % of articles in each category after cleanup
-pub_cat_summary<-papers_df %>% 
-  group_by(DT) %>% 
-  tally() %>% 
-  mutate(perc=n/sum(n)*100) %>% 
-  arrange(n)
 
 # authors (fed, non, total) per publication
 # removes any with no fed authors that might have 
@@ -289,12 +272,61 @@ auth_per_pub <-authors_df %>%
   mutate(perc_fed=fed/total*100) %>% 
   arrange(desc(perc_fed)) %>% 
   mutate(author_no_cat = cut(total,
-                                  breaks = c(0,5, 10, 15, 20, max(total)),
-                                  include.lowest = T,
-                                 right = T))
+                             breaks = c(0,5, 10, 15, 20, max(total)),
+                             include.lowest = T,
+                             right = T))
 
 # include.lowest = T and right = F creates bins of the 
 # form [40, 50) (40 to < 50)
+
+
+# these are likely the ones where fed is SECONDARY Address
+
+no_fed_auth_per_pub <-authors_df %>%   
+  group_by(refID) %>% 
+  summarize(fed=sum(federal==TRUE),
+            nonFed=sum(federal==FALSE),
+            total=sum(fed+nonFed)) %>% 
+  anti_join(auth_per_pub,by="refID")
+
+
+
+authors_df<-authors_df %>% 
+  filter(refID%in%auth_per_pub$refID)
+papers_df<-papers_df %>% 
+  filter(refID%in%auth_per_pub$refID)
+affils_df<-affils_df %>% 
+  filter(refID%in%auth_per_pub$refID)
+
+
+write_rds(papers_df,"./data_clean/for_pub/papers_df_analysis_fed.rds")
+write_rds(authors_df,"./data_clean/for_pub/authors_df_analysis_fed.rds")
+write_rds(affils_df,"./data_clean/for_pub/affils_df_analysis_fed.rds")
+
+
+
+
+# data summaries ----------------------------------------------------------
+
+# and also count how many papers by article category
+papers_by_cat_agency<-
+  papers_df %>% 
+  group_by(DT) %>% 
+  tally() %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(desc(n))
+
+# write_csv(papers_by_cat_agency,"./docs/summary_info/papers_by_cat_agency.csv")
+write_csv(papers_by_cat_agency,paste(save_dir,"/","papers_by_cat_agency.csv",sep=""))
+
+message("papers by category calculated")
+# N and % of articles in each category after cleanup
+pub_cat_summary<-papers_df %>% 
+  group_by(DT) %>% 
+  tally() %>% 
+  mutate(perc=n/sum(n)*100) %>% 
+  arrange(n)
+
 
 
 p <- auth_per_pub %>%
@@ -346,7 +378,7 @@ auth_per_pub_means<-auth_per_pub %>%
 auth_per_pub_means
 
 
-# remove any papers with no feds that snuck through -----------------------
+# remove any papers with no feds that snuck through and save ----------------
 
 
 authors_df<-authors_df %>% 
@@ -355,6 +387,16 @@ papers_df<-papers_df %>%
   filter(refID%in%auth_per_pub$refID)
 affils_df<-affils_df %>% 
   filter(refID%in%auth_per_pub$refID)
+
+
+
+
+
+
+
+
+
+
 
 # total number of scopus IDs in the initial search
 scopus_id_1<-read_csv("./data_raw/affiliations_to_search/fed_affils/agencies_redux_clean.csv")
@@ -778,9 +820,6 @@ message("saving prepped focal datasets")
 
 
 # SAVE FOCAL DATASETS -----------------------------------------------------
-
-write_csv(papers_df,"./data_clean/for_pub/papers_df_fed_anywhere.csv")
-write_csv(authors_df,"./data_clean/for_pub/authors_df_fed_anywhere.csv")
 
 
 write_csv(papers_with_fed_first,"./data_clean/for_pub/papers_df_fed_first.csv")

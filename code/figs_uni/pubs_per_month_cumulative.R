@@ -139,8 +139,10 @@ pubs_per_month_cumulative <- function(pubs_mo, PY_max,PM_max) {
     #          size=5)+
     # scale_y_continuous(expand = c(0, 0), n.breaks = 24, limits = c(0, max(pubs_mo_cum %>% filter(PM<=PM_max) %>% select(cumul_pubs))+1500))+
     # scale_y_continuous(expand = c(0, 0), n.breaks = 24, limits = c(0, max(pubs_mo_cum %>% select(cumul_pubs))+1500))+
-    scale_y_continuous(expand = c(0, 0), limits = c(0, max(pubs_mo_cum %>% select(cumul_pubs))+1500), 
-                       breaks = seq(0, max(pubs_mo_cum %>% select(cumul_pubs))+1500, by = 5000))+
+    scale_y_continuous(expand = c(0, 0), 
+                       limits = c(0, round(max(pubs_mo_cum %>% select(cumul_pubs))+1500,digits=-4)), 
+                       breaks = seq(0, round(max(pubs_mo_cum %>% select(cumul_pubs))+1500,digits=-4), by = 5000)
+                       )+
     # geom_segment(aes(xend=PM_max+.05, 
     #                  yend = (max(perc_change %>% filter(PY==2025) %>% select(cumul_pubs))),
     #                  x = PM_max+.05, 

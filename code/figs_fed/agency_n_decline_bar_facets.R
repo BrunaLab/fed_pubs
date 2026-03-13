@@ -21,7 +21,7 @@ agency_n_decline_bar_facets <- function(agency_n_decline_first,threshhold_ct, PY
         agency_primary == "Commerce"~"(F) Dept Commerce",
         agency_primary == "Interior"~"(G) Dept Interior",
         agency_primary == "NASA"~"(H) NASA",
-        agency_primary == "Smithsonian"~"(I) Smithsonian",
+        # agency_primary == "Smithsonian"~"(I) Smithsonian",
         agency_primary == "NSF"~"National Science Foundation",
         agency_primary == "EPA"~"Environmental Protection Agency",
         agency_primary == "DOJ"~"Justice",
@@ -64,7 +64,7 @@ agency_n_decline_bar_facets <- function(agency_n_decline_first,threshhold_ct, PY
     geom_text(aes(label=n), position=position_dodge(width=0.9), color="black", size = 3)+
     
     facet_wrap(~factor(agency_primary, c(as.vector(order$agency_primary))),
-               ncol = 3, 
+               ncol = 2, 
                scales = "fixed",
                axes="all")+
     scale_y_continuous(breaks = scales::breaks_pretty(n=8))+
