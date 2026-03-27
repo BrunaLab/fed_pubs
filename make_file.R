@@ -5,8 +5,8 @@
 # `01b_scopus_API_uni.R`
 
 # DOWNLOAD DATA FROM USGS PUBLICATIONS WAREHOUSE
-
-# Process with `02_process_usgs.R`
+# https://pubs.usgs.gov/
+# save as usgs_YYYYMMDD.csv in './data_raw/usgs_warehouse_downloads'
 
  
 ###########################################################################
@@ -20,15 +20,20 @@
 date<-"20260101"
 PM_max<-12
 PY_max<-2025
-PY_min<-2020
+PY_min_dataset<-2020
+PY_min_analyses<-2020
 author_position<-"first"
 # author_position<-"anywhere"
+
 # process federal records -------------------------------------------------
 
 # process the usgs publication file downloaded from their website ---------
 
+# api_code<-"---"
+# usgs_mostrecent<-"usgs_20260327.csv"
+# # Process with `process_usgs.R`
 # source("./code/process_usgs.R")
-# process_usgs(---,---)
+# process_usgs(usgs_mostrecent,api_code)
 
 # within year: bind csvs for the scopus IDs -------------------------------
 
@@ -72,20 +77,20 @@ clean_uni(date)
 # NOT EXCLUDING ANY BY FLAG WORDS
 
 source("./code/prep_analysis_datasets_fed.R")
-prep_analysis_datasets_fed(date, PM_max,PY_min,PY_max)
+prep_analysis_datasets_fed(date, PM_max,PY_min_dataset,PY_max)
 
 source("./code/prep_analysis_datasets_uni.R")
-prep_analysis_datasets_uni(date, PM_max, PY_min, PY_max)
+prep_analysis_datasets_uni(date, PM_max, PY_min_dataset, PY_max)
 
 
 
 # figures and summaries of results ----------------------------------------
 
 source("./code/make_figs_fed.R")
-make_figs_fed(date,PM_max,PY_max,author_position)
+make_figs_fed(date,PM_max,PY_min_analyses,PY_max,author_position)
 
 source("./code/make_figs_uni.R")
-make_figs_uni(date,PM_max,PY_max,author_position)
+make_figs_uni(date,PM_max,PY_min_analyses,PY_max,author_position)
 
 
 

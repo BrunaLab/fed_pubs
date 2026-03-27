@@ -97,12 +97,20 @@ rm(dt_list)
   dataFls <- dir(dataDir, pattern = "csv$", full.names = TRUE)
   
   # Read and tag each file
+  
   dt_list <- lapply(dataFls, function(file) {
     dt <- fread(file, fill = TRUE)
     dt[, source_file2 := basename(file)]  # Add column with filename
+    # Convert BP and EP to character to avoid type conflicts
+    if ("BP" %in% names(dt)) {
+      dt[, BP := as.character(BP)]
+    }
+    if ("EP" %in% names(dt)) {
+      dt[, EP := as.character(EP)]
+    }
     return(dt)
   })
-  
+    
   # Combine all tagged data tables
   papers_df <- rbindlist(dt_list, use.names = TRUE, fill = TRUE)
   rm(dt_list)

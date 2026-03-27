@@ -1914,7 +1914,7 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
 
 
   affils_df <- affils_df %>%
-    mutate(affiliation = gsub(" veterans affairs ", " va ", affiliation)) %>%
+    mutate(affiliation = gsub("veterans affairs", "va", affiliation)) %>%
     mutate(affiliation = gsub("smithsonian's", "smithsonian", affiliation))
   affils_df <- affils_df %>%
     mutate(
@@ -2664,6 +2664,11 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
 
   # Final text changes
   affils_df_corrected <- affils_df_corrected %>%
+  mutate(affiliation = gsub("vhagla", "vha greater los angeles", affiliation)) %>%  
+    mutate(affiliation = gsub("vha department of veteran affairs", "vha", affiliation)) %>%  
+  mutate(affiliation = gsub("national oceanic and amp; atmospheric administration", "noaa", affiliation)) %>%
+    mutate(affiliation = gsub("national oceanic and atmospheric administration", "noaa", affiliation)) %>%
+  mutate(affiliation = gsub("national atmospheric and oceanic administration", "noaa", affiliation)) %>%
     mutate(affiliation = gsub("natural resources conservation service", "nrcs", affiliation)) %>%
     mutate(affiliation = gsub("animal and plant health inspection service", "aphis", affiliation)) %>%
     mutate(affiliation = gsub("usda agricultural research service", "ars", affiliation)) %>%
@@ -2737,9 +2742,16 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     mutate(affiliation = gsub("national cancer institute", "nci", affiliation)) %>%
     mutate(affiliation = gsub("national institutes of health", "nih", affiliation)) %>%
     mutate(affiliation = gsub("veterans integrated service network", "visn", affiliation)) %>%
+    mutate(affiliation = gsub("veterans integrated services network", "visn", affiliation)) %>%
     mutate(affiliation = gsub("va wisn", "visn", affiliation)) %>%
     mutate(affiliation = gsub("veterans health affairs", "vha", affiliation)) %>%
-    mutate(affiliation = gsub("veterans health affairs", "vha", affiliation)) %>%
+    mutate(affiliation = gsub("veterans affairs", "va", affiliation)) %>%
+    mutate(affiliation = gsub("army cdcc", "army ccdc", affiliation)) %>%
+    mutate(affiliation = gsub("cdcc army ", "army ccdc ", affiliation)) %>%
+    mutate(affiliation = gsub("cdcc", "ccdc", affiliation)) %>%
+    
+    
+    # mutate(affiliation = gsub("veterans health affairs", "vha", affiliation)) %>%
     mutate(affiliation = gsub("us fish and wildlife service", "usfws", affiliation)) %>%
     mutate(affiliation = gsub("us fish and wildlife ", "usfws", affiliation)) %>%
     mutate(affiliation = gsub("national aeronautics and space administration", "nasa", affiliation)) %>%
@@ -2748,13 +2760,291 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
     mutate(affiliation = gsub("centers for disease control (cdc) ", "cdc ", affiliation)) %>%
     mutate(affiliation = gsub("aphis ws ", "aphis wildlife services ", affiliation)) %>%
     
-    
-  
+    mutate(affiliation = gsub("veterans affair ","va ", affiliation)) %>%
+    mutate(affiliation = gsub("heath care","healthcare", affiliation)) %>%
+    mutate(affiliation = gsub("veterans affairs","va", affiliation)) %>%
+    mutate(affiliation = gsub("veteran affairs","va", affiliation)) %>%
+    mutate(affiliation = gsub("va affairs","va", affiliation)) %>%
+    mutate(affiliation = gsub("healthcare systems","healthcare system", affiliation)) %>%
     # mutate(affiliation = gsub("usda aphis", "aphis", affiliation)) %>%
     # mutate(affiliation = gsub("usda ars", "ars", affiliation)) %>%
+    mutate(affiliation = gsub("–"," ", affiliation)) %>%
+    mutate(affiliation = gsub("   "," ", affiliation)) %>%
+    mutate(affiliation = gsub("sfva","sf va", affiliation)) %>%
+    mutate(affiliation = gsub("serviceswashington","services washington", affiliation)) %>%
+    mutate(affiliation = gsub("surveillanceproject","surveillance project", affiliation)) %>% 
+    mutate(affiliation = gsub("researchlaboratory","research laboratory", affiliation)) %>% 
+    mutate(affiliation = gsub("usfs pnw ","usfs pacific northwest ", affiliation)) %>% 
+    mutate(affiliation = gsub("usfs psw ","usfs pacific southwest ", affiliation)) 
+  
     
+    
+    affils_df_corrected <- affils_df_corrected %>%
     mutate(affiliation = case_when(
 
+      agency_primary=='commerce' & str_detect(affiliation,'national center for environmental prediction') ~'national centers for environmental prediction',
+      agency_primary=='commerce' & str_detect(affiliation,'noaa alaska fisheries science center') ~'noaa nmfs alaska fisheries science center',
+      agency_primary=='commerce' & str_detect(affiliation,'noaa atmospheric turbulence and diffusion division') ~'noaa arl atmospheric turbulence and diffusion division',
+      agency_primary=='commerce' & str_detect(affiliation,'noaa hawaiian island humpback whale national marine sanctuary') ~'noaa hawaiian islands humpback whale national marine sanctuary',
+      agency_primary=='commerce' & str_detect(affiliation,'noaa office of marine and aviation operations (omao)') ~'noaa office of marine and aviation operations',
+      agency_primary=='commerce' & str_detect(affiliation,'noaa pacific islands fisheries center') ~'noaa pacific islands fisheries science center',
+      agency_primary=='commerce' & affiliation=='national institute of standards' ~'national institute of standards and technology',
+      agency_primary=='dod' & affiliation=='naval air warfare cent' ~'naval air warfare center',
+      agency_primary=='dod' & str_detect(affiliation,'2d battalion') ~'2nd battalion',
+      agency_primary=='dod' & str_detect(affiliation,'2d medical battalion') ~'2nd medical battalion',
+      agency_primary=='dod' & str_detect(affiliation,'59 medical wing') ~'59th medical wing',
+      agency_primary=='dod' & str_detect(affiliation,'air force center for sustainment of trauma and readiness skills') ~'air force center for sustainment of trauma and readiness skills',
+      agency_primary=='dod' & str_detect(affiliation,'air force medical corp') ~'air force medical corps',
+      agency_primary=='dod' & str_detect(affiliation,'air force research laboratory rw') ~'air force research laboratory',
+      agency_primary=='dod' & str_detect(affiliation,'air force research laboratory') ~'air force research laboratory rqrs',
+      agency_primary=='dod' & str_detect(affiliation,'air force reserve') ~'air force reserves',
+      agency_primary=='dod' & str_detect(affiliation,'air forcer') ~'air force',
+      agency_primary=='dod' & str_detect(affiliation,'army combat capabilities development com') ~'army combat capabilities development command',
+      agency_primary=='dod' & str_detect(affiliation,'army combat capabilities development command armament center') ~'army combat capabilities development command armaments center',
+      agency_primary=='dod' & str_detect(affiliation,'army combat capabilities development command aviation and missle center') ~'army combat capabilities development command aviation and missile center',
+      agency_primary=='dod' & str_detect(affiliation,'army combat capabilities development command soldier center sttc') ~'army combat capabilities development command soldier center',
+      agency_primary=='dod' & str_detect(affiliation,'army corps of engrs') ~'army corps of engineers',
+      agency_primary=='dod' & str_detect(affiliation,'army institute of surgical reseach') ~'army institute of surgical research',
+      agency_primary=='dod' & str_detect(affiliation,'army medical research directorate africa') ~'army medical research directorate africa kenya',
+      agency_primary=='dod' & str_detect(affiliation,'army medical research institute for chemical defense') ~'army medical research institute of chemical defense',
+      agency_primary=='dod' & str_detect(affiliation,'army medical research institute for infectious disease') ~'army medical research institute of infectious diseases',
+      agency_primary=='dod' & str_detect(affiliation,'army research institute for environmental medicine') ~'army research institute of environmental medicine',
+      agency_primary=='dod' & str_detect(affiliation,'brooke army medical centre') ~'brooke army medical center',
+      agency_primary=='dod' & str_detect(affiliation,'ccdc army research laboratory') ~'army cdcc research laboratory',
+      agency_primary=='dod' & str_detect(affiliation,'col (r) army') ~'colonel (r) army',
+      agency_primary=='dod' & str_detect(affiliation,'department of army') ~'department of the army',
+      agency_primary=='dod' & str_detect(affiliation,'department of defense hpc modernization program gdit') ~'department of defense hpc modernization program',
+      agency_primary=='dod' & str_detect(affiliation,'devcom army research laboratory') ~'army devcom research laboratory',
+      agency_primary=='dod' & str_detect(affiliation,'elgin air force base') ~'eglin air force base',
+      agency_primary=='dod' & str_detect(affiliation,'evan army community hospital') ~'evans army community hospital',
+      agency_primary=='dod' & str_detect(affiliation,'evan army community hospital') ~'evans army community hospital',
+      agency_primary=='dod' & str_detect(affiliation,"evan's army community hospital") ~'evans army community hospital',
+      agency_primary=='dod' & str_detect(affiliation,"evan's army community hospital") ~'evans army community hospital',
+      agency_primary=='dod' & str_detect(affiliation,'marine forces special operations command') ~'marine corps special operations command',
+      agency_primary=='dod' & str_detect(affiliation,'naval hospital in okinawa') ~'naval hospital okinawa',
+      agency_primary=='dod' & str_detect(affiliation,'naval medical research unit no 2') ~'naval medical research unit 2',
+      agency_primary=='dod' & str_detect(affiliation,'naval medical research unit two') ~'naval medical research unit 2',
+      agency_primary=='dod' & str_detect(affiliation,'naval reearch laboratory') ~'naval research laboratory',
+      agency_primary=='dod' & str_detect(affiliation,'naval reearch laboratory') ~'naval research laboratory',
+      agency_primary=='dod' & str_detect(affiliation,'naval researchlaboratory') ~'naval  research laboratory',
+      agency_primary=='dod' & str_detect(affiliation,'naval researchlaboratory') ~'naval research laboratory',
+      agency_primary=='dod' & str_detect(affiliation,'naval special warfare') ~'naval special warfare center',
+      agency_primary=='dod' & str_detect(affiliation,'office of the air force surgeon general') ~'air force office of the surgeon general',
+      agency_primary=='dod' & str_detect(affiliation,'office of the army surgeon general') ~'army office of the surgeon general',
+      agency_primary=='dod' & str_detect(affiliation,'office of the assistant secretary of defense health affairs') ~'office of the assistant secretary of defense for health affairs',
+      agency_primary=='dod' & str_detect(affiliation,'walter reed army institute of research') ~'walter reed army institute of research west',
+      agency_primary=='dod' & str_detect(affiliation,'walter reed national military medical centre') ~'walter reed national military medical center',
+      agency_primary=='doe' & str_detect(affiliation,'pacific northwes national laboratory') ~'pacific northwest national laboratory',
+      agency_primary=='epa' & str_detect(affiliation,'epa region i') ~'epa region 1',
+      
+      agency_primary=='federal reserve system' & affiliation=='federal reserve bank of st' ~'federal reserve bank of st louis',
+      agency_primary=='hhs' & affiliation=='cdc covid 19 response' ~'cdc covid 19 response team',
+      agency_primary=='hhs' & affiliation=='national institute for allergy and infectious disease' ~'national institute of allergy and infectious diseases',
+      agency_primary=='hhs' & affiliation=='national institute of neurological disorders and stroke nih' ~'national institute of neurological disorders and stroke',
+      agency_primary=='hhs' & affiliation=='national institute of neurological disorders' ~'national institute of neurological disorders and stroke',
+      agency_primary=='hhs' & affiliation=='national toxicology program' ~'national toxicology program laboratory',
+      
+      
+      agency_primary=='hhs' & str_detect(affiliation,'center for medicare and medicaid services') ~'centers for medicare and medicaid services',
+      agency_primary=='hhs' & str_detect(affiliation,'international institute of professional education and research iiper') ~'international institute of professional education and research',
+      agency_primary=='hhs' & str_detect(affiliation,'national center for advancing translational science') ~'national center for advancing translational sciences',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute for allergy and infectious diseases') ~'national institute of allergy and infectious diseases',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute for allergy and infectious diseases') ~'national institutes of allergy and infectious diseases',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute for diabetes digestive and kidney diseases') ~'national institute of diabetes and digestive and kidney diseases',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of aging') ~'national institute on aging',
+      
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of allergy and infectious disease') ~'national institute of allergy and infectious diseases',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of allergy and infectious disease') ~'national institutes of allergy and infectious diseases',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of child health') ~'national institute for childrens health quality',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of environmental health science') ~'national institute of environmental health sciences',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of environmental health science') ~'national institute of environmental health sciences',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of environmental health sciences research triangle park') ~'national institute of environmental health sciences research triangle',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of environmental health sciences research triangle') ~'national institute of environmental health sciences',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of environmental health sciences') ~'national institute of mental health and neurosciences',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of heath') ~'nih',
+      
+      
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of mental health and neurosciences') ~'national institute of mental health',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of minority health and health disparities') ~'national institute on minority health and health disparities',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of neurolgogical disorders and stroke') ~'national institute of neurological disorders and stroke',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of neurological disorders and stroke nih') ~'national institute of neurolgogical disorders and stroke',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of neurological disorders and stroke nih') ~'national institute of neurological disorders and stroke',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute of nursing research') ~'national institutes of nursing research',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute on deafness and other communication disorders') ~'national institute on deafness and other communications disorders',
+      agency_primary=='hhs' & str_detect(affiliation,'national institute on drug abuse irp') ~'national institute on drug abuse',
+      agency_primary=='hhs' & str_detect(affiliation,'national institutes of allergy and infectious diseases') ~'national institute of allergy and infectious diseases',
+      agency_primary=='hhs' & str_detect(affiliation,'national institutes of general medical sciences') ~'national institute of general medical sciences',
+      agency_primary=='hhs' & str_detect(affiliation,'nci community oncology program') ~'nci community oncology research program',
+      agency_primary=='hhs' & str_detect(affiliation,'nih clinical center us') ~'nih clinical center',
+      agency_primary=='hhs' & str_detect(affiliation,'nih ipr') ~'nih irp',
+      
+      
+      agency_primary=='interior' & str_detect(affiliation,'national park services') ~'national park service',
+      agency_primary=='interior' & str_detect(affiliation,'national park services') ~'national park service',
+      agency_primary=='interior' & str_detect(affiliation,'usgs western geographic science') ~'usgs western geographic science center',
+      agency_primary=='nasa' & str_detect(affiliation,'nasa antes research center') ~'nasa ames research center',
+      agency_primary=='nasa' & str_detect(affiliation,'nasa goddard space flight center') ~'nasa goddard spaceflight center',
+      agency_primary=='nsf' & str_detect(affiliation,'nsf oir lab') ~'nsf noir lab',
+      agency_primary=='smithsonian' & str_detect(affiliation,'smithsonian institute') ~'smithsonian institution',
+      agency_primary=='smithsonian' & str_detect(affiliation,"smithsonian institution's") ~'smithsonian institution',
+agency_primary=='smithsonian' & str_detect(affiliation,'smithsonian marine state') ~'smithsonian marine station',
+agency_primary=='state' & str_detect(affiliation,'bureau of humanitarian assistance') ~'bureau for humanitarian assistance',
+agency_primary=='state' & str_detect(affiliation,'office of the us global aids coordinator') ~'office of the global aids coordinator',
+agency_primary=='state' & str_detect(affiliation,"us president's malaria initiative impact malaria") ~'us presidents malaria initiative impact malaria project',
+agency_primary=='state' & str_detect(affiliation,'usaid infectious disease detection and surveillanceprogram') ~'usaid infectious disease detection and surveillance project',
+agency_primary=='state' & str_detect(affiliation,'usaid infectious disease detection and surveillanceproject') ~'usaid infectious disease detection and surveillance project',
+agency_primary=='usda' & str_detect(affiliation,'ars soil and water conservation research') ~'ars soil and water conservation research unit',
+agency_primary=='usda' & str_detect(affiliation,'national agricultural statistical service') ~'national agricultural statistics service',
+agency_primary=='usda' &affiliation=='ars southeast watershed research' ~'ars southeast watershed research laboratory',
+agency_primary=='va' & affiliation=='va central ohio healthcare' ~'va central ohio healthcare system',
+agency_primary=='va' & str_detect(affiliation,'butler va healthcare system') ~'va butler healthcare system',
+agency_primary=='va' & str_detect(affiliation,'capitol va healthcare network') ~'va capitol healthcare network',
+agency_primary=='va' & str_detect(affiliation,'caribbean va healthcare system') ~'va caribbean healthcare system',
+agency_primary=='va' & str_detect(affiliation,'durham va health system') ~'durham va healthcare system',
+agency_primary=='va' & str_detect(affiliation,'eastern colorado va healthcare system') ~'va eastern colorado healthcare system',
+agency_primary=='va' & str_detect(affiliation,'eastern colorado va healthcare system') ~'vha eastern colorado healthcare system',
+agency_primary=='va' & str_detect(affiliation,'eastern kansas va healthcare service') ~'eastern kansas va healthcare system',
+agency_primary=='va' & str_detect(affiliation,'eastern oklahoma va healthcare system (eovahcs)') ~'eastern oklahoma va healthcare system',
+agency_primary=='va' & str_detect(affiliation,'edward hines jr va hospital') ~'edward hines va hospital',
+agency_primary=='va' & str_detect(affiliation,'finger lakes va healthcare system') ~'va finger lakes healthcare system',
+agency_primary=='va' & str_detect(affiliation,'loma linda va healthcare system') ~'va loma linda healthcare system',
+agency_primary=='va' & str_detect(affiliation,'long beach va health system') ~'long beach va healthcare system',
+agency_primary=='va' & str_detect(affiliation,'new england va healthcare system') ~'va new england healthcare system',
+agency_primary=='va' & str_detect(affiliation,'new york harbour va healthcare system') ~'va new york harbor healthcare system',
+agency_primary=='va' & str_detect(affiliation,'north florida south georgia va health system') ~'north florida south georgia va healthcare system',
+agency_primary=='va' & str_detect(affiliation,'north florida south georgia va healthcare system') ~'north florida south georgia veterans health system',
+agency_primary=='va' & str_detect(affiliation,'north texas va healthcare system') ~'va north texas healthcare system',
+agency_primary=='va' & str_detect(affiliation,'northeast ohio va healthcare system') ~'va northeast ohio healthcare system',
+agency_primary=='va' & str_detect(affiliation,'pacific islands va healthcare system') ~'va pacific islands healthcare system',
+agency_primary=='va' & str_detect(affiliation,'palo alto healthcare system') ~'palo alto va healthcare system',
+agency_primary=='va' & str_detect(affiliation,'palo alto va health system') ~'palo alto va healthcare system',
+agency_primary=='va' & str_detect(affiliation,'portland va healthcare system') ~'va portland healthcare system',
+agency_primary=='va' & str_detect(affiliation,'puget sound va healthcare system') ~'va puget sound healthcare system',
+agency_primary=='va' & str_detect(affiliation,'salt lake city va healthcare system') ~'va salt lake city healthcare system',
+agency_primary=='va' & str_detect(affiliation,'san francisco va healthcare system') ~'va san francisco healthcare system',
+agency_primary=='va' & str_detect(affiliation,'southern nevada va health system') ~'va southern nevada health system',
+agency_primary=='va' & str_detect(affiliation,'st louis va healthcare system') ~'va st louis healthcare system',
+agency_primary=='va' & str_detect(affiliation,'tennessee valley va healthcare system') ~'vha tennessee valley healthcare system',
+agency_primary=='va' & str_detect(affiliation,'va cheyenne healthcare') ~'va cheyenne healthcare system',
+agency_primary=='va' & str_detect(affiliation,'va eastern colorado healthcare system') ~'vha eastern colorado healthcare system',
+agency_primary=='va' & str_detect(affiliation,'va greater los angeles healthcare system') ~'vha greater los angeles healthcare system',
+agency_primary=='va' & str_detect(affiliation,'va health service research and development') ~'va health services research and development',
+agency_primary=='va' & str_detect(affiliation,'va health services research and development') ~'va health services research and development service',
+agency_primary=='va' & str_detect(affiliation,'va healthcare system') ~'vha healthcare system',
+agency_primary=='va' & str_detect(affiliation,'va hospital') ~'vas hospital',
+agency_primary=='va' & str_detect(affiliation,'va national center for patient safety') ~'vha national center for patient safety',
+agency_primary=='va' & str_detect(affiliation,'va national infectious diseases service (nids)') ~'vha national infectious diseases service',
+agency_primary=='va' & str_detect(affiliation,'va national oncology program office') ~'va national onoclogy program',
+agency_primary=='va' & str_detect(affiliation,'va north texas healthcare services') ~'va north texas healthcare system',
+agency_primary=='va' & str_detect(affiliation,'va of pittsburgh healthcare system') ~'vha pittsburgh healthcare system',
+agency_primary=='va' & str_detect(affiliation,'va office of mental health and suicide prevention') ~'vha office of mental health and suicide prevention',
+agency_primary=='va' & str_detect(affiliation,'va office of public health') ~'vha office of public health',
+agency_primary=='va' & str_detect(affiliation,'va pharmacy benefits management') ~'vha pharmacy benefits management',
+agency_primary=='va' & str_detect(affiliation,'va quality scholar program') ~'va quality scholars program',
+agency_primary=='va' & str_detect(affiliation,'va tennessee valley health system') ~'vha tennessee valley healthcare system',
+agency_primary=='va' & str_detect(affiliation,'va tennessee valley healthcare services') ~'vha tennessee valley healthcare system',
+agency_primary=='va' & str_detect(affiliation,'veterans rural health resource center iowa city') ~'veterans rural health resource center portland',
+agency_primary=='va' & str_detect(affiliation,'veterans rural health resource center salt lake city') ~'veterans rural health resource center slc',
+agency_primary=='va' & str_detect(affiliation,'vha national center for organization development') ~'vha national center for organizational development',
+agency_primary=='va' & str_detect(affiliation,'vha office of integrated veteran care') ~'vha office of integrated veterans care',
+
+
+
+
+agency_primary=='commerce' & affiliation=='great lakes environmental research laboratory' ~'noaa great lakes environmental research laboratory',
+agency_primary=='commerce' & affiliation=='national centers for coastal ocean science' ~'noaa national centers for coastal ocean science',
+agency_primary=='commerce' & str_detect(affiliation,'noaa center for satellite applications and research') ~'noaa nesdis center for satellite applications and research',
+agency_primary=='commerce' & str_detect(affiliation,'noaa channel islands national marine sanctuary') ~'channel islands national marine sanctuary',
+agency_primary=='commerce' & str_detect(affiliation,'noaa colorado basin river forecast center') ~'noaa nws colorado basin river forecast center',
+agency_primary=='commerce' & str_detect(affiliation,'noaa fisheries servicenortheast fisheries science center') ~'noaa fisheries northeast fisheries science center',
+agency_primary=='commerce' & str_detect(affiliation,'noaa hawaiian islands humpback whale national marine sanctuary') ~'hawaiian islands humpback whale national marine sanctuary',
+agency_primary=='commerce' & str_detect(affiliation,'noaa monterey bay national marine sanctuary') ~'monterey bay national marine sanctuary',
+agency_primary=='commerce' & str_detect(affiliation,'noaa national centers for environmental information') ~'noaa nesdis national centers for environmental information',
+agency_primary=='commerce' & str_detect(affiliation,'noaa ncep climate prediction center') ~'noaa nws ncep climate prediction center',
+agency_primary=='commerce' & str_detect(affiliation,'noaa nmfs northeast fisheries science center') ~'noaa northeast fisheries science center',
+agency_primary=='commerce' & str_detect(affiliation,'noaa nws climate prediction center') ~'noaa ncep climate prediction center',
+agency_primary=='commerce' & str_detect(affiliation,'noaa nws climate prediction center') ~'noaa ncep climate prediction center',
+agency_primary=='commerce' & str_detect(affiliation,'noaa office of marine and aviation operations (omao)') ~'noaa office of marine and aviation operations',
+agency_primary=='commerce' & (str_detect(affiliation,'noaa') & str_detect(affiliation,'climate prediction') & str_detect(affiliation,'center'))  ~'noaa ncep climate prediction center',
+agency_primary=='dod' & affiliation=='bureau of medicine and surgery' ~'navy bureau of medicine and surgery',
+agency_primary=='dod' & affiliation=='ccdc ground vehicle systems center' ~'army ccdc ground vehicle systems center',
+agency_primary=='dod' & affiliation=='center for initial military training' ~'army center for initial military training',
+agency_primary=='dod' & affiliation=='cold regions research and engineering laboratory' ~'army cold regions research and engineering laboratory',
+agency_primary=='dod' & affiliation=='combat capabilities development command army research laboratory' ~'army ccdc research laboratory',
+agency_primary=='dod' & affiliation=='command and general staff college' ~'army command and general staff college',
+agency_primary=='dod' & affiliation=='darnall army medical center' ~'cr darnell army medical center',
+agency_primary=='dod' & affiliation=='medical research and development command' ~'army medical research and development command',
+agency_primary=='dod' & affiliation=='research development and engineering command' ~'army research development and engineering command',
+agency_primary=='dod' & affiliation=='us combat capabilities development command army research laboratory' ~'army ccdc research laboratory',
+agency_primary=='dod' & str_detect(affiliation,'101 st airborne division (air assault)') ~'101st airborne division (air assault)',
+
+
+
+agency_primary=='dod' & str_detect(affiliation,'air force center for sustainment of trauma readiness skills') ~'air force center for sustainment of trauma and readiness skills',
+agency_primary=='dod' & str_detect(affiliation,'air force research laboratory rqrs') ~'air force research laboratory',
+agency_primary=='dod' & str_detect(affiliation,'army ccdc chemical biological center') ~'army devcom chemical biological center',
+agency_primary=='dod' & str_detect(affiliation,'army cdcc research laboratory') ~'army ccdc research laboratory',
+agency_primary=='dod' & str_detect(affiliation,'army corps engineer research and development center') ~'army engineer research and development center',
+agency_primary=='dod' & str_detect(affiliation,'army corps engineer research and development center') ~'army engineer research and development center',
+agency_primary=='dod' & str_detect(affiliation,'army corps of engineer research and development center') ~'army engineer research and development center',
+agency_primary=='dod' & str_detect(affiliation,'army engineering research and development center') ~'army engineer research and development center',
+agency_primary=='dod' & str_detect(affiliation,'army research institute of infectious diseases') ~'army medical research institute of infectious diseases',
+agency_primary=='dod' & str_detect(affiliation,'brian allgood army community hospital') ~'brian d allgood army community hospital',
+agency_primary=='dod' & str_detect(affiliation,'carl r darnall army medical center') ~'cr darnall army medical center',
+agency_primary=='dod' & str_detect(affiliation,'ccdc aviation and missile center') ~'army ccdc aviation and missile center',
+agency_primary=='dod' & str_detect(affiliation,'dod combat casualty care research program') ~'combat casualty care research program',
+agency_primary=='dod' & str_detect(affiliation,'office of the assistant secretary of defense for research and engineering') ~'office of the under secretary of defense for research and engineering',
+agency_primary=='dod' & str_detect(affiliation,'special operations command') ~'us special operations command',
+agency_primary=='dod' & str_detect(affiliation,'uniform services university of the health sciences') ~'uniformed services university of the health sciences',
+agency_primary=='dod' & str_detect(affiliation,'uniformed services university of the health sciences bethesda') ~'uniformed services university of the health sciences',
+agency_primary=='dod' & str_detect(affiliation,'us combat casualty care research program') ~'combat casualty care research program',
+agency_primary=='dod' & str_detect(affiliation,'us combat casualty care research program') ~'combat casualty care research program',
+agency_primary=='dod' & str_detect(affiliation,'us special operations command') ~'army special operations command',
+agency_primary=='dod' & str_detect(affiliation,'walter army institute of research') ~'walter reed institute of research',
+agency_primary=='dod' & str_detect(affiliation,'us office of naval research') ~'office of naval research',
+agency_primary=='doe' & str_detect(affiliation,'doe center for bioenergy and bioproducts innovation') ~'doe center for advanced bioenergy and bioproducts innovation',
+agency_primary=='doe' & str_detect(affiliation,'us national laboratory') ~'national laboratory',
+agency_primary=='epa' & str_detect(affiliation,'epa national health and environmental effects research laboratory') ~'national health and environmental effects research laboratory',
+agency_primary=='epa' & str_detect(affiliation,'epa office of air quality planning and standards') ~'office of air quality planning and standards',
+agency_primary=='epa' & str_detect(affiliation,'epa office of research and development') ~'office of research and development',
+agency_primary=='federal reserve system' & str_detect(affiliation,'federal reserve bak of san francisco') ~'federal reserve bank of san francisco',
+agency_primary=='federal reserve system' & str_detect(affiliation,'federal reserve board of minneapolis') ~'federal reserve bank of minneapolis',
+agency_primary=='hhs' & str_detect(affiliation,'cdc monkeypox emergency response team') ~'cdc mpox emergency response team',
+agency_primary=='hhs' & str_detect(affiliation,'fda center for biologics evaluation and research') ~'center for biologics evaluation and research',
+agency_primary=='hhs' & str_detect(affiliation,'frederick national library for cancer research') ~'fredrick national laboratory for cancer research',
+agency_primary=='hhs' & str_detect(affiliation,'national institute for diabetes and digestive and kidney diseases') ~'national institute of diabetes digestive and kidney diseases',
+agency_primary=='hhs' & str_detect(affiliation,"nih office of research on women's health") ~'office of research on womens health',
+agency_primary=='hhs' & str_detect(affiliation,'nih office of research services') ~'office of research services',
+agency_primary=='hhs' & affiliation=="office of research on women's health" ~'office of research on womens health',
+agency_primary=='hhs' & str_detect(affiliation,'us public health service') ~'public health service',
+agency_primary=='nasa' & str_detect(affiliation,'nasa center for chemical evolution') ~'nsf nasa center for chemical evolution',
+agency_primary=='nasa' & str_detect(affiliation,'nasa goddard sellers exoplanet environments collaboration') ~'nasa gsfc sellers exoplanet environments collaboration',
+agency_primary=='other' & str_detect(affiliation,'us consumer product safety commission') ~'consumer product safety commission',
+agency_primary=='other' & str_detect(affiliation,'us general services administration') ~'general services administration',
+agency_primary=='other' & str_detect(affiliation,'us government accountability office') ~'government accountability office',
+agency_primary=='other' & str_detect(affiliation,'us national security council') ~'national security council',
+agency_primary=='other' & str_detect(affiliation,'us nuclear regulatory commission') ~'nuclear regulatory commision',
+agency_primary=='other' & str_detect(affiliation,'us securities and exchange commission') ~'securities and exchange commission',
+agency_primary=='state' & str_detect(affiliation,'usaid bureau for humanitarian assistance') ~'bureau for humanitarian assistance',
+agency_primary=='usda' & affiliation=='ars national soil erosion research laboratory' ~'ars national soil erosion research laboratory',
+agency_primary=='usda' & affiliation=='national laboratory for agriculture and the environment' ~'ars national laboratory for agriculture and the environment',
+agency_primary=='usda' & str_detect(affiliation,'ars national center for cool and cold water aquaculture') ~'national center for cool and coldwater aquaculture',
+agency_primary=='usda' & str_detect(affiliation,'ars national center for genetic resources preservation') ~'ars national laboratory for genetic resources preservation',
+agency_primary=='usda' & str_detect(affiliation,'ars rocky mountain research station') ~'usfs rocky mountain research station',
+agency_primary=='usda' & str_detect(affiliation,'ars sea sugarcane field station') ~'ars sugarcane field station',
+agency_primary=='usda' & str_detect(affiliation,'us forest products laboratory') ~'forest products laboratory',
+agency_primary=='usda' & str_detect(affiliation,'usfs international institute of tropical forestry') ~'international institute of tropical forestry',
+agency_primary=='usda' & str_detect(affiliation,'ws national wildlife research center predator research facility') ~'national wildlife research center predator research facility',
+agency_primary=='va' & str_detect(affiliation,'va center of innovation for complex chronic healthcare') ~'center of innovation for complex chronic healthcare',
+agency_primary=='va' & str_detect(affiliation,'va elizabeth dole center of excellence for veteran and caregiver research') ~'elizabeth dole center of excellence for veteran and caregiver research',
+agency_primary=='va' & str_detect(affiliation,'va hsrandd center for health information and communication') ~'hsr center for health information and communication',
+agency_primary=='va' & str_detect(affiliation,'va national center for ptsd') ~'national center for ptsd',
+
+agency_primary=='commerce' & str_detect(affiliation,'national oceanic and amp; atmospheric administration swfsc') ~'noaa southwest fisheries science center',
+agency_primary=='commerce' & str_detect(affiliation,'noaa swfsc') ~'noaa southwest fisheries science center',
+agency_primary=='commerce' & affiliation=='national oceanic and atmospheric adimnistration' ~'noaa',
+agency_primary=='hhs' & str_detect(affiliation,'fda center for biologics evaluation and research') ~'center for biologics evaluation and research',
+    
       affiliation == "us forest service" ~ "usfs",
       affiliation == "us centers for disease control" ~ "cdc",
       affiliation == "national aeronautics and space administration" ~ "nasa",
@@ -2792,7 +3082,9 @@ ID_fed_affiliations <- function(affils_df, scopus_ids_searched) {
       affiliation == "enivronmental protection agency" ~ "epa",
       affiliation == "national science foundation" ~ "nsf",
       .default = as.character(affiliation)
-    ))
+    )
+)
+
 
 
   affils_df_corrected <- affils_df_corrected %>%

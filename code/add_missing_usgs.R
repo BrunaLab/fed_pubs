@@ -4,7 +4,7 @@ add_missing_usgs<-function(papers_df_trim,authors_df_trim){
   
   # by DOI
   
-  usgs_papers<-read_rds("./data_clean/usgs_papers_clean_2026-01-13.rds")
+  usgs_papers<-read_rds("./data_clean/usgs_papers_clean.rds")
   usgs_with_DI<-usgs_papers %>% filter(!is.na(DI))
   usgs_already_in_papers_df<-papers_df_trim %>% 
     filter(DI%in%usgs_with_DI$DI) %>% 
@@ -15,7 +15,7 @@ add_missing_usgs<-function(papers_df_trim,authors_df_trim){
     mutate(source="usgs_database")
   
   # and these are the authors of those papers
-  usgs_authors<-read_rds("./data_clean/usgs_authors_clean_2026-01-13.rds") 
+  usgs_authors<-read_rds("./data_clean/usgs_authors_clean.rds") 
   
   usgs_authors_for_papers_NOT<- usgs_authors %>% 
     filter(usgs_refID %in%usgs_NOT_in_papers_df$usgs_refID)

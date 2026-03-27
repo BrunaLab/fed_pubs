@@ -5,9 +5,9 @@ fix_usgs_affils <- function(authors_to_fix, papers_to_fix) {
   # authors_to_fix<-authors_df_trim
   # papers_to_fix<-papers_df_trim
 
-  usgs_papers <- read_rds("data_clean/usgs_papers_clean_2026-02-03.rds")
+  usgs_papers <- read_rds("data_clean/usgs_papers_clean.rds")
 
-  usgs_authors <- read_rds("data_clean/usgs_authors_clean_2026-02-03.rds")
+  usgs_authors <- read_rds("data_clean/usgs_authors_clean.rds")
   usgs_authors <- usgs_authors %>%
     filter(federal == TRUE)
 

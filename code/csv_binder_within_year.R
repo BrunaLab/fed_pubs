@@ -35,168 +35,27 @@ library(here)
 # date<-"20260101"
 
 
-data<-paste0("scopus_downloads/",cat,"_",date)
-
-if (cat =="fed"){
-  folder<-c(
-    "usgs",
-    # "2019", # 1
-    "2020", # 2
-    "2021", # 3
-    "2022", # 4
-    "2023", # 5
-    "2024", # 6
-    "2025", # 7
-    "2026"
-    ) # 8
-}else if(cat=="uni"){
-  folder<-c(
-    # "2019_uni_20251010", # 1
-    # "2020_uni_20251010", # 2
-    # "2021_uni_20251010", # 3
-    # "2022_uni_20251010", # 4
-    # "2023_uni_20251010", # 5
-    # "2024_uni_20251010", # 6
-    # "2025_uni_20251010", # 7
-    # "2019_uni_20250901", # 1
-    # "2020_uni_20250901", # 2
-    # "2021_uni_20250901", # 3
-    # "2022_uni_20250901", # 4
-    # "2023_uni_20250901", # 5
-    # "2024_uni_20250901", # 6
-    # "2025_uni_20250901"  # 7
-    
-    # "2019", # 1
-    "2020", # 2
-    "2021", # 3
-    "2022", # 4
-    "2023", # 5
-    "2024", # 6
-    "2025", # 7
-    "2026" # 8
-    ) 
-}else{
-  stop("ERROR: Please enter 'fed' or 'uni' for the variable 'cat'")
+  # Configuration ----
+  data_path <- paste0("scopus_downloads/", cat, "_", date)
+  
+  folders <- if (cat == "fed") {
+    c("usgs", "2020", "2021", "2022", "2023", "2024", "2025", "2026")
+  } else if (cat == "uni") {
+    c("2020", "2021", "2022", "2023", "2024", "2025", "2026")
+  } else {
+    stop("ERROR: Please enter 'fed' or 'uni' for the variable 'cat'")
   }
-
-
-# create folders - subfolder for cats --------------------------------------
-
-
-# setting up the main directory
-main_dir1 <- "./data_raw"
-
-# setting up the sub directory
-sub_dir1 <- paste(cat,"_",date,sep="")
-
-# check if sub directory exists 
-if (file.exists(sub_dir1)){
   
-  # specifying the working directory
-  setwd(file.path(main_dir1, sub_dir1))
-} else {
+
+
+  # Setup directory structure ----
+  base_dir <- file.path("data_raw", paste0(cat, "_", date))
+  dir.create(base_dir, showWarnings = FALSE, recursive = TRUE)
   
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir1, sub_dir1))
-  
-}
-
-# create folders - papers records --------------------------------------
-
-
-# setting up the main directory
-main_dir2 <- paste(main_dir1,"/",sub_dir1,sep="")
-
-# setting up the sub directory
-sub_dir2 <- "papers"
-
-# check if sub directory exists 
-if (file.exists(sub_dir2)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir2, sub_dir2))
-} else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir2, sub_dir2))
-  
-}
-
-main_dir3 <- paste(main_dir2,"/papers",sep="")
-main_dir4 <- paste(main_dir2,"/authors",sep="")
-main_dir5 <- paste(main_dir2,"/affils",sep="")
-
-
-
-
-# create folders - authors records --------------------------------------
-
-
-
-# setting up the sub directory
-sub_dir4 <- "authors"
-
-# check if sub directory exists 
-if (file.exists(sub_dir4)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir2, sub_dir4))
-} else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir2, sub_dir4))
-  
-}
-
-
-
-# create folders - affils records --------------------------------------
-
-
-# setting up the sub directory
-sub_dir5 <- "affils"
-
-# check if sub directory exists 
-if (file.exists(sub_dir5)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir2, sub_dir5))
-} else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir2, sub_dir5))
-  
-}
-
-
-
-
-# create folders - incomplete records --------------------------------------
-
-
-# setting up the main directory
-
-
-
-# setting up the sub directory
-sub_dir6 <- "incomplete_records_removed"
-
-# check if sub directory exists 
-if (file.exists(sub_dir6)){
-  
-  # specifying the working directory
-  setwd(file.path(main_dir2, sub_dir6))
-} else {
-  
-  # create a new sub directory inside
-  # the main path
-  dir.create(file.path(main_dir2, sub_dir6))
-  
-}
+  subdirs <- c("papers", "authors", "affils", "incomplete_records_removed")
+  for (subdir in subdirs) {
+    dir.create(file.path(base_dir, subdir), showWarnings = FALSE, recursive = TRUE)
+  }
 
 
 

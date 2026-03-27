@@ -1,4 +1,4 @@
-make_figs_uni <- function(date,PM_max,PY_max,author_position) {
+make_figs_uni <- function(date,PM_max,PY_min_analyses,PY_max,author_position) {
 
   library(tidyverse)
 library(janitor)
@@ -71,10 +71,14 @@ if (author_position=="anywhere"){
 }else if(author_position=="first"){ 
   
   papers_dataset<-read_csv("./data_clean/for_pub/papers_df_uni_first.csv") 
-  papers_dataset<-as.data.frame(papers_dataset)
+  papers_dataset<-as.data.frame(papers_dataset) %>% 
+    filter(PY<=PY_max) %>% 
+    filter(PY>=PY_min_analyses) 
   
   authors_dataset<-read_csv("./data_clean/for_pub/authors_df_uni_first.csv") 
-  authors_dataset<-as.data.frame(authors_dataset)
+  authors_dataset<-as.data.frame(authors_dataset) %>% 
+    filter(PY<=PY_max) %>% 
+    filter(PY>=PY_min_analyses) 
   # papers_with_all_feds<-read_csv("./data_clean/for_pub/papers_df_uni_first.csv") 
   # papers_with_all_feds<-as.data.frame(papers_with_all_feds)
 }else{
@@ -387,21 +391,25 @@ journals_n_perc_annual_first <- jrnls_yr_first %>%
               values_from = c(n,perc)
   ) %>% 
   select(SO,
-         n_yr_2025,
-         perc_yr_2025,
-         n_yr_2024,
-         perc_yr_2024,
-         n_yr_2023,
-         perc_yr_2023,
-         n_yr_2022,
-         perc_yr_2022,
-         n_yr_2021,
-         perc_yr_2021,
-         # n_yr_2019,
-         # perc_yr_2019,
-         n_yr_2020,
-         perc_yr_2020
-         )     
+         starts_with("n_yr_"),
+         starts_with("perc_yr_")
+  )
+  # select(SO,
+  #        n_yr_2025,
+  #        perc_yr_2025,
+  #        n_yr_2024,
+  #        perc_yr_2024,
+  #        n_yr_2023,
+  #        perc_yr_2023,
+  #        n_yr_2022,
+  #        perc_yr_2022,
+  #        n_yr_2021,
+  #        perc_yr_2021,
+  #        # n_yr_2019,
+  #        # perc_yr_2019,
+  #        n_yr_2020,
+  #        perc_yr_2020
+  #        )     
 
 
 
